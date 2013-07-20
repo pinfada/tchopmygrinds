@@ -9,10 +9,16 @@ gem 'sqlite3'
 
 group :development do
   gem "rspec-rails", "~> 2.13.2"
+  gem "autotest", "~> 4.4.6"
 end
 
 group :test do
+  gem 'cucumber-rails', :require => false
+  gem 'cucumber-rails-training-wheels'
   gem "webrat-rspec-rails", "~> 0.1.1"
+  gem "autotest-rails-pure", "~> 4.1.2"
+  gem "spork", "~> 0.9.2"
+  gem "xpath", "~> 2.0.0"
 end
 
 # Gems used only for assets and not required
