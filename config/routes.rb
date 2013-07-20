@@ -5,6 +5,8 @@ StatExo1::Application.routes.draw do
 
   get "pages/Propos"
 
+  get "pages/Aide"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

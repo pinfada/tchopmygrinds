@@ -10,4 +10,8 @@ class PagesController < ApplicationController
   def Propos
   	@titre = "Propos"
   end
+
+  def Aide
+  	@titre = "Aide"
+  end
 end
