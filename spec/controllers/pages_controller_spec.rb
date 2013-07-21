@@ -11,7 +11,7 @@ describe PagesController do
 
     it "devrait avoir le bon titre" do
       get 'home'
-      expect(response.body).to have_title("| Accueil")
+      expect(response.body).to have_title("| #{@titre}")
     end
   end
 
@@ -23,7 +23,7 @@ describe PagesController do
 
     it "devrait avoir le bon titre" do
       get 'contact'
-      expect(response.body).to have_title("| Contact")
+      expect(response.body).to have_title("| #{@titre}")
     end
   end
 
@@ -35,7 +35,7 @@ describe PagesController do
 
     it "devrait avoir le bon titre" do
       get 'Propos'
-      expect(response.body).to have_title("| Propos")
+      expect(response.body).to have_title("| #{@titre}")
     end
   end
 
@@ -47,7 +47,7 @@ describe PagesController do
 
     it "devrait avoir le bon titre" do
       get 'Aide'
-      expect(response.body).to have_title("| Aide")
+      expect(response.body).to have_title("| #{@titre}")
     end
   end
 
