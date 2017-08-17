@@ -12,4 +12,21 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require turbolinks
+//= require angular
+//= require angular-simple-logger
+//= require ui-leaflet
+//= require leaflet
+//= require angular-rails-templates
+//= require angular-route
+//= require angular-ui-bootstrap
+//= require angular-ui-bootstrap-tpls
+//= require angular-leaflet
+//= require leaflet.js.erb
+//= require leaflet.awesome-markers
+//= require angularjs/rails/resource
+//= require js-routes
+//= require app
+//= require location
+//= require_tree ../partials
 //= require_tree .

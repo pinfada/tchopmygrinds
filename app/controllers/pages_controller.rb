@@ -1,4 +1,6 @@
 class PagesController < ApplicationController
+  respond_to :html, :json
+  
   def home
   	@titre = "Accueil"
   end
@@ -7,11 +9,11 @@ class PagesController < ApplicationController
   	@titre = "Contact"
   end
 
-  def Propos
+  def propos
   	@titre = "Propos"
   end
 
-  def Aide
+  def aide
   	@titre = "Aide"
   end
 end

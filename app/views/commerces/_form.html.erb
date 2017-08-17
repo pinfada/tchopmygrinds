@@ -1,0 +1,33 @@
+<div class="site-content">
+  <form>
+    <%= simple_form_for(@commerce, html: { class: 'form-horizontal' }) do |f| %>
+      <%= f.error_notification %>
+    
+      <div class="form-inputs">
+        <%= f.input :name, label: 'nom', error: 'Username is mandatory, please specify one'  %>
+        <%= f.input :adress1 %>
+        <%= f.input :adress2 %>
+        <%= f.input :details %>
+        <%= f.input :postal %>
+        <%= f.input :country %>
+        <%= f.input :latitude %>
+        <%= f.input :longitude %>
+        <%= f.input :city %>
+      </div>
+    
+    	<div class="form-group">
+    		<%= hidden_field_tag "commerce[product_ids][]", nil %>
+    		<% Product.all.each do |product| %>
+    			<%= check_box_tag "commerce[product_ids][]", product.id, @commerce.product_ids.include?(product.id) %>
+    			<%= product.name %>
+    		<% end %>
+    	</div>
+    
+      <div class="form-actions">
+        <%= f.button :submit %>
+      </div>
+    <% end %>
+  </form>
+</div>
+    
+

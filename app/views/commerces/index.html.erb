@@ -1,0 +1,50 @@
+<p id="notice"><%= notice %></p>
+
+<div class="site-content">
+
+<h1>Commerces</h1>
+
+<br>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Adress1</th>
+      <th>Adress2</th>
+      <th>Details</th>
+      <th>Postal</th>
+      <th>Country</th>
+      <th>Latitude</th>
+      <th>Longitude</th>
+      <th>City</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @commerces.each do |commerce| %>
+      <tr>
+        <td><%= commerce.name %></td>
+        <td><%= commerce.adress1 %></td>
+        <td><%= commerce.adress2 %></td>
+        <td><%= commerce.details %></td>
+        <td><%= commerce.postal %></td>
+        <td><%= commerce.country %></td>
+        <td><%= commerce.latitude %></td>
+        <td><%= commerce.longitude %></td>
+        <td><%= commerce.city %></td>
+        <td><%= link_to 'Show', commerce %></td>
+        <td><%= link_to 'Edit', edit_commerce_path(commerce) %></td>
+        <td><%= link_to 'Destroy', commerce, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Commerce', new_commerce_path %>
+</div>
+
+

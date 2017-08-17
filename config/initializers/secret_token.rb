@@ -4,4 +4,4 @@
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-StatExo1::Application.config.secret_token = '82a76e373cc0d66b05315f732f6875d9643c9030505420950dbc01b327e20ac61f23e9a85062ed4df515c9ae2b3ae299c4e0a856ee302848b55b9fc1def078e3'
+StatExo1::Application.config.secret_token = 'b3ab19c9f2bc5bc02b9b18157ecc0adb890d847da9cff7a71664f81ac94e4e3ebf5191358ee1a9bde7a51723e1f25f75755bc984cec7051a0127cab015bf573e'

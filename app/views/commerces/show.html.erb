@@ -1,0 +1,62 @@
+<p id="notice"><%= notice %></p>
+
+<div class="site-content">
+
+<p>
+  <strong>Name:</strong>
+  <%= @commerce.name %>
+</p>
+
+<p>
+  <strong>Adress1:</strong>
+  <%= @commerce.adress1 %>
+</p>
+
+<p>
+  <strong>Adress2:</strong>
+  <%= @commerce.adress2 %>
+</p>
+
+<p>
+  <strong>Details:</strong>
+  <%= @commerce.details %>
+</p>
+
+<p>
+  <strong>Postal:</strong>
+  <%= @commerce.postal %>
+</p>
+
+<p>
+  <strong>Country:</strong>
+  <%= @commerce.country %>
+</p>
+
+<p>
+  <strong>Latitude:</strong>
+  <%= @commerce.latitude %>
+</p>
+
+<p>
+  <strong>Longitude:</strong>
+  <%= @commerce.longitude %>
+</p>
+
+<p>
+  <strong>City:</strong>
+  <%= @commerce.city %>
+</p>
+
+
+<h3>Commerces à proximité</h3>
+<ul>
+<% for commerce in @commerce.nearbys(10) %>
+  <li><%= link_to commerce.adress1, commerce %> (<%= commerce.distance.round(2) %> miles)</li>
+<% end %>
+</ul>
+
+
+<%= link_to 'Edit', edit_commerce_path(@commerce) %> |
+<%= link_to 'Back', commerces_path %>
+
+</div>

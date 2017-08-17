@@ -4,7 +4,7 @@ require File.expand_path('../boot', __FILE__)
 require "active_record/railtie"
 require "action_controller/railtie"
 require "action_mailer/railtie"
-require "active_resource/railtie"
+#require "active_resource/railtie"
 require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
@@ -17,6 +17,9 @@ end
 
 module StatExo1
   class Application < Rails::Application
+    # Use the responders controller from the responders gem
+    config.app_generators.scaffold_controller :responders_controller
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -57,10 +60,16 @@ module StatExo1
     # This will create an empty whitelist of attributes available for mass-assignment for all models
     # in your app. As such, your models will need to explicitly whitelist or blacklist accessible
     # parameters by using an attr_accessible or attr_protected declaration.
-    config.active_record.whitelist_attributes = true
+    # config.active_record.whitelist_attributes = false
 
     # Enable the asset pipeline
     config.assets.enabled = true
+
+    config.angular_templates.module_name    = 'templates'
+    config.angular_templates.ignore_prefix  = %w(partials/)
+    config.angular_templates.inside_paths   = ['app/assets']
+    # config.angular_templates.markups        = %w(erb str haml slim md)
+    config.angular_templates.extension      = 'html'
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'

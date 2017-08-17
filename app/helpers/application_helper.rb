@@ -4,7 +4,7 @@ module ApplicationHelper
     base_titre = "Premiere app tuto ruby on rails"
     if titre.empty?
       base_titre
-   # Dans le cas ou le titre est renseigné
+    # Dans le cas ou le titre est renseigné
     else
       "#{base_titre} | #{@titre}"
     end

@@ -1,51 +1,58 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.13'
+ruby '2.2.2'
+# gem 'rails', '3.2.13'
+gem 'rails', '~> 5.0', '>= 5.0.1'
+gem 'rack'
 
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
+# Rails defaults
+gem 'sass-rails', '~> 5.0'
+gem 'uglifier', '>= 1.3.0'
+gem 'coffee-rails', '~> 4.2'
+gem 'jquery-rails'
+gem 'turbolinks', '~> 5'
+gem 'jbuilder', '~> 2.5'
+group :development, :test do
+  gem 'byebug', platform: :mri
+end
+group :development do
+  gem 'web-console'
+  gem 'listen', '~> 3.0.5'
+  gem 'spring'
+  gem 'spring-watcher-listen', '~> 2.0.0'
+end
 
-gem 'sqlite3'
+# learn-rails
+gem 'bootstrap-sass'
+gem 'gibbon'
+gem 'bower-rails'
+gem 'leaflet-rails', '~> 1.0', '>= 1.0.2'
+gem 'angularjs-rails', '~> 1.6', '>= 1.6.1'
+gem 'angularjs-rails-resource', '~> 2.2', '>= 2.2.2'
+gem 'angular-rails-templates'
+gem 'angular-ui-bootstrap-rails', '~> 1.3', '>= 1.3.2'
+gem 'angular-leaflet-rails', '~> 0.1.0.6'
+gem 'angular_rails_csrf'
+gem 'leaflet-awesome-markers-rails', '~> 2.0', '>= 2.0.2'
+gem 'js-routes'
+gem 'high_voltage'
+gem 'simple_form'
+gem 'country_select', '~> 3.0'
+gem 'font-awesome-rails'
+gem "responders"
+gem 'sprockets'
+gem 'geocoder', '~> 1.4', '>= 1.4.1'
+gem 'faker', '~> 1.7', '>= 1.7.1'
 
 group :development do
-  gem "rspec-rails", "~> 2.13.2"
-  gem "autotest", "~> 4.4.6"
+  gem 'better_errors'
+  gem 'rails_layout'
+  gem 'sqlite3'
 end
-
+group :production do
+  gem 'pg'
+end
 group :test do
-  gem 'cucumber-rails', :require => false
-  gem 'cucumber-rails-training-wheels'
-  gem "webrat-rspec-rails", "~> 0.1.1"
-  gem "autotest-rails-pure", "~> 4.1.2"
-  gem "spork", "~> 0.9.2"
-  gem "xpath", "~> 2.0.0"
+  gem 'minitest-spec-rails'
+  gem 'minitest-rails-capybara'
 end
-
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
-
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem 'therubyracer', :platforms => :ruby
-
-  gem 'uglifier', '>= 1.0.3'
-end
-
-gem 'jquery-rails'
-
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
-
-# To use Jbuilder templates for JSON
-# gem 'jbuilder'
-
-# Use unicorn as the app server
-# gem 'unicorn'
-
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-# gem 'debugger'

@@ -1,11 +1,17 @@
 StatExo1::Application.routes.draw do
-  get "pages/home"
+  
+  resources :commerces do
+    collection do
+      get :search
+    end
+  end
+  resources :products
+  match '/home', to: 'pages#home', via: 'get'
+  match '/contact', to: 'pages#contact', via: 'get'
+  match '/propos', to: 'pages#propos', via: 'get'
+  match '/aide', to: 'pages#aide', via: 'get'
 
-  get "pages/contact"
-
-  get "pages/Propos"
-
-  get "pages/Aide"
+  root :to => "pages#home"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
