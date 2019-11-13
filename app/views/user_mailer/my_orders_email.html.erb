@@ -1,0 +1,11 @@
+<h1>Bienvenu sur tchopmygrinds.com, <%= @email %></h1>
+<p>
+	Vos commandes : <br>
+</p>
+<p>
+	<% @orders.each do |order| %>
+		<%= order.id %>
+		<%= order.user %>
+		<%= order.status %>
+	<% end %>
+</p>

@@ -1,7 +1,7 @@
 module ApplicationHelper
   # Retourner un titre basé sur la page.
   def full_title(titre)
-    base_titre = "Premiere app tuto ruby on rails"
+    base_titre = "Tchopmygrinds"
     if titre.empty?
       base_titre
     # Dans le cas ou le titre est renseigné

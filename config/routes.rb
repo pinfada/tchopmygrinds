@@ -1,17 +1,54 @@
 StatExo1::Application.routes.draw do
   
-  resources :commerces do
-    collection do
-      get :search
-    end
-  end
-  resources :products
+  mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
+  devise_for :users, controllers: { 
+  #  sessions: 'users/sessions',
+    registrations: 'registrations'
+  }
+  
+  #resources :commerces do
+  #  collection do
+  #    get :search
+  #  end
+  #end
+  
   match '/home', to: 'pages#home', via: 'get'
   match '/contact', to: 'pages#contact', via: 'get'
   match '/propos', to: 'pages#propos', via: 'get'
   match '/aide', to: 'pages#aide', via: 'get'
 
-  root :to => "pages#home"
+  concern :productable do
+    resources :products
+  end
+  
+  concern :ordertable do
+    resources :orderdetails
+  end
+  
+  concern :categorizable do
+    resources :categorizations
+  end
+  
+  resources :commerces, concerns: [:productable, :categorizable] do
+    collection do
+      get :search
+    end
+  end
+  
+  resources :users do
+    resources :orders, concerns: [:productable, :ordertable]
+  end
+  
+  resources :useradresses
+  resources :products, concerns: [:categorizable, :ordertable] do
+    collection do
+      get :listproduct
+      get :listcommerce
+    end
+  end
+
+
+  root "pages#home"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

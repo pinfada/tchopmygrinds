@@ -1,0 +1,47 @@
+Salut <%= @user.name %>
+
+Votre commande a été Validée avec succès
+S'il vous plaît trouver les détails de la commande ci-dessous :
+
+Une fois votre colis expédié, nous vous enverrons un courrier électronique avec un lien pour suivre votre commande. Votre récapitulatif de commande est ci-dessous. Une fois de plus, Merci pour votre confiance.
+Email: info@tchopmygrinds.com
+
+<br >
+<% @order.each do |order| %>
+	<% @products.each do |product| %>
+		Votre commande # <%= order.id %>
+		A la date du : <%= order.created_at %>
+		Produit : <%= product.name %>
+		<% quant_val = OrderDetail.where(order_id: order.id) %>
+		<% quant_val.each do |quantity_value| %>
+			Quantité : <%= quantity_value.quantity %>
+		<% end %>
+		Unit Price : <%=  product.unitprice %>
+	<% end %>
+
+	ADRESSE DE FACTURATION :
+
+	<% billing_address = Useradresse.where(id: order.payment_address_id) %>
+	<% billing_address.each do |b_address| %>
+	Billing Address : <%= "Address 1: #{b_address.address_1} " %>
+										<%= "Address 2: #{b_address.address_2} " %>
+										<%= "City: #{b_address.city}" %>
+										<%= "State: #{b_address.state}" %>
+										<%= "Country: #{b_address.country}" %>
+										<%= "Zip Code: #{b_address.zipcode}" %>
+	<% end %>
+
+	ADRESSE DE LIVRAISON :
+
+	<% shipping_address = Useradresse.where(id: order.delivery_address_id) %>
+	<% shipping_address.each do |s_address| %>
+	Shipping Address :  <%= "Address 1:  #{s_address.address_1} " %>
+										  <%= "Address 2: #{s_address.address_2} " %>
+											<%= "City: #{s_address.city}" %>
+											<%= "State: #{s_address.state}" %>
+											<%= "Country: #{s_address.country}" %>
+											<%= "Zip Code: #{s_address.zipcode}" %>
+	<% end %>
+
+	PAYMENT METHOD: <%=  %>
+<% end %>

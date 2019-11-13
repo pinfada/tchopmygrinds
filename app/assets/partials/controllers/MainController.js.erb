@@ -1,0 +1,266 @@
+(function() {
+    'use strict';
+    var module = angular.module('marketApp');
+
+
+module.controller('MainController', [
+    '$scope',
+    '$compile',
+    '$window',
+    '$uibModal',
+    '$log',
+    '$http',
+    'nemSimpleLogger',
+    'leafletData',
+    'coordinates', 
+    'myCoordinates', 
+    'markers', 
+    'boutiques',
+    'myBoutiques',
+    'SearchCommerce',
+    'GetAllCommerce',
+    '$route',
+    '$routeParams',
+    'Auth',
+    'ngCart',
+    function($scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart) {
+
+        ngCart.setTaxRate(7.5);
+        ngCart.setShipping(2.99);
+    
+        //map = L.mapquest.map('map', {
+        //    center: [47.4550213, -0.5370654],
+        //    layers: [tileLayer],
+        //    zoom: 12
+        //});
+
+        coordinates.getCoordinates().then(function (resultcoord) {
+            var map = null;
+            var mapquest_key = 'qH6FPb3ABRz7fD8LSYwfTGGhw4QASLSn';
+    
+            //nemSimpleLogger.doLog = true; //default is true 
+            //nemSimpleLogger.currentLevel = nemSimpleLogger.LEVELS.debug;//defaults to error only 
+    
+            L.mapquest.key = mapquest_key; //Cle API mapquest
+            L.mapquest.open = true; // Permet d'utiliser les fonctionnalités de openstreet
+            // The ID of a map style. The supported style IDs are 'map', 'hybrid', 'satellite', 'light', 'dark'.
+            var tileLayer = L.mapquest.tileLayer('map');
+            map = L.mapquest.map('map', {
+                center: [resultcoord.lat, resultcoord.lng],
+                layers: [tileLayer],
+                zoom: 12
+            });
+
+            // Controle de la map (localisation, zoom etc...)
+            map.addControl(L.mapquest.control());
+            
+            // Affichage des commerces à proximité si l'utilisateur s'est authentifié
+            if (Auth.isAuthenticated() )
+            {
+                Auth.currentUser().then(function(user) {
+                    // Récupération des coordonnées(x,y) des boutiques et affichage sur la map
+    	            boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
+                        angular.forEach(boutique, function(obj1, key) {
+                            if(typeof obj1 !== "undefined") {
+                                var total = obj1.length}
+                            for(var i=0; i<total; i++) {
+                                var commentaire = "";
+                                var result = obj1[i];
+                                 // Rechercher tous les commerces qui ont le meme nom
+                        	    markers.getMarkers(result).then(function (response) {
+                                    // Récupération des coordonnées de l'enseigne commerciale
+                                    var boutique_place = " ";
+                                    var customIcon = "";
+                                    // si le user qui se connecte est un vendeur
+                                    if (user.seller_role == true){
+                                        boutique_place = [response.allData.shapePoints[0], response.allData.shapePoints[1]];
+                                        var ouvr = 'ouvr'+response.allData.resultNumber;
+                                        $scope[ouvr] = function () {
+                                            $uibModal.open({
+                                                templateUrl: "<%= asset_path('Templates/myModalProduct.html') %>", // loads the template
+                                                controller: "modalProduct",
+                                                backdrop: false, // setting backdrop allows us to close the modal window on clicking outside the modal window
+                                                size: 'lg',
+                                                resolve: {
+                                                    name: function () {
+                                                        return response.allData.fields.name; // Récupération du nom du commerce
+                                                    }
+                                                }
+                                            });
+                                        };
+                                        
+                                        // Customisation des Icons utiliser pour la map
+                                        customIcon = L.mapquest.icons.marker({
+                                            primaryColor: '#22407F',
+                                            secondaryColor: '#3B5998',
+                                            shadow: true,
+                                            size: 'md'
+                                //          symbol: 'A'
+                                        });
+                                        
+                                        commentaire = "Pour adh&eacuterer... <br /><button class='btn' ng-click='open"+ response.allData.resultNumber +"()'>Cliquez sur moi</button>";
+                                        // Accéssible uniquement pour les commerçants
+                                        var open = 'open'+response.allData.resultNumber;
+                                        $scope[open] = function () {
+                                            $uibModal.open({
+                                                ariaLabelledBy: 'modal-title',
+                                                ariaDescribedBy: 'modal-body',
+                                                templateUrl: 'myModalContent.html', // loads the template
+                                                backdrop: false, // setting backdrop allows us to close the modal window on clicking outside the modal window
+                                                windowClass: 'modal', // windowClass - additional CSS class(es) to be added to a modal window template
+                                                size: 'lg',
+                                                controller: function ($scope, $uibModalInstance, $log) {
+                                                    var commerce = {
+                                                        name: response.allData.fields.name,
+                                                        adress1: response.allData.fields.address,
+                                                        adress2: '',
+                                                        details: '',
+                                                        postal: response.allData.fields.postal_code,
+                                                        country:response.allData.fields.country,
+                                                        latitude: response.allData.fields.lat,
+                                                        longitude: response.allData.fields.lng,
+                                                        city: response.allData.fields.city,
+                                                        product_ids: ''
+                                                    };
+                                                    $scope.commerce = commerce;
+                                                    
+                                                    $scope.newCommerce = function () {
+                                                        $log.log(commerce);
+                                                        new GetAllCommerce(
+                                                            commerce 
+                                                        ).create();
+                                                        $route.reload();
+                                                    };
+                                                    
+                                                    $scope.cancel = function () {
+                                                        $uibModalInstance.close(false); 
+                                                    };
+                                                    
+                                                    // console.log($scope.produits)
+                                                    $scope.submit = function () {
+                                                        $log.log('Submiting commerce info.'); // kinda console logs this statement
+                                                    //    $log.log(commerce);
+                                                    //    new GetAllCommerce(
+                                                    //        commerce 
+                                                    //    ).create();
+                                                        $uibModalInstance.close('cancel');
+                                                        $route.reload();
+                                                    };
+                                                },
+                                                resolve: {
+                                                    commerce: function () {
+                                                        return $scope.commerce;
+                                                    }
+                                                }
+                                            });// end of modal.open
+                                        }; // end of scope.open function
+                                        if (response.dataReturned == true) {
+                                            // Customisation de l'Icon pour les commerces déjà presents en base
+                                            customIcon = L.icon({
+                                                iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
+                                                iconSize: [35, 35], // size of the icon
+                                                });
+                                            commentaire = "D&eacuteja adh&eacuterent.<br /> Pour ajouter vos produits <br /><button class='btn' ng-click='ouvr"+ response.allData.resultNumber +"()'>Cliquez ici</button>";
+                                        }
+                                    } else {
+                                        // Si le user est un acheteur
+                                        if (response.dataReturned == true) {
+                                            boutique_place = [response.allData.shapePoints[0], response.allData.shapePoints[1]];
+                                            // Customisation de l'Icon pour les commerces déjà presents en base
+                                            customIcon = L.icon({
+                                                iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
+                                                iconSize: [35, 35], // size of the icon
+                                                });
+                                            commentaire = "Commerce adh&eacuterent.<br /> Pour Commandez vos produits <br /><button class='btn' ng-click='ouvr"+ response.allData.resultNumber +"()'>Cliquez ici</button>";
+                                        }
+                                    }
+                                    
+                                    var html =  
+                                            "<div>"
+                                            +"    <script type='text/ng-template' id='myModalContent.html'>"
+                                            +"        <div class='modal-header'>"
+                                            +"          <h3 class='modal-title' id='modal-title'>Section Commerce</h3>"
+                                            +"        </div>"
+                                            +"        <form ng-submit='submit()' novalidate>"
+                                            +"              <div class='modal-body' id='modal-body'>"
+                                            +"                  <uib-tabset active='active'>"
+                                            +"                    <uib-tab index='0' heading='Commerce'>"
+                                            +"                      <br/>"
+                                            +"                      <div class='row'>"
+                                            +"                      <div class='col-md-8'>"
+                                            +"                      <div class='form-group'>"
+                                            +"                          <label class='control-label'>Commerce </label>"
+                                            +"                          <input class='form-control' type='text' ng-model='commerce.name' />"
+                                            +"                      </div>"
+                                            +"                      <div class='form-group'>"
+                                            +"                          <label class='control-label'>Adresse</label>"
+                                            +"                          <input class='form-control' type='text' ng-model='commerce.adress1' />"
+                                            +"                      </div>"
+                                            +"                      <div class='form-group'>"
+                                            +"                          <label class='control-label'>Adresse complémentaire</label>"
+                                            +"                          <input class='form-control' type='text' ng-model='commerce.adress2' />"
+                                            +"                      </div>"
+                                            +"                      <div class='form-row'>"
+                                            +"                          <div class='form-group col-md-6'>"
+                                            +"                              <label class='control-label' id='inputCity'>Ville</label>"
+                                            +"                              <input class='form-control' type='text' ng-model='commerce.city' />"
+                                            +"                          </div>"
+                                            +"                          <div class='form-group col-md-4'>"
+                                            +"                              <label class='control-label' id='inputState'>Etat</label>"
+                                            +"                              <input class='form-control' type='text' ng-model='commerce.country' />"
+                                            +"                          </div>"
+                                            +"                          <div class='form-group col-md-2'>"
+                                            +"                              <label class='control-label' id='inputZip'>Zip</label>"
+                                            +"                              <input class='form-control' type='text' ng-model='commerce.postal' />"
+                                            +"                          </div>"
+                                            +"                      </div>"
+                                            +"                      </div>"
+                                            +"                      <div class='col-md-4'>"
+                                            +"                          <input type='button' ng-click='newCommerce(commerce)' class='btn btn-primary mb-2' value='Save'>"
+                                            +"                      </div>"
+                                            +"                      </div>"
+                                            +"                    </uib-tab>"
+                                            +"                  </uib-tabset>"
+                                            +"              </div>"
+                                            +"              <div class='modal-footer'>"
+                                            +"                  <button type='button' class='btn btn-warning' ng-click='cancel()'>Cancel</button>"
+                                            +"                  <button type='submit' class='btn primary-btn'>Valider</button>"
+                                            +"              </div>"
+                                            +"        </form>"
+                                            +"    </script>"
+                                            +     commentaire
+                                            +"</div>";
+                                    
+                                    // Compile title DOM into a link function
+                                    var linkFn = $compile(angular.element(html));
+                                    
+                                    // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
+                                    var popup = linkFn($scope);
+                                    
+                                    //var popup_content = '<div><strong>' + response.dataName + ' </strong> situé au ' + response.allData.fields.address + ' ' + commentaire + '</div>';
+                                    if (boutique_place !== " ") {
+                                        var customPopup = L.popup()
+                                            .setLatLng(boutique_place)
+                                            .setContent(popup[0])
+                                            .openOn(map);
+                                        //map.removeLayer(result);
+                                        L.marker(boutique_place, {icon: customIcon}).bindPopup(customPopup).addTo(map);
+                                    }
+    
+                        	    },
+                        	    	function(error){
+                        	    		console.log("Error Log",error.statusText);
+                                	}
+                        	    );
+                            }
+                        });
+    	            });
+                }, function(error) {
+                    // unauthenticated error
+                });
+            }
+        });
+
+    }]);
+
+})();

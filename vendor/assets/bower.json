@@ -6,6 +6,9 @@
     "angular-resource": "latest",
     "bootstrap-sass-official": "latest",
     "ui-leaflet": "latest",
-    "leaflet": "latest"
+    "leaflet": "latest",
+    "ngcart": "latest",
+    "angular-trix": "latest",
+    "ngGeolocation": "latest"
   }
 }

@@ -1,7 +1,7 @@
 <!--Entête-->
 <div class="col-md-1 general_menu startpage">
   <ul>
-    <li><a href="/" ng-click="SeeMap = !SeeMap" class="gradientmenu active"><i class="fa fa-home"></i></a></li>
+    <li><a href="/" ng-click="MapOpen = !MapOpen" class="gradientmenu active"><i class="fa fa-home"></i></a></li>
     <li><a href="search" ng-click="SeeSearch = !SeeSearch" class="gradientmenu"><i class="fa fa-sliders"></i></a></li>
   </ul>
 </div>
@@ -9,7 +9,7 @@
 
 <div class="row site">
     <!--Content-->
-    <div class="col-md-11 general_content_styles" ng-show="SeeMap">
+    <div class="col-md-11 general_content_styles" ng-show="MapOpen">
       <!--Header-->
         <div class="row">
             <div class="col-md-12 header">

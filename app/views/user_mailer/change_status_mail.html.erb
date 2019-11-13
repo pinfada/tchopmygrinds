@@ -1,0 +1,5 @@
+<h1>Bienvenu sur tchopmygrinds.com, <%= @user.name %></h1>
+<p>
+	Le statut de votre commande a été mis à jour.<br>
+</p>
+<p><%= link_to "Check Status", orders_url(order_id: @order_id) %></p>

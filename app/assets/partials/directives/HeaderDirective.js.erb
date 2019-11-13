@@ -1,0 +1,9 @@
+marketApp.directive('header', function(){
+    return {
+        restrict: 'EA',
+        templateUrl: "<%= asset_path('Templates/header.html.erb') %>",
+        scope: true,
+        transclude : true,
+        controller: 'HeaderController'
+    };
+});

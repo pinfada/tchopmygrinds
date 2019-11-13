@@ -2,18 +2,24 @@
 <html ng-app="marketApp">
   <head>
     <title><%= full_title(yield(:title)) %></title>
+    <%= stylesheet_link_tag    "https://cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.css" %>
     <%= stylesheet_link_tag    'application', media: 'all', "data-turbolinks-track" => "reload"  %>
     <%= javascript_include_tag 'application', "data-turbolinks-track" => "reload" %>
+    <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.js" %>
+    <%= javascript_include_tag "//cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js" %>
+    <%= javascript_include_tag "//cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.js" %>
     <%= csrf_meta_tag %>
-    <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/r29/html5.min.js"></script>
-    <![endif]-->
+    <%= render 'layouts/shim' %>
   </head>
   <body>
-    <div header></div>
-    <div class = "container-fluid">
-      <%= yield %>
+    <div header>
+	    <% flash.each do |key, value| %> 
+	    	<%= content_tag(:div, value, class: "alert alert-#{key}") %> 
+	    <% end %>
+      <div class = "container-fluid">
+        <%= yield %>
+      </div>
+      <%= debug(params) if Rails.env.development? %>   
     </div>
-    
   </body>
 </html>

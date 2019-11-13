@@ -1,0 +1,195 @@
+// Define the `HeeaderController` controller on the `MarketApp` module
+marketApp.controller('HeaderController', [
+  '$q', 
+  '$scope', 
+  '$uibModal', 
+  'Auth', 
+  '$http', 
+  '$route', 
+  'GetAllProduct', 
+  'SearchProduct', 
+  'SearchCommerce',
+  '$timeout', 
+  'myCoordinates', 
+  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, GetAllProduct, SearchProduct, SearchCommerce, $timeout, myCoordinates) {
+
+    var deferred = $q.defer();
+    
+    $scope.activemenu = false;
+    $scope.SeeSearch = false;
+    $scope.MapOpen = false;
+    $scope.ProfileOpen = false;
+    $scope.credentials = { email: '', password: 'password1', password_confirmation: 'password1', buyer_role: 'true' };
+
+    $scope.OpenRegistration = function () {
+        $scope.activemenu = true;
+        $uibModal.open({
+            templateUrl: "<%= asset_path('Templates/myModalRegistration.html') %>", // loads the template
+            controller: 'modalRegistration'
+        });
+    };
+
+    $scope.searchParams = {
+        "query":""
+    };
+    
+    $scope.foo = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+    
+    $scope.records = [];
+    
+    $scope.selectedIndex = 0;
+    
+    $scope.itemClicked = function ($index) {
+    //  console.log($index);
+      $scope.selectedIndex = $index;
+    };
+
+    $scope.availableSearchParams = [
+//      { key: "céréales", name: "Céreales", placeholder: "Céreales..." },
+//      { key: "tubercules", name: "Tubercules", placeholder: "Tubercules...", suggestedValues: ['Macabo', 'Igname', 'Pomme de terre', 'Manioc'] },
+      { key: "fruits", name: "Fruits", placeholder: "Fruits...", restrictToSuggestedValues: false, suggestedValues: ['Mangue', 'Banane', 'Cerise', 'Clémentine', 'Poire'] },
+      { key: "légumes", name: "Légumes", placeholder: "Légumes..", restrictToSuggestedValues: true, suggestedValues: ['Oignons', 'Haricots', 'Gombo', 'Choux', 'Echalotte'] },
+//      { key: "épices", name: "Epices", placeholder: "Epices..." }
+    ];
+
+    // Récupération de l'ensemble des produits présents en base
+    if  (Auth.isAuthenticated() ){
+      // Check on load if user signed in
+      Auth.currentUser().then(function(user) {
+        $scope.isAuthenticated = true;
+        $scope.username = user.name;
+        if (user.seller_role == true){
+            $scope.isSeller = true;
+        }
+        if (user.buyer_role == true){
+            $scope.isBuyer = true;
+        }
+      }, function(error) {
+        // Log on console to check out what the error is.
+        // console.info('Error user not signed in!');
+      });
+    }
+
+    $scope.$on('devise:login', function(event, currentUser) {
+      $scope.username = currentUser.name;
+      $scope.isAuthenticated = true;
+      if (currentUser.seller_role == true){
+          $scope.isSeller = true;
+      }
+      if (currentUser.buyer_role == true){
+          $scope.isBuyer = true;
+      }
+      myCoordinates.getCoordinates().then(function (position) {
+        GetAllProduct.query().then(function (results) {
+          // Pour chaque produits on vérifie si celui-ci est proche de notre position
+          angular.forEach(results, function (item) {
+            SearchProduct.query({name_query:item.name, lat_query:position.lat, lng_query:position.lng}).then(function (retour) {
+              $scope.name = item.name;
+              $scope.stock = item.unitsinstock;
+              if  (retour.length > 0){
+                $scope.result = true;
+              } else {
+                $scope.result = false;
+              }
+              $scope.records.push({name:$scope.name, unitsinstock:$scope.stock, result:$scope.result});
+              deferred.resolve($scope.records);
+            }, function (error) {
+                // do something about the error
+                console.log("Error Log",error.statusText);
+                deferred.reject(error);
+            });
+          });
+          // console.log("GetAllProduct", $scope.records);
+          deferred.resolve($scope.records);
+        }, function (error) {
+            // do something about the error
+            console.log("Error Log",error.statusText);
+            deferred.reject(error);
+        });
+
+        $scope.productSelected = function (item) {
+          //Récupération de l'adresse IP
+          //myCoordinates.getCoordinates().then(function (position) {
+            SearchCommerce.query({name_query:item.name, lat_query:position.lat, lng_query:position.lng}).then(function (results) {
+                //console.log("donnée renseignée", results);
+                $scope.commercenear = results;
+                //console.log($scope.commercenear);
+                $uibModal.open({
+                    templateUrl: "<%= asset_path('Templates/myModalCommercelist.html') %>", // loads the template
+                    controller: 'modalCommercelist',
+                    size: 'large',
+                    resolve: {
+                      commercenear: function() {
+                        return { 
+                          listcommerce: $scope.commercenear
+                        };
+                      }
+                    }
+                });
+                deferred.resolve($scope.commercenear);
+            }, function (error) {
+                // do something about the error
+                console.log("Error Log",error.statusText);
+                deferred.reject(error);
+            });
+        };
+      });
+      // Deconnexion automatique
+      $timeout(function() {
+        Auth.logout();
+        $route.reload();
+        console.info('It`s OK, website logged out in mind of secureness!');
+      }, 1800000);
+    });
+    
+    $scope.$on('devise:new-session', function(event, currentUser) {
+      $scope.isAuthenticated = true;
+      if (currentUser.seller_role == true){
+          $scope.isSeller = true;
+      }
+      if (currentUser.buyer_role == true){
+          $scope.isBuyer = true;
+      }
+    });
+    
+    $scope.$on('devise:logout', function(event, oldCurrentUser) {
+      $scope.isAuthenticated = false;
+      if (oldCurrentUser.seller_role == true){
+          $scope.isSeller = false;
+      }
+      if (oldCurrentUser.buyer_role == true){
+          $scope.isBuyer = false;
+      }
+    });
+    
+    $scope.$on('devise:new-registration', function(event, user) {
+      $scope.isAuthenticated = true;
+      if (user.seller_role == true){
+          $scope.isSeller = true;
+      }
+      if (user.buyer_role == true){
+          $scope.isBuyer = true;
+      }
+    });
+    
+    $scope.logout = function() {
+      $scope.activemenu = false;
+      Auth.logout().then(function(oldUser) {
+        alert(oldUser.name + " You're successfully logged out!");
+        $route.reload();
+      }, function(error) {
+        // An error occurred logging out.
+      });
+    };
+
+    $scope.signup = function () {
+        Auth.register($scope.credentials).then(function(registeredUser) {
+            alert(registeredUser.email + " You'll receive confirmation email !");
+            $route.reload();
+        }, function(error) {
+            console.info('Error in user registration!');
+            alert('Error in user registration!');
+        });
+    };
+
+}]);

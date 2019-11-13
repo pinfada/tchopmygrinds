@@ -5,5 +5,24 @@
   <%= @product.name %>
 </p>
 
+<table>
+    <thead>
+        <tr>
+            <th colspan="2">Commerce</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% @product.commerces.each do |commerce| %>
+          <tr>
+            <% if commerce.nearbys.present? %>
+              <td><%= commerce.name %></td>
+              <td><%= commerce.city %></td>
+              <td><%= link_to commerce.adress1, commerce %> (<%= commerce.distance_to(commerce.adress1) %> miles)</td>
+            <% end %>
+          </tr>
+        <% end %>
+    </tbody>
+</table>
+
 <%= link_to 'Edit', edit_product_path(@product) %> |
 <%= link_to 'Back', products_path %>

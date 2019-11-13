@@ -6,6 +6,11 @@
   <thead>
     <tr>
       <th>Name</th>
+      <th>quantityperunit</th>
+      <th>unitprice</th>
+      <th>unitsinstock</th>
+      <th>unitsonorder</th>
+      <th>reorderlevel</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -14,6 +19,11 @@
     <% @products.each do |product| %>
       <tr>
         <td><%= product.name %></td>
+        <td><%= product.quantityperunit %></td>
+        <td><%= product.unitprice %></td>
+        <td><%= product.unitsinstock %></td>
+        <td><%= product.unitsonorder %></td>
+        <td><%= product.reorderlevel %></td>
         <td><%= link_to 'Show', product %></td>
         <td><%= link_to 'Edit', edit_product_path(product) %></td>
         <td><%= link_to 'Destroy', product, method: :delete, data: { confirm: 'Are you sure?' } %></td>

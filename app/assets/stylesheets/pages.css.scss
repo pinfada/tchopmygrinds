@@ -1,7 +1,3 @@
-// Place all the styles related to the Pages controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
-
 @import "bootstrap-sprockets";
 
 @import "bootstrap";
@@ -20,23 +16,25 @@ html, body {
 }
 
 /*General menu styles*/
-
+/*
 #map {
     max-width: 97%;
     height: auto !important;
     height: 100%;
+
 }
+*/
 
 .map {
   min-width: 100%;
   min-height: 100%;
   background: #ebe6dc;
-  margin-left: 50px;
+  /*margin-left: 50px;*/
   position: fixed !important;
 }
 
 .general_menu {
-  background: #293137;
+  background: #2F2F2F;
   height: 100%;
   z-index: 8;
   position: fixed;
@@ -79,6 +77,9 @@ html, body {
 }
 
 .site {
+  height: 100%;
+  margin: 0px;
+/*
   max-width: 740px;
   margin-left: 50px;
   min-height: 100%;
@@ -87,16 +88,17 @@ html, body {
   height: auto !important;
   height: 100%;
   background-repeat: repeat-x;
+*/
 }
 
 /*header*/
-
+/*
 .header {
   height: 85px;
   background: #ffffff;
   background-position-y: bottom;
   padding-top: 25px;
-}
+}*/
 
 .angular-leaflet-map {
   position: absolute;
@@ -111,10 +113,10 @@ html, body {
   padding-right: 0;
 }
 
-/*#map_canvas {
-  position: relative;
+#map {
+  position: absolute;
 }
-
+/*
 #map_canvas {
   margin: 0;
   padding: 0;
@@ -124,8 +126,10 @@ html, body {
 
 .logo {
   float: left;
-  margin-right: 10px;
-  font-size: 1.7em;
+  max-width: 300px;
+  max-height: 200px;
+/*  margin-right: 10px; 
+  font-size: 1.7em; 
   color: #20272c;
   text-transform: uppercase;
   letter-spacing: -1px;
@@ -135,6 +139,83 @@ html, body {
   &:hover {
     color: #c7eaf9;
     text-decoration: none;
+  }*/
+}
+
+.news_container {
+  border-bottom: 1px solid #222222;
+  margin-left: -30px;
+  padding-left: 15px;
+  padding-top: 15px;
+}
+
+.my_news .title_news {
+  margin: 0 -15px 15px -31px;
+  background: #121212;
+  height: 40px;
+  h2 {
+    padding-top: 10px;
+    padding-left: 15px;
+  }
+}
+
+.news .data {
+  font-size: 10px;
+  color: #ffffff;
+  background: #67A000;
+  padding: 2px 10px;
+  border-radius: 3px;
+  margin-right: 10px;
+}
+
+.map_in_news {
+  width: 100%;
+  height: 150px;
+  margin-top: 10px;
+}
+
+.news_user_info {
+  margin-top: 30px;
+  img {
+    float: left;
+    margin-right: 10px;
+  }
+  a {
+    display: block;
+  }
+  span {
+    margin-top: 10px;
+  }
+}
+
+/*tweets*/
+
+.tweets span, .news_user_info span {
+  background: #1B1B1B;
+  padding: 8px;
+  border-radius: 5px;
+  font-style: italic;
+  color: #4D4D4D;
+  display: block;
+}
+
+.tweets span i {
+  display: block;
+  position: absolute;
+  margin-top: 8px;
+  margin-left: 20px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 9px solid #181818;
+}
+
+.tweet_link {
+  margin-top: 5px;
+  margin-left: 45px;
+  a {
+    margin-right: 15px;
   }
 }
 
@@ -184,6 +265,28 @@ html, body {
   box-shadow: 1px 0px 10px rgba(0, 0, 0, 0.28);
   background: #ffffff;
   margin-bottom: 0px;
+}
+
+.general_menu .avatar {
+    padding: 25px 8px;
+    display: block;
+}
+
+.inner {
+  ul {
+    margin-top: 0px;
+  }
+  .active {
+    background: #ffffff;
+    margin-right: -1px;
+    &:hover {
+      background: #ffffff;
+      margin-right: -1px;
+    }
+    i {
+      color: #ee635d;
+    }
+  }
 }
 
 /*Features*/
@@ -476,6 +579,54 @@ html, body {
   }
 }
 
+.inner .active {
+  background: #b5e5f6;
+  /* Old browsers */
+  background: -moz-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+  /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%, #b5e5f6), color-stop(36%, #f0fbff), color-stop(100%, #ffffff));
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+  /* IE10+ */
+  background: linear-gradient(to right, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+  /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5e5f6', endColorstr='#ffffff',GradientType=1 );
+  /* IE6-9 */
+  margin-left: 4px;
+  margin-right: -1px;
+  border-bottom-left-radius: 10px;
+  border-top-left-radius: 10px;
+  &:hover {
+    background: #b5e5f6;
+    /* Old browsers */
+    background: -moz-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+    /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%, #b5e5f6), color-stop(36%, #f0fbff), color-stop(100%, #ffffff));
+    /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+    /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+    /* Opera 11.10+ */
+    background: -ms-linear-gradient(left, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+    /* IE10+ */
+    background: linear-gradient(to right, #b5e5f6 0%, #f0fbff 36%, #ffffff 100%);
+    /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5e5f6', endColorstr='#ffffff',GradientType=1 );
+    /* IE6-9 */
+    margin-left: 4px;
+    margin-right: -1px;
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+  }
+  i {
+    color: #ee635d;
+  }
+}
+
 .activepoint .arrow {
   background-image: image_tag image_path("arrow.png");
   width: 14px;
@@ -501,10 +652,118 @@ html, body {
     box-shadow: none;
 }
 
-
 h5.cat {
   color: #ee635d;
   font-size: 18px;
   font-weight: 400;
   margin-top: 0px;
+}
+
+/* Profile block */
+
+.open_span {
+    display: block;
+    position: fixed;
+    margin-left: 710px;
+    margin-top: -10px;
+    z-index: 9;
+    -moz-transition: all 0.3s linear;
+    -o-transition: all 0.3s linear;
+    -webkit-transition: all 0.3s linear;
+}
+
+.close_span {
+    display: block;
+    position: fixed;
+    margin-left: 760px;
+    margin-top: -10px;
+    z-index: 9;
+    -moz-transition: all 0.3s linear;
+    -o-transition: all 0.3s linear;
+    -webkit-transition: all 0.3s linear;
+}
+.close-profile-link {
+    background: url(asset-path('open_profile_link.png'));
+    width: 27px;
+    height: 52px;
+    display: block;
+    padding: 14px 9px;
+    font-size: 16px;
+    color: #FFF;
+}
+
+.profile {
+    background: #364047;
+    min-height: 100%;
+    max-width: 790px;
+    z-index: 8;
+    padding-left: 80px;
+    padding-top: 30px;
+    color: #6f8390;
+    left:-50px;
+    margin-bottom: 0px;
+}
+.profile_closed {
+    left: -790px !important;
+    position: absolute;
+    z-index: 7 !important;
+}
+
+.profile {
+	.user {
+		float: left;
+		img {
+			max-width: 90px;
+			//Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+			border-radius: 5px;
+			float: left;
+			margin-right: 15px;
+		}
+		h2 {
+			font-size: 18px;
+			font-weight: 500;
+			color: #ffffff;
+		}
+		div {
+			padding-left: 67px;
+			margin-top: -18px;
+		}
+		ul li {
+			list-style: none;
+			color: #B3B3B3;
+		}
+	}
+	.buttons {
+		text-align: right;
+		a {
+			margin-left: 10px;
+			span {
+				padding: 0;
+				//Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+				border-radius: 100px;
+				background: #ff2800;
+				color: #ffffff;
+				//Instead of the line below you could use @include text-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
+				text-shadow: none;
+				display: block;
+				height: 19px;
+				width: 19px;
+				border: 2px solid #ffffff;
+				position: absolute;
+				margin-top: -34px;
+				margin-left: 24px;
+				font-size: 12px;
+			}
+		}
+	}
+	h2 {
+		color: #ffffff;
+		font-size: 16px;
+	}
+}
+
+.profile {
+    -moz-transition: all 0.3s linear;
+    -o-transition: all 0.3s linear;
+    -webkit-transition: all 0.3s linear;
 }

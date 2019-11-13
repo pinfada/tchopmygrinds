@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.2.2'
+# ruby '2.5.3'
 # gem 'rails', '3.2.13'
 gem 'rails', '~> 5.0', '>= 5.0.1'
 gem 'rack'
@@ -42,7 +42,22 @@ gem 'font-awesome-rails'
 gem "responders"
 gem 'sprockets'
 gem 'geocoder', '~> 1.4', '>= 1.4.1'
-gem 'faker', '~> 1.7', '>= 1.7.1'
+gem 'faker'
+gem 'devise'
+gem 'cancancan', '~> 2.0'
+gem 'rails_admin'
+gem 'activerecord-reset-pk-sequence'
+gem 'database_cleaner', '~> 1.4.0'
+gem 'sendgrid'
+gem "figaro"
+gem 'aws-sdk', '~> 3'
+
+source "https://rails-assets.org" do
+  gem "rails-assets-angular-devise"
+  gem "rails-assets-moment"
+  gem 'rails-assets-ngGeolocation'
+  gem 'rails-assets-ng-cart'
+end
 
 group :development do
   gem 'better_errors'
@@ -50,7 +65,8 @@ group :development do
   gem 'sqlite3'
 end
 group :production do
-  gem 'pg'
+  gem 'pg', '~> 0.18'
+  gem 'rails_12factor'
 end
 group :test do
   gem 'minitest-spec-rails'

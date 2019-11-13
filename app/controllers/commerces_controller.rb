@@ -1,4 +1,6 @@
 class CommercesController < ApplicationController
+#  before_action :authenticate_user!, :except => [:show, :index, :search]
+  authorize_resource
   before_action :set_commerce, only: [:show, :edit, :update, :destroy]
 
   respond_to :html, :json
@@ -18,10 +20,11 @@ class CommercesController < ApplicationController
   end
 
   def edit
+    respond_with(@commerce)
   end
 
   def create
-    @commerce = Commerce.new(commerce_params)
+    @commerce = Commerce.create(commerce_params)
     @commerce.save
     respond_with(@commerce)
   end
@@ -36,11 +39,15 @@ class CommercesController < ApplicationController
     respond_with(@commerce)
   end
 
-    def search
-      query = params[:query]
-      commerces = Commerce.where('name LIKE ?',"%#{query}%").exists?
+  def search
+    search_name = params[:name_query]
+    if search_name
+#      commerces = Commerce.where('name LIKE ?',"%#{search_name}%").exists?
+      recupcommerce = Commerce.where('name LIKE ?',"%#{search_name}%")
+      commerces = recupcommerce.exists?
       respond_with commerces
     end
+  end
 
   private
     def set_commerce
@@ -48,6 +55,7 @@ class CommercesController < ApplicationController
     end
 
     def commerce_params
-      params.require(:commerce).permit(:name, :adress1, :adress2, :details, :postal, :country, :latitude, :longitude, :city, product_ids: [])
+      params.require(:commerce).permit(:name, :adress1, :adress2, :details, :postal, :country, :latitude, :longitude, :city, product_ids: []) if params[:commerce]
     end
+
 end

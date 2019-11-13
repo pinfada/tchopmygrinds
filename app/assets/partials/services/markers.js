@@ -1,0 +1,22 @@
+marketApp.factory("myMarkers", ['$q', 'SearchCommerce', function myMarkers($q, SearchCommerce) {
+	
+	var deferredPromise = null;
+	return {
+		getMarkers: function(enseigne) {
+//			var boutique_place = [enseigne.shapePoints[0], enseigne.shapePoints[1]];
+			var nom = enseigne.name;
+			var deferred = $q.defer();
+			SearchCommerce.query({name_query:nom}).then(function(commerces) {
+				var markers = commerces;
+				deferred.resolve({dataReturned: markers, dataName: nom, allData: enseigne});
+        	}, function (error) {
+        	    // do something about the error
+        	    console.log("Error Log",error.statusText);
+        	    deferred.reject(error);
+        	});
+
+			deferredPromise = deferred.promise;
+			return deferredPromise;
+		}
+	};
+}]);

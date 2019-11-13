@@ -9,7 +9,9 @@
 //
 // WARNING: THE FIRST BLANK LINE MARKS THE END OF WHAT'S TO BE PROCESSED, ANY BLANK LINE SHOULD
 // GO AFTER THE REQUIRES BELOW.
+// require location -- 20190130
 //
+//= require moment
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
@@ -25,8 +27,12 @@
 //= require leaflet.js.erb
 //= require leaflet.awesome-markers
 //= require angularjs/rails/resource
+//= require angular-devise
 //= require js-routes
+//= require angular-moment.min
+//= require ngcart
+//= require ngGeolocation
+//= require angular-trix
 //= require app
-//= require location
 //= require_tree ../partials
 //= require_tree .
