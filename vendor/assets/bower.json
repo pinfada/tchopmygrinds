@@ -10,5 +10,7 @@
     "ngcart": "latest",
     "angular-trix": "latest",
     "ngGeolocation": "latest"
+  },
+  "resolutions": {
   }
 }

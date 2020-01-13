@@ -1,4 +1,5 @@
 class UserMailer < ApplicationMailer
+  include SendGrid
   #def welcome_email(user)
   #  @user = user
   #  @url  = 'https://stat-exo1-pinfada.c9.io/sign_in'
@@ -8,13 +9,14 @@ class UserMailer < ApplicationMailer
   #      )
   #end
   def welcome_message(user)
+    @user = user
     sendgrid_category "Welcome"
-    mail :to => user.email, :subject => "Bienvenu #{user.name} sur tchopmygrinds :-)"
+    mail :to => user.email, :subject => "Welcome #{user.name} on tchopmygrinds :-)"
   end
 
   def goodbye_message(user)
     sendgrid_disable :ganalytics
-    mail :to => user.email, :subject => "A bientôt sur tchopmygrinds :-("
+    mail :to => user.email, :subj ect => "A bientôt sur tchopmygrinds :-("
   end
   
   def order_confirmation(user, order)
@@ -24,7 +26,7 @@ class UserMailer < ApplicationMailer
       @products = order_id.products
     end
     mail(to: @user.email, subject: 'Votre commande a été reçu',
-         cc: 'admin@tchopmygrinds.com'
+         cc: 'hello@tchopmygrinds.com'
         )
   end
 
@@ -33,7 +35,7 @@ class UserMailer < ApplicationMailer
     @status = status
     @order_id = order_id
     mail(to: @user.email, subject: 'Statut commande mis à jour',
-         cc: 'admin@tchopmygrinds.com'
+         cc: 'hello@tchopmygrinds.com'
       )
   end
   

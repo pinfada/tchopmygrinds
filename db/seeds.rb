@@ -28,29 +28,59 @@ Product.reset_pk_sequence # remise de l'id à 1 pour table produit
 Categorization.delete_all # suppression de la table produit
 Categorization.reset_pk_sequence # remise de l'id à 1 pour table produit
 
-lgrtab = 20
-debtab = 0
-fintab = 0
-url = "https://www.jasonbase.com/things/GKDA.json"
-liste = JSON.parse(open(url).read)
-fintab = liste.length
-debtab = fintab - lgrtab
-newliste = liste.slice(debtab, fintab)
-commerces = Commerce.all
-commerces.each do |commerce|
-  sauvproduit = " "
-  newliste.each do |x|
-    getproduit =  x["produit"]
-    getprice = x["Moyen"]
-    getunitsonorder = rand(10) + 5
-    getquantite = getunitsonorder.to_s + " - " + x["Unitprice"]  
-    getunitstock = rand(100) + 10
-    next if getproduit == sauvproduit
-    sauvproduit = getproduit
-    Product.create(name: getproduit, quantityperunit: getquantite, unitprice: getprice, unitsinstock: getunitstock, unitsonorder: getunitsonorder, commerce_id: commerce.id)
-  end
-  products = Product.all
-  products.each do |produit|
-    commerce.products << produit
-  end
+
+2.times do
+ User.create(
+   name: Faker::Name.name,
+   email: Faker::Internet.email,
+   password: Faker::Internet.password,
+   admin: 'false',
+   seller_role: 'true',
+   buyer_role: 'false'
+ )
 end
+
+2.times do
+ User.create(
+   name: Faker::Name.name,
+   email: Faker::Internet.email,
+   password: Faker::Internet.password,
+   admin: 'false',
+   seller_role: 'false',
+   buyer_role: 'true'
+ )
+end
+
+User.create(
+  name: 'mitch',
+  email: 'cali77@hotmail.fr',
+  password: 'password',
+  admin: 'true'
+)
+
+#lgrtab = 20
+#debtab = 0
+#fintab = 0
+#url = "https://www.jasonbase.com/things/GKDA.json"
+#liste = JSON.parse(open(url).read)
+#fintab = liste.length
+#debtab = fintab - lgrtab
+#newliste = liste.slice(debtab, fintab)
+#commerces = Commerce.all
+#commerces.each do |commerce|
+#  sauvproduit = " "
+#  newliste.each do |x|
+#    getproduit =  x["produit"]
+#    getprice = x["Moyen"]
+#    getunitsonorder = rand(10) + 5
+#    getquantite = getunitsonorder.to_s + " - " + x["Unitprice"]  
+#    getunitstock = rand(100) + 10
+#    next if getproduit == sauvproduit
+#    sauvproduit = getproduit
+#    Product.create(name: getproduit, quantityperunit: getquantite, unitprice: getprice, unitsinstock: getunitstock, unitsonorder: getunitsonorder, commerce_id: commerce.id)
+#  end
+#  products = Product.all
+#  products.each do |produit|
+#    commerce.products << produit
+#  end
+#end

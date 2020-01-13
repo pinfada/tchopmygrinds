@@ -51,7 +51,7 @@ StatExo1::Application.configure do
     password: Rails.application.secrets.email_provider_password
   }
   # ActionMailer Config
-  config.action_mailer.default_url_options = { :host => 'https://stat-exo1-pinfada.c9.io/' }
+  config.action_mailer.default_url_options = { :host => 'localhost', port: 3000}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.raise_delivery_errors = true
   # Send email in development mode?

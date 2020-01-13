@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-# ruby '2.5.3'
-# gem 'rails', '3.2.13'
 gem 'rails', '~> 5.0', '>= 5.0.1'
 gem 'rack'
 
@@ -12,6 +10,7 @@ gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
+gem 'pg', '~> 0.18'
 group :development, :test do
   gem 'byebug', platform: :mri
 end
@@ -41,6 +40,8 @@ gem 'country_select', '~> 3.0'
 gem 'font-awesome-rails'
 gem "responders"
 gem 'sprockets'
+#gem 'sprockets', '~> 3.5', '>= 3.5.2'
+#gem 'sprockets-rails', :require => 'sprockets/railtie'
 gem 'geocoder', '~> 1.4', '>= 1.4.1'
 gem 'faker'
 gem 'devise'
@@ -50,7 +51,6 @@ gem 'activerecord-reset-pk-sequence'
 gem 'database_cleaner', '~> 1.4.0'
 gem 'sendgrid'
 gem "figaro"
-gem 'aws-sdk', '~> 3'
 
 source "https://rails-assets.org" do
   gem "rails-assets-angular-devise"
@@ -62,7 +62,7 @@ end
 group :development do
   gem 'better_errors'
   gem 'rails_layout'
-  gem 'sqlite3'
+  #gem 'sqlite3'
 end
 group :production do
   #gem 'pg', '~> 0.18'

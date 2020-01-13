@@ -10,6 +10,8 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
+
+  after_create :send_welcome_email
          
   def send_password_reset
     generate_token(:password_reset_token)

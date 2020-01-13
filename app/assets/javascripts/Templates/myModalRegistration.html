@@ -3,21 +3,56 @@
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 -->
 
-<form ng-submit="signIn()" novalidate>
-  <div class="modal-header">
-    <h3 class="modal-title" id="modal-title">Connexion</h3>
-  </div>
+<!-- 
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">Access</h3>
+</div>
+-->
 
-  <div class="modal-body" id="modal-body">
-    <div class="form-group">
-      <label for="exampleInputEmail1">Email address</label>
-      <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" ng-model="credentials.email">
-      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-group">
-      <label for="exampleInputPassword1">Password</label>
-      <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" ng-model="credentials.password">
-    </div>
+<div class="modal-body" id="modal-body">
+
+    <uib-tabset active="activeJustified" justified="true">
+        <uib-tab index="1" heading="Sign In">
+          <form ng-submit="signIn()" novalidate>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Email address</label>
+              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" ng-model="credentials.email">
+              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputPassword1">Password</label>
+              <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" ng-model="credentials.password">
+            </div>
+          </form> 
+        </uib-tab>
+        <uib-tab index="2" heading="Sign Up">
+          <form ng-submit="signUp()" novalidate>
+            <div class="modal-body">
+                <!-- NAME -->
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" class="form-control" ng-model="name" required>
+                    <p ng-show="form.userForm.name.$invalid && !form.userForm.name.$pristine" class="help-block">You name is required.</p>
+                </div>
+                <!-- USERNAME -->
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" class="form-control" ng-model="user.username" ng-minlength="3" ng-maxlength="8" required>
+                    <p ng-show="form.userForm.username.$error.minlength" class="help-block">Username is too short.</p>
+                    <p ng-show="form.userForm.username.$error.maxlength" class="help-block">Username is too long.</p>
+                </div>
+                <!-- EMAIL -->
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" ng-model="email" required>
+                    <p ng-show="form.userForm.email.$invalid && !form.userForm.email.$pristine" class="help-block">Enter a valid email.</p>
+                </div>
+            </div>
+          </form>
+        </uib-tab>
+    </uib-tabset>
+
+</div>
 
 <!--    
     <div class="form-group">
@@ -25,10 +60,7 @@
     </div>
 -->
 
-  </div>
-  
-  <div class="modal-footer">
-    <button type="button" class="btn btn-warning" ng-click="cancel()">Cancel</button>
-    <button type="submit" class="btn primary-btn">Login</button>
-  </div>
-</form>
+<div class="modal-footer">
+  <button type="button" class="btn btn-warning" ng-click="cancel()">Cancel</button>
+  <button type="submit" class="btn primary-btn">Submit</button>
+</div>
