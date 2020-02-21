@@ -11,7 +11,8 @@ marketApp.controller('HeaderController', [
   'SearchCommerce',
   '$timeout', 
   'myCoordinates', 
-  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, GetAllProduct, SearchProduct, SearchCommerce, $timeout, myCoordinates) {
+  'myBoutiques',
+  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, GetAllProduct, SearchProduct, SearchCommerce, $timeout, myCoordinates, boutiques, myBoutiques) {
 
     var deferred = $q.defer();
     
@@ -25,7 +26,17 @@ marketApp.controller('HeaderController', [
         $scope.activemenu = true;
         $uibModal.open({
             templateUrl: "<%= asset_path('Templates/myModalRegistration.html') %>", // loads the template
-            controller: 'modalRegistration'
+            controller: 'modalRegistration',
+            backdrop: true,
+            windowClass: 'modal',
+            resolve: {
+                coordinates: function () {
+                    return myCoordinates; 
+                },
+                boutiques: function (myBoutiques) {
+                  return myBoutiques;
+                }
+            }
         });
     };
 

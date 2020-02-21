@@ -2,11 +2,13 @@ class CommercesController < ApplicationController
 #  before_action :authenticate_user!, :except => [:show, :index, :search]
   authorize_resource
   before_action :set_commerce, only: [:show, :edit, :update, :destroy]
+  before_action :set_user, only: [:index, :create, :new]
 
   respond_to :html, :json
 
   def index
-    @commerces = Commerce.all
+#   @commerces = Commerce.all
+    @commerces = @user.commerces
     respond_with(@commerces)
   end
 
@@ -15,7 +17,8 @@ class CommercesController < ApplicationController
   end
 
   def new
-    @commerce = Commerce.new
+#   @commerce = Commerce.new
+    @commerce = @user.commerces.new
     respond_with(@commerce)
   end
 
@@ -24,7 +27,8 @@ class CommercesController < ApplicationController
   end
 
   def create
-    @commerce = Commerce.create(commerce_params)
+#   @commerce = Commerce.create(commerce_params)
+    @commerce = @user.commerces.create(commerce_params)
     @commerce.save
     respond_with(@commerce)
   end
@@ -52,6 +56,10 @@ class CommercesController < ApplicationController
   private
     def set_commerce
       @commerce = Commerce.find(params[:id])
+    end
+
+    def set_user
+     @user = User.find(params[:user_id])
     end
 
     def commerce_params

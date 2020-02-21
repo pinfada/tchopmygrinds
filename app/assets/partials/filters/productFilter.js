@@ -12,8 +12,8 @@ marketApp.filter('productFilter', ['SearchProduct', 'myIp', function(SearchProdu
                     if (results.length > 0) {
                         console.log(results, input);
                     }
+                    //console.log("donnée en sortie : ", input);
                     return input;
-                    console.log("donnée en sortie : ", input);
                 }, function (error) {
                     // do something about the error
                     console.log("Error Log",error.statusText);

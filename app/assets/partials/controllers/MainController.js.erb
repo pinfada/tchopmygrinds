@@ -4,6 +4,7 @@
 
 
 module.controller('MainController', [
+    '$q', 
     '$scope',
     '$compile',
     '$window',
@@ -23,10 +24,12 @@ module.controller('MainController', [
     '$routeParams',
     'Auth',
     'ngCart',
-    function($scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart) {
+    'GetUserCommerces',
+    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces) {
 
         ngCart.setTaxRate(7.5);
         ngCart.setShipping(2.99);
+        var deferred = $q.defer();
     
         //map = L.mapquest.map('map', {
         //    center: [47.4550213, -0.5370654],
@@ -58,7 +61,48 @@ module.controller('MainController', [
             if (Auth.isAuthenticated() )
             {
                 Auth.currentUser().then(function(user) {
-                    // Récupération des coordonnées(x,y) des boutiques et affichage sur la map
+
+                    // Si l'utilisateur à un role de vendeur on vérifie si il possède des commerces
+                    if (user.seller_role == true && user.statut_type == "sedentary"){
+                        console.log("seller : ", user)
+                        //vérification de la présence des commerces en base et pour l'utilisateur connecté
+                        GetUserCommerces.get({userid: user.id}).then(function(result){
+                            // Si l'utilisateur ne possède pas de commerce
+                            if (result.length == 0){
+                                // Ajout de nouveaux commerces via un ecran modal
+                                boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
+                                    $uibModal.open({
+                                        templateUrl: "<%= asset_path('Templates/myModalMarker.html') %>", // loads the template
+                                        controller: 'modalMarker',
+                                        backdrop: true,
+                                        windowClass: 'modal',
+                                        resolve: {
+                                            boutique: function () {
+                                                return boutique; 
+                                            },
+                                            user: function () {
+                                                return user; 
+                                            }
+                                        }
+                                    })
+                                })
+                            }
+                            $scope.commerces = result
+                            console.log("commerces : ", $scope.commerces)
+                            deferred.resolve($scope.commerces);
+                        }, function (error) {
+                            // do something about the error
+                            console.log("Error Log",error.statusText);
+                            deferred.reject(error);
+                        });
+                        
+                        var p = deferred.promise;
+                        console.log(p.value)
+                    } else {
+
+
+
+                    // Récupération du nom de commerces à proximité en fonction des coordonnées(x,y) et affichage sur la map
     	            boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
                         angular.forEach(boutique, function(obj1, key) {
                             if(typeof obj1 !== "undefined") {
@@ -66,9 +110,8 @@ module.controller('MainController', [
                             for(var i=0; i<total; i++) {
                                 var commentaire = "";
                                 var result = obj1[i];
-                                 // Rechercher tous les commerces qui ont le meme nom
+                                 // Rechercher tous les commerces qui ont le meme nom dans la base COMMERCE
                         	    markers.getMarkers(result).then(function (response) {
-                                    // Récupération des coordonnées de l'enseigne commerciale
                                     var boutique_place = " ";
                                     var customIcon = "";
                                     // si le user qui se connecte est un vendeur
@@ -154,6 +197,7 @@ module.controller('MainController', [
                                                 }
                                             });// end of modal.open
                                         }; // end of scope.open function
+                                        // Pour chhaque commerces présents en base customisation de l'icone affichage sur la MAP
                                         if (response.dataReturned == true) {
                                             // Customisation de l'Icon pour les commerces déjà presents en base
                                             customIcon = L.icon({
@@ -255,6 +299,7 @@ module.controller('MainController', [
                             }
                         });
     	            });
+}
                 }, function(error) {
                     // unauthenticated error
                 });

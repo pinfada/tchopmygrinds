@@ -3,7 +3,7 @@ class ProductsController < ApplicationController
   authorize_resource
   #before_action :searchnear
   before_action :set_product, only: [:show, :edit, :update, :destroy]
-  before_action :set_commerce, only: :create
+  before_action :set_commerce, only: [:create, :new]
 
   respond_to :html, :json
   # GET /products
@@ -39,6 +39,7 @@ class ProductsController < ApplicationController
   def create
     # @product = Product.new(product_params)
     @product = @commerce.products.create(product_params)
+    @product.save
     respond_with(@product)
 
     #respond_to do |format|
@@ -89,6 +90,9 @@ class ProductsController < ApplicationController
   end
 
   # GET /commerces/listcommerce
+  # Recuperation de la liste des commerces en fonction :
+  # - Des coordonnées de l'utilisateur
+  # - Du produit
   def listcommerce
     recuproduct = []
     search_name = params[:name_query]

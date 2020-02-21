@@ -1,6 +1,6 @@
 class ApplicationMailer < ActionMailer::Base
   include SendGrid
-  default from: 'from@tchopmygrinds.com'
+  default from: 'hello@tchopmygrinds.com'
   layout 'mailer'
 end
 

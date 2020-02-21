@@ -1,4 +1,5 @@
 class UserMailer < ApplicationMailer
+  require 'sendgrid-ruby'
   include SendGrid
   #def welcome_email(user)
   #  @user = user
@@ -16,7 +17,7 @@ class UserMailer < ApplicationMailer
 
   def goodbye_message(user)
     sendgrid_disable :ganalytics
-    mail :to => user.email, :subj ect => "A bientôt sur tchopmygrinds :-("
+    mail :to => user.email, :subject => "A bientôt sur tchopmygrinds :-("
   end
   
   def order_confirmation(user, order)

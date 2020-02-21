@@ -37,6 +37,7 @@ StatExo1::Application.routes.draw do
   
   resources :users do
     resources :orders, concerns: [:productable, :ordertable]
+    resources :commerces, concerns: [:productable, :categorizable] 
   end
   
   resources :useradresses

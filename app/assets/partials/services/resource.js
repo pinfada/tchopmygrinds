@@ -17,6 +17,7 @@ marketApp.factory("SearchCommerce", ['railsResourceFactory', function(railsResou
   });
 }]);
 
+// Renvoi la liste complete des commerces
 marketApp.factory("GetAllCommerce", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({ 
           url: "/commerces", 
@@ -27,6 +28,7 @@ marketApp.factory("GetAllCommerce", ['railsResourceFactory', 'railsSerializer', 
   });
 }]);
 
+// Renvoi la liste complete des produits
 marketApp.factory("GetAllProduct", ['railsResourceFactory', function(railsResourceFactory) {
   return railsResourceFactory({ 
           url: "/products", 
@@ -34,12 +36,24 @@ marketApp.factory("GetAllProduct", ['railsResourceFactory', function(railsResour
   });
 }]);
 
+// Renvoie la liste des produits pour un commerce
 marketApp.factory("GetCommerceProducts", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({
           url: "/commerces/{{commerceid}}/products", 
           name: "product",
           serializer: railsSerializer(function () {
             this.nestedAttribute('commerces', 'Commerce');
+          })
+  });
+}]);
+
+// Renvoi la Liste des commerces d'un utilisateur
+marketApp.factory("GetUserCommerces", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({
+          url: "/users/{{userid}}/commerces", 
+          name: "usercommerces",
+          serializer: railsSerializer(function () {
+            this.nestedAttribute('users', 'User');
           })
   });
 }]);

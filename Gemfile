@@ -50,6 +50,7 @@ gem 'rails_admin'
 gem 'activerecord-reset-pk-sequence'
 gem 'database_cleaner', '~> 1.4.0'
 gem 'sendgrid'
+gem 'sendgrid-ruby'
 gem "figaro"
 
 source "https://rails-assets.org" do
