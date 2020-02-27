@@ -63,12 +63,13 @@ module.controller('MainController', [
                 Auth.currentUser().then(function(user) {
 
                     // Si l'utilisateur à un role de vendeur on vérifie si il possède des commerces
-                    if (user.seller_role == true && user.statut_type == "sedentary"){
-                        console.log("seller : ", user)
+                    if (user.seller_role == true){
+                        //console.log("seller : ", user)
                         //vérification de la présence des commerces en base et pour l'utilisateur connecté
                         GetUserCommerces.get({userid: user.id}).then(function(result){
-                            // Si l'utilisateur ne possède pas de commerce
-                            if (result.length == 0){
+                            // Si le vendeur sedentaire ne possède pas de commerce
+                            var nb_commerce = result.length
+                            if (nb_commerce == 0 && user.statut_type == "sedentary"){
                                 // Ajout de nouveaux commerces via un ecran modal
                                 boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
                                     $uibModal.open({
@@ -86,19 +87,76 @@ module.controller('MainController', [
                                         }
                                     })
                                 })
+                            } else {
+                                // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
+                                for(var i=0; i<nb_commerce; i++) {
+                                    console.log("commerces : ", result[i])
+
+                                    var boutique_place = "";
+                                    var customIcon = "";
+                                    var commentaire = "";
+
+                                    boutique_place = [result[i].latitude, result[i].longitude];
+                                    var btnproduct = 'btnproduct'+result[i].id;
+                                    var commerce_id = result[i].id;
+                                    $scope[btnproduct] = function () {
+                                        $uibModal.open({
+                                            templateUrl: "<%= asset_path('Templates/myModalProduct.html') %>", // loads the template
+                                            controller: "modalProduct",
+                                            backdrop: false, // setting backdrop allows us to close the modal window on clicking outside the modal window
+                                            size: 'lg',
+                                            resolve: {
+                                                commerce: function () {
+                                                    return commerce_id; // Appel au controlleur modalProduct avec en entrée le nom du commerce
+                                                }
+                                            }
+                                        });
+                                    };
+                                    
+                                    // Customisation des Icons utiliser pour la map
+                                    customIcon = L.mapquest.icons.marker({
+                                        primaryColor: '#22407F',
+                                        secondaryColor: '#3B5998',
+                                        shadow: true,
+                                        size: 'md'
+                            //          symbol: 'A'
+                                    });
+
+                                    // Customisation de l'Icon pour les commerces déjà presents en base
+                                    customIcon = L.icon({
+                                        iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
+                                        iconSize: [35, 35], // size of the icon
+                                        });
+                                    commentaire = "<div><b>D&eacuteja adh&eacuterent</b>.<br /> Pour ajouter vos produits <br /><button class='btn' ng-click='btnproduct"+ result[i].id +"()'>Cliquez ici</button></div>";
+
+                                    // Compile title DOM into a link function
+                                    var linkFn = $compile(angular.element(commentaire));
+                                    
+                                    // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
+                                    var popup = linkFn($scope);
+
+                                    if (boutique_place !== " ") {
+                                        var customPopup = L.popup()
+                                            .setLatLng(boutique_place)
+                                            .setContent(popup[0])
+                                            .openOn(map);
+                                        //map.removeLayer(result);
+                                        L.marker(boutique_place, {icon: customIcon}).bindPopup(customPopup).addTo(map);
+                                    }
+
+                                }
                             }
-                            $scope.commerces = result
-                            console.log("commerces : ", $scope.commerces)
+
                             deferred.resolve($scope.commerces);
                         }, function (error) {
                             // do something about the error
                             console.log("Error Log",error.statusText);
                             deferred.reject(error);
                         });
-                        
                         var p = deferred.promise;
-                        console.log(p.value)
+
                     } else {
+                        // L'utilisateur a un rôle d'acheteur
 
 
 
@@ -116,30 +174,6 @@ module.controller('MainController', [
                                     var customIcon = "";
                                     // si le user qui se connecte est un vendeur
                                     if (user.seller_role == true){
-                                        boutique_place = [response.allData.shapePoints[0], response.allData.shapePoints[1]];
-                                        var ouvr = 'ouvr'+response.allData.resultNumber;
-                                        $scope[ouvr] = function () {
-                                            $uibModal.open({
-                                                templateUrl: "<%= asset_path('Templates/myModalProduct.html') %>", // loads the template
-                                                controller: "modalProduct",
-                                                backdrop: false, // setting backdrop allows us to close the modal window on clicking outside the modal window
-                                                size: 'lg',
-                                                resolve: {
-                                                    name: function () {
-                                                        return response.allData.fields.name; // Récupération du nom du commerce
-                                                    }
-                                                }
-                                            });
-                                        };
-                                        
-                                        // Customisation des Icons utiliser pour la map
-                                        customIcon = L.mapquest.icons.marker({
-                                            primaryColor: '#22407F',
-                                            secondaryColor: '#3B5998',
-                                            shadow: true,
-                                            size: 'md'
-                                //          symbol: 'A'
-                                        });
                                         
                                         commentaire = "Pour adh&eacuterer... <br /><button class='btn' ng-click='open"+ response.allData.resultNumber +"()'>Cliquez sur moi</button>";
                                         // Accéssible uniquement pour les commerçants
@@ -197,15 +231,6 @@ module.controller('MainController', [
                                                 }
                                             });// end of modal.open
                                         }; // end of scope.open function
-                                        // Pour chhaque commerces présents en base customisation de l'icone affichage sur la MAP
-                                        if (response.dataReturned == true) {
-                                            // Customisation de l'Icon pour les commerces déjà presents en base
-                                            customIcon = L.icon({
-                                                iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
-                                                iconSize: [35, 35], // size of the icon
-                                                });
-                                            commentaire = "D&eacuteja adh&eacuterent.<br /> Pour ajouter vos produits <br /><button class='btn' ng-click='ouvr"+ response.allData.resultNumber +"()'>Cliquez ici</button>";
-                                        }
                                     } else {
                                         // Si le user est un acheteur
                                         if (response.dataReturned == true) {

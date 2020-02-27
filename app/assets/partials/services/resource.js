@@ -51,7 +51,7 @@ marketApp.factory("GetCommerceProducts", ['railsResourceFactory', 'railsSerializ
 marketApp.factory("GetUserCommerces", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({
           url: "/users/{{userid}}/commerces", 
-          name: "usercommerces",
+          name: "commerce",
           serializer: railsSerializer(function () {
             this.nestedAttribute('users', 'User');
           })

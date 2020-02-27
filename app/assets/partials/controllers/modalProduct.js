@@ -1,6 +1,6 @@
-marketApp.controller("modalProduct", ['$q', '$scope','$uibModalInstance', '$log', '$route', 'GetAllCommerce', 'GetCommerceProducts', 'name', 'myFruitsliste', 'moment',  function ($q, $scope, $uibModalInstance, $log, $route, GetAllCommerce, GetCommerceProducts, name, myFruitsliste, moment){
+marketApp.controller("modalProduct", ['$q', '$scope','$uibModalInstance', '$log', '$route', 'GetAllCommerce', 'GetCommerceProducts', 'commerce', 'myFruitsliste', 'moment',  function ($q, $scope, $uibModalInstance, $log, $route, GetAllCommerce, GetCommerceProducts, commerce, myFruitsliste, moment){
 
-    var deferred = $q.defer();
+    //var deferred = $q.defer();
     $scope.SeeGraph = false;
 
     $scope.onClick = function (points, evt) {
@@ -63,33 +63,33 @@ marketApp.controller("modalProduct", ['$q', '$scope','$uibModalInstance', '$log'
     });
 
     //vérification présence du commerce en base et récupération de l'id
-    GetAllCommerce.query().then(function(commerce){
-        var recupid = commerce.filter(function(item) {
-            return item.name === name;
-        })[0];
-        deferred.resolve(recupid);
-    }, function (error) {
-        // do something about the error
-        console.log("Error Log",error.statusText);
-        deferred.reject(error);
-    });
+    //GetAllCommerce.query().then(function(commerce){
+    //    var recupid = commerce.filter(function(item) {
+    //        return item.name === name;
+    //    })[0];
+    //    deferred.resolve(recupid);
+    //}, function (error) {
+    //    // do something about the error
+    //    console.log("Error Log",error.statusText);
+    //    deferred.reject(error);
+    //});
     
-	var p = deferred.promise;
+	//var p = deferred.promise;
 
     // Create the array to hold the list of Products
     $scope.produits = [];
     // Create the function to push the data into the "produits" array
     $scope.newProduit = function (donnee) {
-        p.then(function(value) {
+    //    p.then(function(value) {
             $scope.name = donnee.name;
             $scope.prix = donnee.prix;
             $scope.quantite = donnee.quantite;
             $scope.stock = donnee.stock;
             $scope.discontinued = donnee.discontinued;
-            $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceid: value.id});
+            $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceid: commerce});
             $scope.name = $scope.prix = $scope.quantite ="";
             $scope.SeeGraph = true;
-        });
+    //    });
     };
     
     $scope.findValue = function(newValue, oldValue) { 

@@ -6,6 +6,10 @@ class Ability
     if user.try(:admin?)
       can :manage, :all               # allow superadmins to do anything
     else
+        if user.seller_role
+            can :manage, Commerce
+            can :manage, Product
+        end
       can :read, :all
     end
     
