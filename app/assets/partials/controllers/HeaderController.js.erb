@@ -22,6 +22,20 @@ marketApp.controller('HeaderController', [
     $scope.ProfileOpen = false;
     $scope.credentials = { email: '', password: 'password1', password_confirmation: 'password1', buyer_role: 'true' };
 
+    $scope.records = [];
+    $scope.coordonnees = [];
+    $scope.latitude = '';
+    $scope.longitude = '';
+
+    // recuperation des coordonnees de l'utilisateur
+    myCoordinates.getCoordinates().then(function (position) {
+      $scope.latitude = position.lat
+      $scope.longitude = position.lng
+      $scope.coordonnees.push($scope.latitude, $scope.longitude)
+    });
+    //console.log("coordonnees : ", $scope.coordonnees)
+
+    // Ouverture de la fenetre de souscription/authentification
     $scope.OpenRegistration = function () {
         $scope.activemenu = true;
         $uibModal.open({
@@ -31,7 +45,7 @@ marketApp.controller('HeaderController', [
             windowClass: 'modal',
             resolve: {
                 coordinates: function () {
-                    return myCoordinates; 
+                  return $scope.coordonnees; 
                 },
                 boutiques: function (myBoutiques) {
                   return myBoutiques;
@@ -45,8 +59,6 @@ marketApp.controller('HeaderController', [
     };
     
     $scope.foo = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-    
-    $scope.records = [];
     
     $scope.selectedIndex = 0;
     
@@ -90,11 +102,11 @@ marketApp.controller('HeaderController', [
       if (currentUser.buyer_role == true){
           $scope.isBuyer = true;
       }
-      myCoordinates.getCoordinates().then(function (position) {
+      //myCoordinates.getCoordinates().then(function (position) {
         GetAllProduct.query().then(function (results) {
           // Pour chaque produits on vérifie si celui-ci est proche de notre position
           angular.forEach(results, function (item) {
-            SearchProduct.query({name_query:item.name, lat_query:position.lat, lng_query:position.lng}).then(function (retour) {
+            SearchProduct.query({name_query:item.name, lat_query:$scope.latitude, lng_query:$scope.longitude}).then(function (retour) {
               $scope.name = item.name;
               $scope.stock = item.unitsinstock;
               if  (retour.length > 0){
@@ -144,7 +156,7 @@ marketApp.controller('HeaderController', [
                 deferred.reject(error);
             });
         };
-      });
+      //});
       // Deconnexion automatique
       $timeout(function() {
         Auth.logout();

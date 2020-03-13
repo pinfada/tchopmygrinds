@@ -2,6 +2,7 @@ class User < ApplicationRecord
   enum statut_type: { itinerant: 0, sedentary: 1, others: 2 }
   has_many :orders, dependent: :destroy
   has_many :commerces
+  has_many :addresses
 	before_save { self.email = email.downcase }
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i 
 	validates :email, presence: true, 

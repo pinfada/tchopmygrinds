@@ -10,10 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_16_071553) do
+ActiveRecord::Schema.define(version: 2020_03_06_044940) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "addresses", force: :cascade do |t|
+    t.bigint "user_id"
+    t.text "address1"
+    t.text "address2"
+    t.text "city"
+    t.text "state"
+    t.text "country"
+    t.text "zipcode"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.float "latitude"
+    t.float "longitude"
+    t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
 
   create_table "categorizations", force: :cascade do |t|
     t.integer "product_id"
@@ -87,19 +102,6 @@ ActiveRecord::Schema.define(version: 2020_02_16_071553) do
     t.index ["commerce_id"], name: "index_products_on_commerce_id"
   end
 
-  create_table "useradresses", force: :cascade do |t|
-    t.integer "user_id"
-    t.text "address_1"
-    t.text "address_2"
-    t.text "city"
-    t.text "state"
-    t.text "country"
-    t.text "zipcode"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_useradresses_on_user_id"
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -122,5 +124,6 @@ ActiveRecord::Schema.define(version: 2020_02_16_071553) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "addresses", "users"
   add_foreign_key "commerces", "users"
 end

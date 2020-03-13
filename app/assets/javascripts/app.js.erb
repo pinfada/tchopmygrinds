@@ -17,6 +17,13 @@
 	];
 	var marketApp = angular.module('marketApp', modules);
 
+	marketApp.run(['Auth', function (Auth) {
+	    Auth.currentUser().then(function(user) {
+	      console.log(user);
+	      console.log(Auth._currentUser);
+	    });
+	}]);
+
 	marketApp.config([
 		'$routeProvider', 
 		'$locationProvider', 

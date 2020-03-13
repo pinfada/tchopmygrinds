@@ -1,4 +1,15 @@
-marketApp.controller("modalProduct", ['$q', '$scope','$uibModalInstance', '$log', '$route', 'GetAllCommerce', 'GetCommerceProducts', 'commerce', 'myFruitsliste', 'moment',  function ($q, $scope, $uibModalInstance, $log, $route, GetAllCommerce, GetCommerceProducts, commerce, myFruitsliste, moment){
+marketApp.controller("modalProduct", [
+    '$q', 
+    '$scope',
+    '$uibModalInstance', 
+    '$log', 
+    '$route', 
+    'GetAllCommerce', 
+    'GetCommerceProducts', 
+    'commerce', 
+    'myFruitsliste', 
+    'moment',  
+    function ($q, $scope, $uibModalInstance, $log, $route, GetAllCommerce, GetCommerceProducts, commerce, myFruitsliste, moment){
 
     //var deferred = $q.defer();
     $scope.SeeGraph = false;
@@ -60,7 +71,20 @@ marketApp.controller("modalProduct", ['$q', '$scope','$uibModalInstance', '$log'
     //Liste des produits selectionnables par les commercants
     myFruitsliste.then(function(value) {
         $scope.fruits = value;
+        console.log(value)
     });
+
+    // On vérifie la présence de produit pour chaque commerce présent en base
+    GetCommerceProducts.get({commerceid: commerce}).then(function (products) {
+        //  console.log("produits :", products)
+        $scope.nbproduit = products.length
+        $scope.produits = products;
+    }, function (error) {
+        // do something about the error
+        console.log("Error Log",error.statusText);
+        deferred.reject(error);
+    });
+
 
     //vérification présence du commerce en base et récupération de l'id
     //GetAllCommerce.query().then(function(commerce){
@@ -104,25 +128,25 @@ marketApp.controller("modalProduct", ['$q', '$scope','$uibModalInstance', '$log'
         var last = newValue[lgrValue - 1];
         if(typeof last !== "undefined") {
             var nom_produit = last.name;
-            console.log(nom_produit);
+            //console.log(nom_produit);
             angular.forEach($scope.fruits, function(item) {
                 if (item.produit === nom_produit) {
-                    $scope.results.push({produit: item.produit, prix: item.Moyen, date: item.Date});
-                    mini.push(Number(item.Mini));
-                    maxi.push(Number(item.Maxi));
-                    moyen.push(Number(item.Moyen));
-                    d1 = moment(item.Date, "DD/MM/YYYY");
+                    $scope.results.push({produit: item.produit, prix: item.moyen, date: item.date});
+                    mini.push(item.mini.replace( ',' , '.' ));
+                    maxi.push(item.maxi.replace( ',' , '.' ));
+                    moyen.push(item.moyen.replace( ',' , '.' ));
+                    d1 = moment(item.date, "YYYY-MM-DD");
                     $scope.labels.push(d1);
                 }
             });
         }
-        
+
         $scope.data = [
           mini,
           maxi,
           moyen
         ];
-        
+
         //var nums = mini.concat(maxi, moyen);
         //var nbmax = Math.max(nums);
         //var nbmin = Math.min(nums);

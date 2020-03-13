@@ -5,7 +5,7 @@ marketApp.factory('myFruitsliste', ['$q', '$http', function myFruitsliste($q, $h
 
     $http({
         method: 'GET',
-        url: 'https://www.jasonbase.com/things/GKDA.json',
+        url: 'http://localhost:3000/agrimer',
         responseType: 'json'
     }).then(function(response) {
     //        console.log(response.data);

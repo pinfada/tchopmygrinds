@@ -8,6 +8,9 @@
         <li ng-hide="isAuthenticated"><a href="#" ng-click="OpenRegistration()" class="gradientmenu" ng-class="{'active': activemenu === true}"><i class="fa fa-user"></i></a></li>
         <li><a href="/" ng-click="MapOpen = !MapOpen" class="gradientmenu" ng-class="{'active': MapOpen === true}"><i class="fa fa-home"></i></a></li>
         <li ng-show="isBuyer"><a href="/" ng-click="SeeSearch = !SeeSearch" class="gradientmenu" ng-class="{'active': SeeSearch === true}"><i class="fa fa-sliders"></i></a></li>
+
+        <li ng-show="isSeller"><a href="/" ng-click="" class="gradientmenu"><i class="fa fa-archive"></i></a></li>
+
       </ul>
     </div>
     <!--/Entête--> 
@@ -20,11 +23,18 @@
             <div class="col-md-12">
                 <div class="user">
                     <%= image_tag "ava1.png" %>
-                    <div>
+                    <div ng-show="isSeller">
                         <h2>{{username}}</h2>
                         <ul>
                             <li>Nombre de commerces <a href="#">3 commerces</a></li>
                             <li>Nombre de produits vendus <a href="#">59 produits</a></li>
+                        </ul>
+                    </div>
+                    <div ng-show="isBuyer">
+                        <h2>{{username}}</h2>
+                        <ul>
+                            <li>Nombre de commerces à proximités <a href="#">11 commerces</a></li>
+                            <li>Nombre de commandes en cours <a href="#">2 commandes</a></li>
                         </ul>
                     </div>
                 </div>

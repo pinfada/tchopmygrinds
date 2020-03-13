@@ -25,7 +25,8 @@ module.controller('MainController', [
     'Auth',
     'ngCart',
     'GetUserCommerces',
-    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces) {
+    'GetAllAddress',
+    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetAllAddress) {
 
         ngCart.setTaxRate(7.5);
         ngCart.setShipping(2.99);
@@ -69,28 +70,42 @@ module.controller('MainController', [
                         GetUserCommerces.get({userid: user.id}).then(function(result){
                             // Si le vendeur sedentaire ne possède pas de commerce
                             var nb_commerce = result.length
-                            if (nb_commerce == 0 && user.statut_type == "sedentary"){
-                                // Ajout de nouveaux commerces via un ecran modal
-                                boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
-                                    $uibModal.open({
-                                        templateUrl: "<%= asset_path('Templates/myModalMarker.html') %>", // loads the template
-                                        controller: 'modalMarker',
-                                        backdrop: true,
-                                        windowClass: 'modal',
-                                        resolve: {
-                                            boutique: function () {
-                                                return boutique; 
-                                            },
-                                            user: function () {
-                                                return user; 
+                            if (nb_commerce == 0){
+                                if (user.statut_type == "sedentary"){
+                                    boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
+                                        $uibModal.open({
+                                            templateUrl: "<%= asset_path('Templates/myModalMarker.html') %>", // loads the template
+                                            controller: 'modalMarker',
+                                            backdrop: true,
+                                            windowClass: 'modal',
+                                            resolve: {
+                                                boutique: function () {
+                                                    return boutique; 
+                                                },
+                                                user: function () {
+                                                    return user; 
+                                                }
                                             }
-                                        }
+                                        })
                                     })
-                                })
+                                }
                             } else {
+                                // recuperation adresses clients affichage sur la map
+                                GetAllAddress.query().then(function (addresses) {
+                                    angular.forEach(addresses, function (address) {
+                                        L.marker([address.latitude, address.longitude]).addTo(map);
+                                    })
+
+                                }, function (error) {
+                                    // do something about the error
+                                    console.log("Error Log",error.statusText);
+                                    deferred.reject(error);
+                                });
+
+
                                 // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
                                 for(var i=0; i<nb_commerce; i++) {
-                                    console.log("commerces : ", result[i])
+                                    //console.log("commerces : ", result[i])
 
                                     var boutique_place = "";
                                     var customIcon = "";
@@ -99,6 +114,13 @@ module.controller('MainController', [
                                     boutique_place = [result[i].latitude, result[i].longitude];
                                     var btnproduct = 'btnproduct'+result[i].id;
                                     var commerce_id = result[i].id;
+                                    // On vérifie la présence de produit pour chaque commerce présent en base
+                                    //GetCommerceProducts.get({commerceid: commerce_id}).then(function (products) {
+                                    //    console.log("produits :", products)
+                                    //    var nb_produit = products.length
+                                    //    
+                                    //})
+
                                     $scope[btnproduct] = function () {
                                         $uibModal.open({
                                             templateUrl: "<%= asset_path('Templates/myModalProduct.html') %>", // loads the template
@@ -143,7 +165,6 @@ module.controller('MainController', [
                                         //map.removeLayer(result);
                                         L.marker(boutique_place, {icon: customIcon}).bindPopup(customPopup).addTo(map);
                                     }
-
                                 }
                             }
 

@@ -6,6 +6,7 @@ marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', funct
 			var deferred = $q.defer();
 			$geolocation.getCurrentPosition({timeout: 60000}).then(function (position) {
 				// This will be executed when the location is accessed
+				//console.log("position : ",position);
 				//console.log("latitude : ",position.coords.latitude);
 				//console.log("longitude : ",position.coords.longitude);
 				var myCoordinates = {};

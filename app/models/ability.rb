@@ -9,8 +9,12 @@ class Ability
         if user.seller_role
             can :manage, Commerce
             can :manage, Product
+            can :manage, Address
         end
-      can :read, :all
+        if user.buyer_role
+            can :manage, Address
+        end
+        can :read, :all
     end
     
     #if user.try(:seller_role?)

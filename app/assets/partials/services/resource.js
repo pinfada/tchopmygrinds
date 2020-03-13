@@ -36,6 +36,25 @@ marketApp.factory("GetAllProduct", ['railsResourceFactory', function(railsResour
   });
 }]);
 
+// Renvoi la liste complete des produits
+marketApp.factory("GetAllAddress", ['railsResourceFactory', function(railsResourceFactory) {
+  return railsResourceFactory({ 
+          url: "/addresses", 
+          name: "address" 
+  });
+}]);
+
+// Renvoi la liste complete des adresses d'un utilisateur
+marketApp.factory("GetUserAddresses", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({ 
+          url: "/users/{{userid}}/addresses", 
+          name: "address",
+          serializer: railsSerializer(function () {
+            this.resource('addresses', 'Address');
+          })
+  });
+}]);
+
 // Renvoie la liste des produits pour un commerce
 marketApp.factory("GetCommerceProducts", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({

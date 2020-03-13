@@ -16,6 +16,7 @@ StatExo1::Application.routes.draw do
   match '/contact', to: 'pages#contact', via: 'get'
   match '/propos', to: 'pages#propos', via: 'get'
   match '/aide', to: 'pages#aide', via: 'get'
+  match '/agrimer', to: 'pages#agrimer', via: 'get'
 
   concern :productable do
     resources :products
@@ -38,15 +39,17 @@ StatExo1::Application.routes.draw do
   resources :users do
     resources :orders, concerns: [:productable, :ordertable]
     resources :commerces, concerns: [:productable, :categorizable] 
+    resources :addresses
   end
   
-  resources :useradresses
   resources :products, concerns: [:categorizable, :ordertable] do
     collection do
       get :listproduct
       get :listcommerce
     end
   end
+
+  resources :addresses
 
 
   root "pages#home"

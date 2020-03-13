@@ -4,7 +4,7 @@ marketApp.factory('myIp', ['$q', '$http', function myIp($q, $http) {
 
     $http({
         method: 'GET',
-        url: 'https://ipinfo.io/json'
+        url: 'https://freegeoip.net/json/'
     }).then(function(response) {
 			var myIp = {};
 			myIp.ip = response.data.ip;

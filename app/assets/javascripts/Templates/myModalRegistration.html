@@ -39,6 +39,7 @@
             </div>
             </br>
             <div ng-switch="data.userSelect.name">
+              
               <!-- BLOC SELLER -->
               <div class="form-group" ng-switch-when="seller">
                 <!-- USER MOBILITE -->
@@ -46,13 +47,13 @@
                   <div class="input-group-prepend">
                     <label class="input-group-text" for="userSelect">Choose type of mobility</label>
                   </div>
-                  <select class="userSelect" id="userSelect" ng-model="myMobility" ng-options="usermobility.name for usermobility in usermobilities">
+                  <select class="userSelect" id="userSelect" ng-model="data.myMobility" ng-options="usermobility.name for usermobility in usermobilities">
                     <option value="">---Please select---</option>
                   </select>
                 </div>
                 </br>
 
-                <div ng-switch="myMobility.name">
+                <div ng-switch="data.myMobility.name">
                   <!-- NAME -->
                   <div class="form-group">
                       <label>Name</label>
@@ -77,6 +78,7 @@
                   </div>
                 </div>
               </div>
+
               <!-- BLOC BUYER -->
               <div class="form-group" ng-switch-when="buyer">
                 <!-- NAME -->

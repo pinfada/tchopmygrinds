@@ -27,4 +27,9 @@ class PagesController < ApplicationController
   	@titre = "Panier"
   	respond_with(@titre)
   end
+
+  def agrimer
+    @data = File.read("#{Rails.root}/public/agrimer.json")
+    render :json => @data
+  end
 end

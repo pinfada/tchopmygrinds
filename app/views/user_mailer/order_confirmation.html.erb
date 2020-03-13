@@ -21,10 +21,10 @@ Email: info@tchopmygrinds.com
 
 	ADRESSE DE FACTURATION :
 
-	<% billing_address = Useradresse.where(id: order.payment_address_id) %>
+	<% billing_address = Address.where(id: order.payment_address_id) %>
 	<% billing_address.each do |b_address| %>
-	Billing Address : <%= "Address 1: #{b_address.address_1} " %>
-										<%= "Address 2: #{b_address.address_2} " %>
+	Billing Address : <%= "Address 1: #{b_address.address1} " %>
+										<%= "Address 2: #{b_address.address2} " %>
 										<%= "City: #{b_address.city}" %>
 										<%= "State: #{b_address.state}" %>
 										<%= "Country: #{b_address.country}" %>
@@ -33,10 +33,10 @@ Email: info@tchopmygrinds.com
 
 	ADRESSE DE LIVRAISON :
 
-	<% shipping_address = Useradresse.where(id: order.delivery_address_id) %>
+	<% shipping_address = Address.where(id: order.delivery_address_id) %>
 	<% shipping_address.each do |s_address| %>
-	Shipping Address :  <%= "Address 1:  #{s_address.address_1} " %>
-										  <%= "Address 2: #{s_address.address_2} " %>
+	Shipping Address :  <%= "Address 1:  #{s_address.address1} " %>
+										  <%= "Address 2: #{s_address.address2} " %>
 											<%= "City: #{s_address.city}" %>
 											<%= "State: #{s_address.state}" %>
 											<%= "Country: #{s_address.country}" %>
