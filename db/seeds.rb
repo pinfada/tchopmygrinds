@@ -29,34 +29,34 @@ Categorization.delete_all # suppression de la table produit
 Categorization.reset_pk_sequence # remise de l'id à 1 pour table produit
 
 
-2.times do
- User.create(
-   name: Faker::Name.name,
-   email: Faker::Internet.email,
-   password: Faker::Internet.password,
-   admin: 'false',
-   seller_role: 'true',
-   buyer_role: 'false'
- )
-end
-
-2.times do
- User.create(
-   name: Faker::Name.name,
-   email: Faker::Internet.email,
-   password: Faker::Internet.password,
-   admin: 'false',
-   seller_role: 'false',
-   buyer_role: 'true'
- )
-end
-
-User.create(
-  name: 'mitch',
-  email: 'cali77@hotmail.fr',
-  password: 'password',
-  admin: 'true'
-)
+#2.times do
+# User.create(
+#   name: Faker::Name.name,
+#   email: Faker::Internet.email,
+#   password: Faker::Internet.password,
+#   admin: 'false',
+#   seller_role: 'true',
+#   buyer_role: 'false'
+# )
+#end
+#
+#2.times do
+# User.create(
+#   name: Faker::Name.name,
+#   email: Faker::Internet.email,
+#   password: Faker::Internet.password,
+#   admin: 'false',
+#   seller_role: 'false',
+#   buyer_role: 'true'
+# )
+#end
+#
+#User.create(
+#  name: 'mitch',
+#  email: 'cali77@hotmail.fr',
+#  password: 'password',
+#  admin: 'true'
+#)
 
 #lgrtab = 20
 #debtab = 0

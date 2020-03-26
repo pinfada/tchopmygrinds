@@ -12,7 +12,9 @@ class Ability
             can :manage, Address
         end
         if user.buyer_role
+            can :read, Commerce
             can :manage, Address
+            can :manage, Product
         end
         can :read, :all
     end

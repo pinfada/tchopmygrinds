@@ -9,7 +9,7 @@
         <li><a href="/" ng-click="MapOpen = !MapOpen" class="gradientmenu" ng-class="{'active': MapOpen === true}"><i class="fa fa-home"></i></a></li>
         <li ng-show="isBuyer"><a href="/" ng-click="SeeSearch = !SeeSearch" class="gradientmenu" ng-class="{'active': SeeSearch === true}"><i class="fa fa-sliders"></i></a></li>
 
-        <li ng-show="isSeller"><a href="/" ng-click="" class="gradientmenu"><i class="fa fa-archive"></i></a></li>
+        <li ng-show="isSeller"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-pagelines"></i></a></li>
 
       </ul>
     </div>
@@ -23,15 +23,16 @@
             <div class="col-md-12">
                 <div class="user">
                     <%= image_tag "ava1.png" %>
+                    <h2>{{username}}</h2>
+                    <br>
                     <div ng-show="isSeller">
-                        <h2>{{username}}</h2>
                         <ul>
-                            <li>Nombre de commerces <a href="#">3 commerces</a></li>
-                            <li>Nombre de produits vendus <a href="#">59 produits</a></li>
+                            <li ng-if="nb_commerce > 0">Nombre de commerces <a href="#"> {{nb_commerce}} commerces</a></li>
+                            <li ng-if="nb_produit > 0">Nombre de produits en stock <a href="#">{{nb_produit}} produits</a></li>
+                            <li ng-if="nb_commerce == 0"><i>Pas de commerce pour cet utilisateur</i></li>
                         </ul>
                     </div>
                     <div ng-show="isBuyer">
-                        <h2>{{username}}</h2>
                         <ul>
                             <li>Nombre de commerces à proximités <a href="#">11 commerces</a></li>
                             <li>Nombre de commandes en cours <a href="#">2 commandes</a></li>
@@ -40,6 +41,7 @@
                 </div>
                 <div class="buttons">
                     <a href="#" class="btn btn-danger btn-sm" ng-click="logout()">Sign out</a>
+                    <a href="" class="btn btn-sm btn-twitter"> <i class="fa fa-twitter"></i>Login via Twitter</a>
                 </div>
             </div>
         </div>
@@ -110,7 +112,7 @@
                     <div class="search">
                         <input type="email" class="form-control  input-sm" id="exampleInputEmail2" placeholder="Enter email" ng-model="credentials.email"/>
                     </div>
-                    <a ng-click="signup()" class="btn btn-warning col-md-2 btn-sm">Sign Up</a>
+                    <a ng-click="" class="btn btn-warning col-md-2 btn-sm">Sign Up</a>
                 </div>
             </div>
         </div>
@@ -143,7 +145,105 @@
             </div>
         </div>
     </div>
-    
+    <!--Content-->
+    <div class="col-md-11 general_content_styles" id="contvisu" ng-if="!MapOpen" ng-show="OngletCommerce">
+             <!--Map open (for adaptive)-->
+        <div class="row map_open">
+            <div class="col-md-12">
+                <a href="/" id="map_open">Open map</a>
+            </div>
+        </div>
+          <!--/Map open (for adaptive)-->
+
+        <!--Commerce info-->
+        <div class="row" ng-hide = "IsVisible">
+            <div class="col-md-12">
+                <h5 class="cat">Commerce List</h5>
+                <div ng-repeat="commerce in commerces">
+                    <div class="card" style="width: 18rem;">
+                        <%= image_tag "ava1.png", class:"card-img-top" %>
+                        <div class="card-body">
+                            <h5 class="card-title">{{commerce.name}}</h5>
+                            <p class="card-text">Commerce localisé à l'adresse {{commerce.adress1}} dans la ville de {{commerce.city}}</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Siren : 999 999 999 99999</li>
+                            <li class="list-group-item">Etat : Actif depuis le 20/09/2017</li>
+                            <li class="list-group-item">Catégorie d'établissement : Siège et établissement principal</li>
+                        </ul>
+                        <div class="card-body">
+                            <button type="button" class="btn btn-sm btn-primary" ng-click="ShowHide()">Show product</button>
+                            <button type="button" ng-click="delCommerce(commerce)" class="btn btn-sm btn-outline-primary text-uppercase"> <i class="fas fa-trash-alt"></i> Delete</button>
+                        </div>
+                    </div>
+                    <br><br>
+                </div>
+            </div>
+        </div>
+
+        <!--Produit info-->
+
+
+        <div class="row" ng-show = "IsVisible">
+            <div class="col-md-12">
+                <h5 class="cat">Product List</h5>
+                <div ng-repeat="produit in products track by $index">
+                    <div class="card">
+                        <div class="row">
+                            <aside class="col-sm-5 border-right">
+                                <article class="gallery-wrap"> 
+                                    <div class="img-big-wrap">
+                                        <%= image_tag "ava1.png" %>
+                                    </div> <!-- slider-product.// -->
+                                    <div class="img-small-wrap">
+                                        <%= image_tag "ava1.png", class:"item-gallery" %>
+                                        <%= image_tag "ava1.png", class:"item-gallery" %>
+                                        <%= image_tag "ava1.png", class:"item-gallery" %>
+                                        <%= image_tag "ava1.png", class:"item-gallery" %>
+                                    </div> <!-- slider-nav.// -->
+                                </article> <!-- gallery-wrap .end// -->
+                            </aside>
+                            <aside class="col-sm-7">
+                                <article class="card-body p-5">
+                                    <h3 class="title mb-3">{{produit.name}}</h3>
+                                    <p class="price-detail-wrap"> 
+                                        <span class="price h3 text-warning"> 
+                                            <span class="num">{{produit.unitprice | currency}}</span>
+                                        </span> 
+                                        <span>/par kg</span> 
+                                    </p> <!-- price-detail-wrap .// -->
+                                    <dl class="item-property">
+                                      <dt>Description</dt>
+                                      <dd><p>Here goes description consectetur adipisicing elit, sed do eiusmod
+                                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                    quis nostrud exercitation ullamco </p></dd>
+                                    </dl>
+                                    <dl class="param param-feature">
+                                      <dt>Model#</dt>
+                                      <dd>12345611</dd>
+                                    </dl>  <!-- item-property-hor .// -->
+                                    <dl class="param param-feature">
+                                      <dt>Color</dt>
+                                      <dd>Black and white</dd>
+                                    </dl>  <!-- item-property-hor .// -->
+                                    <dl class="param param-feature">
+                                      <dt>Delivery</dt>
+                                      <dd>Europe</dd>
+                                    </dl>  <!-- item-property-hor .// -->
+                                    <hr>
+                                    <button type="button" ng-click="delProduct($index)" class="btn btn-lg btn-outline-primary text-uppercase"> <i class="fas fa-trash-alt"></i> Delete</button>
+                                    <button type="button" class="btn btn-primary" ng-click="ShowHide()">Show commerce</button>
+                                </article> <!-- card-body.// -->
+                            </aside> <!-- col.// -->
+                        </div> <!-- row.// -->
+                    </div> <!-- card.// -->
+                    <br><br>
+                </div>
+                <br><br>
+            </div>
+        </div>
+    </div>
+    <!--/Produit info-->
     <!--Content-->
     <div class="col-md-11 side-bar" id="cont" ng-if="!MapOpen" ng-show="SeeSearch">
       <!--Header-->

@@ -8,9 +8,20 @@ class AddressesController < ApplicationController
   # GET /addresses
   # GET /addresses.json
   def index
-    @addresses = Address.all
+    #@addresses = Address.all
     #@addresses = @user.addresses
+    #respond_with(@addresses)
+
+    userid = params[:user_id]
+    if userid.present? 
+      @user = User.find(userid)
+      @addresses = @user.addresses
+    else
+      @addresses = Address.all.order("created_at ASC")
+    end
+
     respond_with(@addresses)
+
   end
 
   # GET /addresses/1

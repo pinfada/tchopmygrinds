@@ -44,10 +44,18 @@ marketApp.factory("GetAllAddress", ['railsResourceFactory', function(railsResour
   });
 }]);
 
+// Renvoi les informations d'un utilisateur
+marketApp.factory("GetAllUser", ['railsResourceFactory', function(railsResourceFactory) {
+  return railsResourceFactory({ 
+          url: "/users", 
+          name: "user" 
+  });
+}]);
+
 // Renvoi la liste complete des adresses d'un utilisateur
 marketApp.factory("GetUserAddresses", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({ 
-          url: "/users/{{userid}}/addresses", 
+          url: "/users/{{userId}}/addresses", 
           name: "address",
           serializer: railsSerializer(function () {
             this.resource('addresses', 'Address');
@@ -58,7 +66,18 @@ marketApp.factory("GetUserAddresses", ['railsResourceFactory', 'railsSerializer'
 // Renvoie la liste des produits pour un commerce
 marketApp.factory("GetCommerceProducts", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({
-          url: "/commerces/{{commerceid}}/products", 
+          url: "/commerces/{{commerceId}}/products", 
+          name: "product",
+          serializer: railsSerializer(function () {
+            this.nestedAttribute('commerces', 'Commerce');
+          })
+  });
+}]);
+
+// Suppression produit associé à un commerce
+marketApp.factory("SupCommerceProducts", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({
+          url: "/commerces/{{commerceId}}/products/{{id}}", 
           name: "product",
           serializer: railsSerializer(function () {
             this.nestedAttribute('commerces', 'Commerce');
@@ -69,7 +88,7 @@ marketApp.factory("GetCommerceProducts", ['railsResourceFactory', 'railsSerializ
 // Renvoi la Liste des commerces d'un utilisateur
 marketApp.factory("GetUserCommerces", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({
-          url: "/users/{{userid}}/commerces", 
+          url: "/users/{{userId}}/commerces", 
           name: "commerce",
           serializer: railsSerializer(function () {
             this.nestedAttribute('users', 'User');

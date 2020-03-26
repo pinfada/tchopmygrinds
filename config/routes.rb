@@ -1,5 +1,6 @@
 StatExo1::Application.routes.draw do
   
+  get 'users/index'
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   devise_for :users, controllers: { 
   #  sessions: 'users/sessions',

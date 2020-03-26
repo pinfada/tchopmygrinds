@@ -3,13 +3,16 @@ marketApp.controller("modalProduct", [
     '$scope',
     '$uibModalInstance', 
     '$log', 
-    '$route', 
+    '$route',
+    '$window',
     'GetAllCommerce', 
+    'GetAllProduct',
     'GetCommerceProducts', 
+    'SupCommerceProducts',
     'commerce', 
     'myFruitsliste', 
     'moment',  
-    function ($q, $scope, $uibModalInstance, $log, $route, GetAllCommerce, GetCommerceProducts, commerce, myFruitsliste, moment){
+    function ($q, $scope, $uibModalInstance, $log, $route, $window, GetAllCommerce, GetAllProduct, GetCommerceProducts, SupCommerceProducts, commerce, myFruitsliste, moment){
 
     //var deferred = $q.defer();
     $scope.SeeGraph = false;
@@ -17,6 +20,8 @@ marketApp.controller("modalProduct", [
     $scope.onClick = function (points, evt) {
       console.log(points, evt);
     };
+
+    var ind_suppression = false
     
     $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }, { yAxisID: 'y-axis-3' }];
     
@@ -71,12 +76,12 @@ marketApp.controller("modalProduct", [
     //Liste des produits selectionnables par les commercants
     myFruitsliste.then(function(value) {
         $scope.fruits = value;
-        console.log(value)
+        //console.log(value)
     });
 
     // On vérifie la présence de produit pour chaque commerce présent en base
-    GetCommerceProducts.get({commerceid: commerce}).then(function (products) {
-        //  console.log("produits :", products)
+    GetCommerceProducts.get({commerceId: commerce}).then(function (products) {
+        //console.log("produits :", products)
         $scope.nbproduit = products.length
         $scope.produits = products;
     }, function (error) {
@@ -105,18 +110,19 @@ marketApp.controller("modalProduct", [
     // Create the function to push the data into the "produits" array
     $scope.newProduit = function (donnee) {
     //    p.then(function(value) {
-            $scope.name = donnee.name;
-            $scope.prix = donnee.prix;
-            $scope.quantite = donnee.quantite;
-            $scope.stock = donnee.stock;
-            $scope.discontinued = donnee.discontinued;
-            $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceid: commerce});
-            $scope.name = $scope.prix = $scope.quantite ="";
-            $scope.SeeGraph = true;
+        $scope.name = donnee.name;
+        $scope.prix = donnee.prix;
+        $scope.quantite = donnee.quantite;
+        $scope.stock = donnee.stock;
+        $scope.discontinued = donnee.discontinued;
+        $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceId: commerce});
+        $scope.name = $scope.prix = $scope.quantite ="";
+        $scope.SeeGraph = true;
     //    });
     };
     
     $scope.findValue = function(newValue, oldValue) { 
+        // initialisation variables
         $scope.results = [];
         var mini = [];
         var maxi = [];
@@ -124,9 +130,11 @@ marketApp.controller("modalProduct", [
         $scope.date = [];
         $scope.labels = [];
         var d1 = "";
+
         var lgrValue = newValue.length;
         var last = newValue[lgrValue - 1];
-        if(typeof last !== "undefined") {
+
+        if  (typeof last !== "undefined") {
             var nom_produit = last.name;
             //console.log(nom_produit);
             angular.forEach($scope.fruits, function(item) {
@@ -154,7 +162,16 @@ marketApp.controller("modalProduct", [
     };
     
     $scope.remove = function(index){
-      $scope.produits.splice(index, 1);
+        var delProduct = $scope.produits
+        var data = delProduct[index]
+        //console.log("produit : ", data)
+        $scope.produits.splice(index, 1);
+        ind_suppression = true
+        $log.log('Remove product info.'); // kinda console logs this statement
+        $log.log(data);
+        new SupCommerceProducts(
+            data
+        ).remove();
     };
     
     //Observation changement d'état de la variable $scope.produits
@@ -165,17 +182,23 @@ marketApp.controller("modalProduct", [
     };
     
     $scope.submit = function () {
-        var total = $scope.produits.length;
-        for(var i=0; i<total; i++) {
-            var result = $scope.produits[i];
-            $log.log('Submiting product info.'); // kinda console logs this statement
-            $log.log(result);
-            new GetCommerceProducts(
-                result 
-            ).create();
-            $uibModalInstance.close('cancel');
-            $route.reload();
+        console.log("ind_suppression", ind_suppression)
+        if  (ind_suppression == false) {
+            var total = $scope.produits.length;
+            for(var i=0; i<total; i++) {
+                var result = $scope.produits[i];
+                $log.log('Submiting product info.'); // kinda console logs this statement
+                $log.log(result);
+                new GetCommerceProducts(
+                    result 
+                ).create();
+                //$uibModalInstance.close('cancel');
+                //$route.reload();
+                //$window.location.reload();
+            }
         }
+        $uibModalInstance.close('cancel');
+        $window.location.reload();
     };
 
 }]);

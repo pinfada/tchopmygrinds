@@ -9,11 +9,18 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.json
   def index
-    @products = Product.all.order("created_at ASC")
+    #@products = Product.all.order("created_at ASC")
     #products = Product.all.group(:name)
     #@products = products.sum(:unitsinstock)
+    commerceid = params[:commerce_id]
+    if commerceid.present? 
+      @commerce = Commerce.find(commerceid)
+      @products = @commerce.products
+    else
+      @products = Product.all.order("created_at ASC")
+    end
+    
     respond_with(@products)
-    # @products = @commerce.products
   end
 
   # GET /products/1
@@ -38,8 +45,8 @@ class ProductsController < ApplicationController
   # POST /products.json
   def create
     # @product = Product.new(product_params)
+    # @product.save
     @product = @commerce.products.create(product_params)
-    @product.save
     respond_with(@product)
 
     #respond_to do |format|

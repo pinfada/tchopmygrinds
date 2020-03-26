@@ -2,13 +2,18 @@ class CommercesController < ApplicationController
 #  before_action :authenticate_user!, :except => [:show, :index, :search]
   authorize_resource
   before_action :set_commerce, only: [:show, :edit, :update, :destroy]
-  before_action :set_user, only: [:index, :create, :new]
+  before_action :set_user, only: [:create, :new]
 
   respond_to :html, :json
 
   def index
-#   @commerces = Commerce.all
-    @commerces = @user.commerces
+    userid = params[:user_id]
+    if userid.present? 
+      @user = User.find(userid)
+      @commerces = @user.commerces
+    else
+      @commerces = Commerce.all
+    end
     respond_with(@commerces)
   end
 
@@ -63,7 +68,7 @@ class CommercesController < ApplicationController
     end
 
     def commerce_params
-      params.require(:commerce).permit(:name, :adress1, :adress2, :details, :postal, :country, :latitude, :longitude, :city, product_ids: []) if params[:commerce]
+      params.require(:commerce).permit(:name, :adress1, :adress2, :details, :postal, :country, :latitude, :longitude, :city, :user_id, product_ids: []) if params[:commerce]
     end
 
 end

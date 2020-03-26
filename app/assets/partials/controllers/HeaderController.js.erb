@@ -1,4 +1,4 @@
-// Define the `HeeaderController` controller on the `MarketApp` module
+// Define the `HeaderController` controller on the `MarketApp` module
 marketApp.controller('HeaderController', [
   '$q', 
   '$scope', 
@@ -6,19 +6,26 @@ marketApp.controller('HeaderController', [
   'Auth', 
   '$http', 
   '$route', 
+  '$window',
+  '$log',
+  'GetUserCommerces',
+  'GetCommerceProducts', 
+  'SupCommerceProducts', 
   'GetAllProduct', 
   'SearchProduct', 
+  'GetAllCommerce',
   'SearchCommerce',
   '$timeout', 
   'myCoordinates', 
   'myBoutiques',
-  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, GetAllProduct, SearchProduct, SearchCommerce, $timeout, myCoordinates, boutiques, myBoutiques) {
+  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, boutiques, myBoutiques) {
 
     var deferred = $q.defer();
     
     $scope.activemenu = false;
     $scope.SeeSearch = false;
     $scope.MapOpen = false;
+    $scope.OngletCommerce = false
     $scope.ProfileOpen = false;
     $scope.credentials = { email: '', password: 'password1', password_confirmation: 'password1', buyer_role: 'true' };
 
@@ -76,32 +83,81 @@ marketApp.controller('HeaderController', [
     ];
 
     // Récupération de l'ensemble des produits présents en base
-    if  (Auth.isAuthenticated() ){
-      // Check on load if user signed in
-      Auth.currentUser().then(function(user) {
-        $scope.isAuthenticated = true;
-        $scope.username = user.name;
-        if (user.seller_role == true){
-            $scope.isSeller = true;
-        }
-        if (user.buyer_role == true){
-            $scope.isBuyer = true;
-        }
-      }, function(error) {
-        // Log on console to check out what the error is.
-        // console.info('Error user not signed in!');
-      });
-    }
+    // if  (Auth.isAuthenticated() )
+    // {
+    //   // Check on load if user signed in
+    //   Auth.currentUser().then(function(user) {
+    //     $scope.isAuthenticated = true;
+    //     $scope.username = user.name;
+    //     if (user.seller_role == true){
+    //         $scope.isSeller = true;
+    //     }
+    //     if (user.buyer_role == true){
+    //         $scope.isBuyer = true;
+    //     }
+    //   }, function(error) {
+    //     // Log on console to check out what the error is.
+    //      console.info('Error isAuthenticated user!');
+    //   });
+    // }
 
     $scope.$on('devise:login', function(event, currentUser) {
       $scope.username = currentUser.name;
       $scope.isAuthenticated = true;
+      $scope.IsVisible = false;
+      $scope.ShowHide = function () {
+        $scope.IsVisible = $scope.IsVisible ? false : true;
+      }
+
       if (currentUser.seller_role == true){
           $scope.isSeller = true;
-      }
-      if (currentUser.buyer_role == true){
-          $scope.isBuyer = true;
-      }
+          // Récupération de la liste des commerces du user
+          GetUserCommerces.get({userId: currentUser.id}).then(function(commerces){
+            $scope.commerces = commerces
+            $scope.nb_commerce = commerces.length
+
+            var calc_nbproduct = 0
+            angular.forEach(commerces, function (commerce) {
+              GetCommerceProducts.get({commerceId: commerce.id}).then(function(products){
+                $scope.products = products
+                calc_nbproduct = calc_nbproduct + products.length
+                $scope.nb_produit = calc_nbproduct
+                //console.log("produits : ", $scope.nb_produit)
+                //console.log("nbre produits : ", $scope.nb_produit)
+              }, function(error) {
+                  // Log on console to check out what the error is.
+                  console.info('Error recuperation liste produits!');
+              })
+            });
+          }, function(error) {
+              // Log on console to check out what the error is.
+              console.info('Error recuperation liste commerces!');
+          });
+
+          $scope.delCommerce = function (data) {
+            $log.log('Deleting commerce info.'); // kinda console logs this statement
+            $log.log(data);
+            new GetAllCommerce(
+                data 
+            ).remove();
+            //$route.reload();
+            $window.location.reload();
+          }
+
+          $scope.delProduct = function (index) {
+            var delProduct = $scope.products
+            var data = delProduct[index]
+            //console.log("produit : ", data)
+            $scope.products.splice(index, 1);
+            $log.log('Remove product info.'); // kinda console logs this statement
+            $log.log(data);
+            new SupCommerceProducts(
+                data
+            ).remove();
+          }
+
+      } else {
+        $scope.isBuyer = true;
       //myCoordinates.getCoordinates().then(function (position) {
         GetAllProduct.query().then(function (results) {
           // Pour chaque produits on vérifie si celui-ci est proche de notre position
@@ -133,7 +189,7 @@ marketApp.controller('HeaderController', [
         $scope.productSelected = function (item) {
           //Récupération de l'adresse IP
           //myCoordinates.getCoordinates().then(function (position) {
-            SearchCommerce.query({name_query:item.name, lat_query:position.lat, lng_query:position.lng}).then(function (results) {
+            SearchCommerce.query({name_query:item.name, lat_query:$scope.latitude, lng_query:$scope.longitude}).then(function (results) {
                 //console.log("donnée renseignée", results);
                 $scope.commercenear = results;
                 //console.log($scope.commercenear);
@@ -156,6 +212,9 @@ marketApp.controller('HeaderController', [
                 deferred.reject(error);
             });
         };
+
+      }
+
       //});
       // Deconnexion automatique
       $timeout(function() {
@@ -166,6 +225,7 @@ marketApp.controller('HeaderController', [
     });
     
     $scope.$on('devise:new-session', function(event, currentUser) {
+      //console.log("nouvelle session")
       $scope.isAuthenticated = true;
       if (currentUser.seller_role == true){
           $scope.isSeller = true;
@@ -183,17 +243,23 @@ marketApp.controller('HeaderController', [
       if (oldCurrentUser.buyer_role == true){
           $scope.isBuyer = false;
       }
+      $scope.IsVisible = false;
+      $scope.activemenu = false;
+      $scope.SeeSearch = false;
+      $scope.MapOpen = false;
+      $scope.OngletCommerce = false
+      $scope.ProfileOpen = false;
     });
     
-    $scope.$on('devise:new-registration', function(event, user) {
-      $scope.isAuthenticated = true;
-      if (user.seller_role == true){
-          $scope.isSeller = true;
-      }
-      if (user.buyer_role == true){
-          $scope.isBuyer = true;
-      }
-    });
+    // $scope.$on('devise:new-registration', function(event, user) {
+    //   $scope.isAuthenticated = true;
+    //   if (user.seller_role == true){
+    //       $scope.isSeller = true;
+    //   }
+    //   if (user.buyer_role == true){
+    //       $scope.isBuyer = true;
+    //   }
+    // });
     
     $scope.logout = function() {
       $scope.activemenu = false;

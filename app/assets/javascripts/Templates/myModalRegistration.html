@@ -39,7 +39,6 @@
             </div>
             </br>
             <div ng-switch="data.userSelect.name">
-              
               <!-- BLOC SELLER -->
               <div class="form-group" ng-switch-when="seller">
                 <!-- USER MOBILITE -->
@@ -57,18 +56,18 @@
                   <!-- NAME -->
                   <div class="form-group">
                       <label>Name</label>
-                      <input type="text" name="name" class="form-control" ng-model="data.name" required>
+                      <input type="text" name="name" placeholder="Full name" class="form-control" ng-model="data.name" required>
                       <p ng-show="form.userForm.name.$invalid && !form.userForm.name.$pristine" class="help-block">Your name is required.</p>
                   </div>
                   <!-- EMAIL -->
                   <div class="form-group">
                       <label>Email</label>
-                      <input type="email" name="email" class="form-control" ng-model="data.email" required>
+                      <input type="email" name="email" placeholder="Email address" class="form-control" ng-model="data.email" required>
                       <p ng-show="form.userForm.email.$invalid && !form.userForm.email.$pristine" class="help-block">Enter a valid email.</p>
                   </div>
                   <div class="form-group" ng-switch-when="sedentary">
                     <div class="alert alert-info" role="alert">
-                      Please enter the address of your shop After!
+                      Please enter the address of your store After!
                     </div>
                   </div>
                   <div class="form-group" ng-switch-when="itinerant">
@@ -84,7 +83,7 @@
                 <!-- NAME -->
                 <div class="form-group">
                     <label>Name</label>
-                    <input type="text" name="name" class="form-control" ng-model="data.name" required>
+                    <input type="text" name="name" placeholder="Full name" class="form-control" ng-model="data.name" required>
                     <p ng-show="form.userForm.name.$invalid && !form.userForm.name.$pristine" class="help-block">Your name is required.</p>
                 </div>
                 <!-- USERNAME 
@@ -98,7 +97,7 @@
                 <!-- EMAIL -->
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" class="form-control" ng-model="data.email" required>
+                    <input type="email" name="email" placeholder="Email address" class="form-control" ng-model="data.email" required>
                     <p ng-show="form.userForm.email.$invalid && !form.userForm.email.$pristine" class="help-block">Enter a valid email.</p>
                 </div>
               </div>
