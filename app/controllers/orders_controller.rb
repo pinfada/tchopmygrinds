@@ -9,14 +9,22 @@ class OrdersController < ApplicationController
   # GET /orders
   # GET /orders.json
   def index
-  # @orders = Order.all
-    @orders = @user.orders
+    userid = params[:user_id]
+    if userid.present? 
+      @user = User.find(userid)
+      @orders = @user.orders
+    else
+      @orders = order.all.order("created_at ASC")
+    end
+
+    respond_with(@orders)
   end
 
   # GET /orders/1
   # GET /orders/1.json
   def show
-    @order = @user.orders.find(params[:id])
+    #@order = @user.orders.find(params[:id])
+    respond_with(@order)
   end
 
   # GET /orders/new
@@ -82,7 +90,7 @@ class OrdersController < ApplicationController
     
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
-      params.require(:product).permit(:OrderDate, :requiredate, :shippedate, :status, :user_id, :payment_address_id, :delivery_address_id)
+      params.require(:order).permit(:OrderDate, :requiredate, :shippedate, :status, :user_id, :payment_address_id, :delivery_address_id)
     end
     
 end

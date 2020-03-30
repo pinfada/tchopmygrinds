@@ -7,7 +7,21 @@ class OrderdetailsController < ApplicationController
   # GET /orderdetails
   # GET /orderdetails.json
   def index
-    @orderdetails = Orderdetail.all
+    userid = params[:user_id]
+    orderid = params[:order_id]
+    if userid.present? && orderid.present?
+      @user = User.find(userid)
+      @order = Order.find(orderid)
+      orders = @user.orders
+      @orderdetails = @order.orderdetails
+      #orders.each do |order|
+      #  @orderdetails = Orderdetail.where(order_id: order.id)
+      #end
+    else
+      @orderdetails = Orderdetail.all
+    end
+
+    respond_with(@orderdetails)
   end
 
   # GET /orderdetails/1

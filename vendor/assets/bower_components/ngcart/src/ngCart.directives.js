@@ -93,10 +93,12 @@ angular.module('ngCart.directives', ['ngCart.fulfilment'])
                     fulfilmentProvider.setService($scope.service);
                     fulfilmentProvider.setSettings($scope.settings);
                     fulfilmentProvider.checkout()
-                        .success(function (data, status, headers, config) {
+                        //.success(function (data, status, headers, config) {
+                        .then(function (data, status, headers, config) {
                             $rootScope.$broadcast('ngCart:checkout_succeeded', data);
                         })
-                        .error(function (data, status, headers, config) {
+                        //.error(function (data, status, headers, config) {
+                        .catch(function (data, status, headers, config) {
                             $rootScope.$broadcast('ngCart:checkout_failed', {
                                 statusCode: status,
                                 error: data

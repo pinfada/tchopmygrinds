@@ -182,7 +182,7 @@ marketApp.controller("modalProduct", [
     };
     
     $scope.submit = function () {
-        console.log("ind_suppression", ind_suppression)
+        //console.log("ind_suppression", ind_suppression)
         if  (ind_suppression == false) {
             var total = $scope.produits.length;
             for(var i=0; i<total; i++) {

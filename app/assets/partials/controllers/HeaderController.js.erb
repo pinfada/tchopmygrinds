@@ -17,11 +17,14 @@ marketApp.controller('HeaderController', [
   'SearchCommerce',
   '$timeout', 
   'myCoordinates', 
+  'myConnexion',
   'myBoutiques',
-  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, boutiques, myBoutiques) {
+  'GetUserOrders',
+  'GetOrderDetails',
+  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, myConnexion, boutiques, myBoutiques, GetUserOrders, GetOrderDetails) {
 
     var deferred = $q.defer();
-    
+    //$window.location.reload();
     $scope.activemenu = false;
     $scope.SeeSearch = false;
     $scope.MapOpen = false;
@@ -34,85 +37,36 @@ marketApp.controller('HeaderController', [
     $scope.latitude = '';
     $scope.longitude = '';
 
+    $scope.labels = ['Janvier', 'Février', 'mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+    $scope.series = ['Nombre de commandes'];
+
+    $scope.data = [
+      [65, 59, 80, 81, 56, 55, 40, 47, 75, 69, 92, 70]
+    ];
+
+    $scope.labels01 = ["Igname", "Fraises", "Bananes plantains"];
+    $scope.data01 = [300, 500, 100];
+
     // recuperation des coordonnees de l'utilisateur
     myCoordinates.getCoordinates().then(function (position) {
       $scope.latitude = position.lat
       $scope.longitude = position.lng
       $scope.coordonnees.push($scope.latitude, $scope.longitude)
     });
-    //console.log("coordonnees : ", $scope.coordonnees)
 
-    // Ouverture de la fenetre de souscription/authentification
-    $scope.OpenRegistration = function () {
-        $scope.activemenu = true;
-        $uibModal.open({
-            templateUrl: "<%= asset_path('Templates/myModalRegistration.html') %>", // loads the template
-            controller: 'modalRegistration',
-            backdrop: true,
-            windowClass: 'modal',
-            resolve: {
-                coordinates: function () {
-                  return $scope.coordonnees; 
-                },
-                boutiques: function (myBoutiques) {
-                  return myBoutiques;
-                }
-            }
-        });
-    };
-
-    $scope.searchParams = {
-        "query":""
-    };
-    
-    $scope.foo = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-    
-    $scope.selectedIndex = 0;
-    
-    $scope.itemClicked = function ($index) {
-    //  console.log($index);
-      $scope.selectedIndex = $index;
-    };
-
-    $scope.availableSearchParams = [
-//      { key: "céréales", name: "Céreales", placeholder: "Céreales..." },
-//      { key: "tubercules", name: "Tubercules", placeholder: "Tubercules...", suggestedValues: ['Macabo', 'Igname', 'Pomme de terre', 'Manioc'] },
-      { key: "fruits", name: "Fruits", placeholder: "Fruits...", restrictToSuggestedValues: false, suggestedValues: ['Mangue', 'Banane', 'Cerise', 'Clémentine', 'Poire'] },
-      { key: "légumes", name: "Légumes", placeholder: "Légumes..", restrictToSuggestedValues: true, suggestedValues: ['Oignons', 'Haricots', 'Gombo', 'Choux', 'Echalotte'] },
-//      { key: "épices", name: "Epices", placeholder: "Epices..." }
-    ];
-
-    // Récupération de l'ensemble des produits présents en base
-    // if  (Auth.isAuthenticated() )
-    // {
-    //   // Check on load if user signed in
-    //   Auth.currentUser().then(function(user) {
-    //     $scope.isAuthenticated = true;
-    //     $scope.username = user.name;
-    //     if (user.seller_role == true){
-    //         $scope.isSeller = true;
-    //     }
-    //     if (user.buyer_role == true){
-    //         $scope.isBuyer = true;
-    //     }
-    //   }, function(error) {
-    //     // Log on console to check out what the error is.
-    //      console.info('Error isAuthenticated user!');
-    //   });
-    // }
-
-    $scope.$on('devise:login', function(event, currentUser) {
-      $scope.username = currentUser.name;
+    myConnexion.getConnexion().then(function (user) {
+      console.log("info authentication : ", user)
+      $scope.username = user.name;
       $scope.isAuthenticated = true;
       $scope.IsVisible = false;
       $scope.ShowHide = function () {
         $scope.IsVisible = $scope.IsVisible ? false : true;
       }
 
-      if (currentUser.seller_role == true){
+      if (user.isSeller == true){
           $scope.isSeller = true;
           // Récupération de la liste des commerces du user
-          GetUserCommerces.get({userId: currentUser.id}).then(function(commerces){
+          GetUserCommerces.get({userId: user.id}).then(function(commerces){
             $scope.commerces = commerces
             $scope.nb_commerce = commerces.length
 
@@ -213,9 +167,95 @@ marketApp.controller('HeaderController', [
             });
         };
 
-      }
+        // Récupération des commandes de l'utilisateur
+        GetUserOrders.get({userId: user.id}).then(function (orders) {
+            //console.log("orders :", orders)
+            $scope.nb_order = orders.length
+            $scope.orders = orders
+            angular.forEach($scope.orders, function(order) {
+                GetOrderDetails.get({userId: user.id, orderId: order.id}).then(function (orderdetails) {
+                    console.log("orderdetails :", orderdetails)
+                    $scope.nborderdetails = orderdetails.length
+                    $scope.orderdetails = orderdetails
+                }, function (error) {
+                    // do something about the error
+                    console.log("Error Log",error.statusText);
+                    deferred.reject(error);
+                });
+            })
+        }, function (error) {
+            // do something about the error
+            console.log("Error Log",error.statusText);
+            deferred.reject(error);
+        });
 
-      //});
+      }
+    }, function (error) {
+        // do something about the error
+        console.log("Error Log",error.statusText);
+    });
+    //console.log("coordonnees : ", $scope.coordonnees)
+
+    // Ouverture de la fenetre de souscription/authentification
+    $scope.OpenRegistration = function () {
+        $scope.activemenu = true;
+        $uibModal.open({
+            templateUrl: "<%= asset_path('Templates/myModalRegistration.html') %>", // loads the template
+            controller: 'modalRegistration',
+            backdrop: true,
+            windowClass: 'modal',
+            resolve: {
+                coordinates: function () {
+                  return $scope.coordonnees; 
+                },
+                boutiques: function (myBoutiques) {
+                  return myBoutiques;
+                }
+            }
+        });
+    };
+
+    $scope.searchParams = {
+        "query":""
+    };
+    
+    $scope.foo = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+    
+    $scope.selectedIndex = 0;
+    
+    $scope.itemClicked = function ($index) {
+    //  console.log($index);
+      $scope.selectedIndex = $index;
+    };
+
+    $scope.availableSearchParams = [
+//      { key: "céréales", name: "Céreales", placeholder: "Céreales..." },
+//      { key: "tubercules", name: "Tubercules", placeholder: "Tubercules...", suggestedValues: ['Macabo', 'Igname', 'Pomme de terre', 'Manioc'] },
+      { key: "fruits", name: "Fruits", placeholder: "Fruits...", restrictToSuggestedValues: false, suggestedValues: ['Mangue', 'Banane', 'Cerise', 'Clémentine', 'Poire'] },
+      { key: "légumes", name: "Légumes", placeholder: "Légumes..", restrictToSuggestedValues: true, suggestedValues: ['Oignons', 'Haricots', 'Gombo', 'Choux', 'Echalotte'] },
+//      { key: "épices", name: "Epices", placeholder: "Epices..." }
+    ];
+
+    // Récupération de l'ensemble des produits présents en base
+    // if  (Auth.isAuthenticated() )
+    // {
+    //   // Check on load if user signed in
+    //   Auth.currentUser().then(function(user) {
+    //     $scope.isAuthenticated = true;
+    //     $scope.username = user.name;
+    //     if (user.seller_role == true){
+    //         $scope.isSeller = true;
+    //     }
+    //     if (user.buyer_role == true){
+    //         $scope.isBuyer = true;
+    //     }
+    //   }, function(error) {
+    //     // Log on console to check out what the error is.
+    //      console.info('Error isAuthenticated user!');
+    //   });
+    // }
+
+    $scope.$on('devise:login', function(event, currentUser) {
       // Deconnexion automatique
       $timeout(function() {
         Auth.logout();

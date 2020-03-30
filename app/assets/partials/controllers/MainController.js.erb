@@ -195,8 +195,6 @@ module.controller('MainController', [
 
                     } else {
                         // L'utilisateur a un rôle d'acheteur
-                        // Récupération du nom de commerces à proximité en fonction des coordonnées(x,y) et affichage sur la map
-        	            //boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
                         GetAllCommerce.query().then(function (boutiques) {
                             //console.log("boutiques : ", boutiques)
                             angular.forEach(boutiques, function(boutique, key) {
@@ -216,6 +214,9 @@ module.controller('MainController', [
                                         resolve: {
                                             boutique: function () {
                                                 return boutique; // Appel au controlleur modalOrder avec en entrée le nom du commerce
+                                            },
+                                            user: function () {
+                                                return user; 
                                             }
                                         }
                                     });

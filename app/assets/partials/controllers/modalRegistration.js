@@ -5,10 +5,11 @@ marketApp.controller("modalRegistration", [
     '$log', 
     'Auth', 
     '$route', 
+    '$window',
     'coordinates', 
     'boutiques', 
     'GetUserAddresses',
-    function ($scope, $uibModal, $uibModalInstance, $log, Auth, $route, coordinates, boutiques, GetUserAddresses){
+    function ($scope, $uibModal, $uibModalInstance, $log, Auth, $route, $window, coordinates, boutiques, GetUserAddresses){
 
     $scope.credentials = {
         email: '', 
@@ -53,7 +54,8 @@ marketApp.controller("modalRegistration", [
         $log.log($scope.credentials);
         Auth.login($scope.credentials).then(function(user) {
             $uibModalInstance.close('cancel');
-            $route.reload();
+            //$route.reload();
+            $window.location.reload()
         }, function(error) {
             console.info('Error in authenticating user!');
             alert('Error in signing in user!');

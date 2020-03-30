@@ -26,7 +26,7 @@ marketApp.controller("modalMarker", [
         for(var i=0; i<total; i++) {
             if(result[i] !== "") {
                 var store = angular.fromJson(result[i])
-                console.log("store : ", store)
+                //console.log("store : ", store)
                 var commerce = {
                     name: store.fields.name,
                     adress1: store.fields.address,

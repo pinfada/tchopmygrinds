@@ -5,13 +5,16 @@ marketApp.controller("modalOrder", [
     '$log', 
     '$route',
     'boutique', 
+    'user',
     'GetCommerceProducts',
-    function ($q, $scope, $uibModalInstance, $log, $route, boutique, GetCommerceProducts){
+    'GetUserOrders',
+    'GetOrderDetails',
+    function ($q, $scope, $uibModalInstance, $log, $route, boutique, user, GetCommerceProducts, GetUserOrders, GetOrderDetails){
 
     var deferred = $q.defer();
 
 
-    // On vérifie la présence de produit pour chaque commerce présent en base
+    // Récupération de la liste des produits pour un commerce
     GetCommerceProducts.get({commerceId: boutique.id}).then(function (products) {
         //console.log("produits :", products)
         $scope.nbproduit = products.length
@@ -23,8 +26,21 @@ marketApp.controller("modalOrder", [
         deferred.reject(error);
     });
 
-    //$scope.produits = produits
-    //$scope.nbproduit = produits.length
+    $scope.$on('ngCart:checkout_succeeded', function(event, cart) {
+        console.log("cart : ", cart)
+        var cart = {
+            OrderDate: new Date().toISOString().slice(0,10),
+            requiredate: new Date().toISOString().slice(0,10),
+            shippedate: '',
+            status: '0',
+            userId: user.id
+        }
+        $log.log('Submiting store info.'); // kinda console logs this statement
+        $log.log(cart);
+        //new GetUserOrders(
+        //    cart 
+        //).create();
+    });
 
     $scope.cancel = function () {
         $uibModalInstance.close(false); 

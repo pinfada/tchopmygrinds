@@ -35,7 +35,7 @@
                     <div ng-show="isBuyer">
                         <ul>
                             <li>Nombre de commerces à proximités <a href="#">11 commerces</a></li>
-                            <li>Nombre de commandes en cours <a href="#">2 commandes</a></li>
+                            <li>Nombre de commandes passées <a href="#">{{nb_order}} commandes</a></li>
                         </ul>
                     </div>
                 </div>
@@ -70,8 +70,13 @@
                 <!--news-->
                 <div class="row news_container">
                     <div class="col-md-8 news">
-                        <span class="data">12.11.2013</span> You friend <a href="#">Mattew An</a> visited restaurant "<a href="#">Pizza larenzo</a>"
-                         <div id="map2" class="map_in_news"></div>
+                        <span class="data">12.11.2020</span><strong>Monde : </strong>Alerte maladie du panama. Les bananes sont en danger "<a href="#">Source AFP</a>"
+                    </div>
+                    <div class="col-md-8 news">
+                        <span class="data">13.11.2020</span><strong>Flop : </strong>Vente en baisse de 10% des pommes de terre sur la semaine.
+                    </div>
+                    <div class="col-md-8 news">
+                        <span class="data">13.11.2020</span><strong>Top : </strong>Vente en hausse de 14% des haricots sur la semaine.
                     </div>
                     <div class="col-md-4 news_user_info">
                         <%= image_tag "no_ava.png" %><a href="#">Mattew An</a>Write a review:
@@ -83,6 +88,44 @@
             </div>
         </div>
         <!--/my news-->
+
+        <!--Products sales graph-->
+        <div class="row">
+            <div class="col-md-12 my_news">
+                <div class="title_news">
+                    <h2>Sales performance</h2>
+                </div>
+                <!--Graph-->
+                <h4>Commandes clients</h4>
+                <div class="row news_container">
+                    <canvas id="bar" width="500px" height="300px" class="chart chart-bar" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride" chart-click="onClick"></canvas>
+                </div>
+                <div class="col-md-4 col-sm-4 mb">
+                    <h4>Meilleurs ventes</h4>
+                    <canvas id="doughnut" class="chart chart-doughnut"
+                          chart-data="data01" chart-labels="labels01">
+                    </canvas> 
+                    <br />
+                </div>
+                <div class="col-md-4 col-sm-4 mb">
+                    <h4>xxxxxxxxxxx</h4>
+                    <canvas id="doughnut" class="chart chart-doughnut"
+                          chart-data="data01" chart-labels="labels01">
+                    </canvas> 
+                    <br />
+                </div>
+                <div class="col-md-4 col-sm-4 mb">
+                    <h4>xxxxxxxxxxx</h4>
+                    <canvas id="doughnut" class="chart chart-doughnut"
+                          chart-data="data01" chart-labels="labels01">
+                    </canvas> 
+                    <br />
+                </div>
+                <!--/graph-->
+            </div>
+        </div>
+        <!--/Products sales graph-->
+
     </div>
     <!--/Profile-->
 

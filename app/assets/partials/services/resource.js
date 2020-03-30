@@ -63,6 +63,28 @@ marketApp.factory("GetUserAddresses", ['railsResourceFactory', 'railsSerializer'
   });
 }]);
 
+// Renvoi la liste complete des commandes d'un utilisateur
+marketApp.factory("GetUserOrders", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({ 
+          url: "/users/{{userId}}/orders", 
+          name: "order",
+          serializer: railsSerializer(function () {
+            this.resource('orders', 'Order');
+          })
+  });
+}]);
+
+// Renvoi la liste complete des commandes d'un utilisateur
+marketApp.factory("GetOrderDetails", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({ 
+          url: "/users/{{userId}}/orders/{{orderId}}/orderdetails", 
+          name: "orderdetail",
+          serializer: railsSerializer(function () {
+            this.resource('orderdetails', 'Orderdetail');
+          })
+  });
+}]);
+
 // Renvoie la liste des produits pour un commerce
 marketApp.factory("GetCommerceProducts", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({
