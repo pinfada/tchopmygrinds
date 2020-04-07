@@ -21,7 +21,13 @@ class OrderdetailsController < ApplicationController
       @orderdetails = Orderdetail.all
     end
 
-    respond_with(@orderdetails)
+    #respond_with(@orderdetails)
+    if @orderdetails
+      render json: @orderdetails, status: :ok
+    else
+      render json: {}, status: :not_found
+    end
+
   end
 
   # GET /orderdetails/1
@@ -32,40 +38,50 @@ class OrderdetailsController < ApplicationController
   # GET /orderdetails/new
   def new
     @orderdetail = Orderdetail.new
+    respond_with(@orderdetail)
   end
 
   # GET /orderdetails/1/edit
   def edit
+    @orderdetail = Orderdetails.update(orderdetail_params)
+    if @orderdetail
+      render json: @orderdetail, status: :ok
+    else
+      render json: {}, status: :not_found
+    end
+    #respond_with(@orderdetail)
   end
 
   # POST /orderdetails
   # POST /orderdetails.json
   def create
     @orderdetail = Orderdetails.create(orderdetail_params)
+    respond_with(@orderdetail)
 
-    respond_to do |format|
-      if @orderdetail.save
-        format.html { redirect_to @orderdetail, notice: 'Orderdetail was successfully created.' }
-        format.json { render :show, status: :created, location: @orderdetail }
-      else
-        format.html { render :new }
-        format.json { render json: @orderdetail.errors, status: :unprocessable_entity }
-      end
-    end
+    # respond_to do |format|
+    #   if @orderdetail.save
+    #     format.html { redirect_to @orderdetail, notice: 'Orderdetail was successfully created.' }
+    #     format.json { render :show, status: :created, location: @orderdetail }
+    #   else
+    #     format.html { render :new }
+    #     format.json { render json: @orderdetail.errors, status: :unprocessable_entity }
+    #   end
+    # end
   end
 
   # PATCH/PUT /orderdetails/1
   # PATCH/PUT /orderdetails/1.json
   def update
-    respond_to do |format|
-      if @orderdetail.update(orderdetail_params)
-        format.html { redirect_to @orderdetail, notice: 'Orderdetail was successfully updated.' }
-        format.json { render :show, status: :ok, location: @orderdetail }
-      else
-        format.html { render :edit }
-        format.json { render json: @orderdetail.errors, status: :unprocessable_entity }
-      end
-    end
+    respond_with(@orderdetail)
+    #respond_to do |format|
+    #  if @orderdetail.update(orderdetail_params)
+    #    format.html { redirect_to @orderdetail, notice: 'Orderdetail was successfully updated.' }
+    #    format.json { render :show, status: :ok, location: @orderdetail }
+    #  else
+    #    format.html { render :edit }
+    #    format.json { render json: @orderdetail.errors, status: :unprocessable_entity }
+    #  end
+    #end
   end
 
   # DELETE /orderdetails/1
@@ -94,7 +110,7 @@ class OrderdetailsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def orderdetail_params
-      params.require(:orderdetail).permit(:UnitPrice, :Quantity, :Discount, order_attributes: order_params, product_attributes: product_params)
+      params.require(:orderdetail).permit(:unitprice, :quantity, :discount, order_attributes: order_params, product_attributes: product_params)
     end
     
     def product_params

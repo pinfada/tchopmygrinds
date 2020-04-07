@@ -9,7 +9,7 @@
         <li><a href="/" ng-click="MapOpen = !MapOpen" class="gradientmenu" ng-class="{'active': MapOpen === true}"><i class="fa fa-home"></i></a></li>
         <li ng-show="isBuyer"><a href="/" ng-click="SeeSearch = !SeeSearch" class="gradientmenu" ng-class="{'active': SeeSearch === true}"><i class="fa fa-sliders"></i></a></li>
 
-        <li ng-show="isSeller"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-pagelines"></i></a></li>
+        <li ng-show="isSeller"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-tasks"></i></a></li>
 
       </ul>
     </div>
@@ -34,8 +34,8 @@
                     </div>
                     <div ng-show="isBuyer">
                         <ul>
-                            <li>Nombre de commerces à proximités <a href="#">11 commerces</a></li>
-                            <li>Nombre de commandes passées <a href="#">{{nb_order}} commandes</a></li>
+                            <li ng-if="nb_commerce > 0">Nombre de commerces à proximités <a href="#"> {{nb_commerce}} commerces</a></li>
+                            <li ng-if="nb_order > 0">Nombre de commandes passées <a href="#">{{nb_order}} commandes</a></li>
                         </ul>
                     </div>
                 </div>
@@ -90,36 +90,15 @@
         <!--/my news-->
 
         <!--Products sales graph-->
-        <div class="row">
+        <div class="row" ng-show="isSeller">
             <div class="col-md-12 my_news">
                 <div class="title_news">
                     <h2>Sales performance</h2>
                 </div>
                 <!--Graph-->
-                <h4>Commandes clients</h4>
+                <h4>Completed orders / Customers</h4>
                 <div class="row news_container">
                     <canvas id="bar" width="500px" height="300px" class="chart chart-bar" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride" chart-click="onClick"></canvas>
-                </div>
-                <div class="col-md-4 col-sm-4 mb">
-                    <h4>Meilleurs ventes</h4>
-                    <canvas id="doughnut" class="chart chart-doughnut"
-                          chart-data="data01" chart-labels="labels01">
-                    </canvas> 
-                    <br />
-                </div>
-                <div class="col-md-4 col-sm-4 mb">
-                    <h4>xxxxxxxxxxx</h4>
-                    <canvas id="doughnut" class="chart chart-doughnut"
-                          chart-data="data01" chart-labels="labels01">
-                    </canvas> 
-                    <br />
-                </div>
-                <div class="col-md-4 col-sm-4 mb">
-                    <h4>xxxxxxxxxxx</h4>
-                    <canvas id="doughnut" class="chart chart-doughnut"
-                          chart-data="data01" chart-labels="labels01">
-                    </canvas> 
-                    <br />
                 </div>
                 <!--/graph-->
             </div>
@@ -300,7 +279,7 @@
         </div>
         <!--/Header-->
         <!--Category menu-->
-        <div class="row">
+        <div class="row" ng-if="nb_produit_all > 0">
             <div class="col-md-12">
                 <div id="tabs">
                     <div id="tab1" class="active tab">

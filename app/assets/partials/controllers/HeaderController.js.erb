@@ -1,7 +1,7 @@
 // Define the `HeaderController` controller on the `MarketApp` module
 marketApp.controller('HeaderController', [
   '$q', 
-  '$scope', 
+  '$scope',
   '$uibModal', 
   'Auth', 
   '$http', 
@@ -19,12 +19,11 @@ marketApp.controller('HeaderController', [
   'myCoordinates', 
   'myConnexion',
   'myBoutiques',
-  'GetUserOrders',
-  'GetOrderDetails',
-  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, myConnexion, boutiques, myBoutiques, GetUserOrders, GetOrderDetails) {
+  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, myConnexion, boutiques, myBoutiques) {
 
     var deferred = $q.defer();
     //$window.location.reload();
+    $scope.nb_order = 99;
     $scope.activemenu = false;
     $scope.SeeSearch = false;
     $scope.MapOpen = false;
@@ -38,27 +37,34 @@ marketApp.controller('HeaderController', [
     $scope.longitude = '';
 
     $scope.labels = ['Janvier', 'Février', 'mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-    $scope.series = ['Nombre de commandes'];
+    $scope.series = ['Nombre de commandes', 'nombre de clients'];
 
     $scope.data = [
-      [65, 59, 80, 81, 56, 55, 40, 47, 75, 69, 92, 70]
+      [65, 59, 80, 81, 56, 55, 40, 47, 75, 69, 92, 70],
+      [15, 19, 20, 21, 36, 35, 10, 17, 25, 29, 32, 54]
     ];
 
-    $scope.labels01 = ["Igname", "Fraises", "Bananes plantains"];
-    $scope.data01 = [300, 500, 100];
-
-    // recuperation des coordonnees de l'utilisateur
-    myCoordinates.getCoordinates().then(function (position) {
-      $scope.latitude = position.lat
-      $scope.longitude = position.lng
-      $scope.coordonnees.push($scope.latitude, $scope.longitude)
-    });
+    $scope.datasetOverride = [
+      {
+        label: "Bar chart",
+        borderWidth: 1,
+        type: 'bar'
+      },
+      {
+        label: "Line chart",
+        borderWidth: 3,
+        hoverBackgroundColor: "rgba(255,99,132,0.4)",
+        hoverBorderColor: "rgba(255,99,132,1)",
+        type: 'line'
+      }
+    ];
 
     myConnexion.getConnexion().then(function (user) {
-      console.log("info authentication : ", user)
+      console.log("HeaderController --> myConnexion : ", user)
       $scope.username = user.name;
       $scope.isAuthenticated = true;
       $scope.IsVisible = false;
+      var userid = user.id;
       $scope.ShowHide = function () {
         $scope.IsVisible = $scope.IsVisible ? false : true;
       }
@@ -109,91 +115,100 @@ marketApp.controller('HeaderController', [
                 data
             ).remove();
           }
+      } 
 
-      } else {
-        $scope.isBuyer = true;
-      //myCoordinates.getCoordinates().then(function (position) {
-        GetAllProduct.query().then(function (results) {
-          // Pour chaque produits on vérifie si celui-ci est proche de notre position
-          angular.forEach(results, function (item) {
-            SearchProduct.query({name_query:item.name, lat_query:$scope.latitude, lng_query:$scope.longitude}).then(function (retour) {
-              $scope.name = item.name;
-              $scope.stock = item.unitsinstock;
-              if  (retour.length > 0){
-                $scope.result = true;
-              } else {
-                $scope.result = false;
-              }
-              $scope.records.push({name:$scope.name, unitsinstock:$scope.stock, result:$scope.result});
-              deferred.resolve($scope.records);
-            }, function (error) {
-                // do something about the error
-                console.log("Error Log",error.statusText);
-                deferred.reject(error);
-            });
-          });
-          // console.log("GetAllProduct", $scope.records);
-          deferred.resolve($scope.records);
-        }, function (error) {
-            // do something about the error
-            console.log("Error Log",error.statusText);
-            deferred.reject(error);
-        });
+      if (user.isBuyer == true){
+          $scope.isBuyer = true;
 
-        $scope.productSelected = function (item) {
-          //Récupération de l'adresse IP
+          // Récupération des commandes de l'utilisateur
+          //GetUserOrders.get({userId: userid}).then(function (orders) {
+          //    console.log("HeaderController--> orders :  :", orders)
+          //    $scope.nb_order = orders.length
+          //    //$scope.orders = orders
+          //}, function (error) {
+          //    // do something about the error
+          //    console.log("Error Log",error.statusText);
+          //    deferred.reject(error);
+          //});
+          // recuperation des coordonnees de l'utilisateur
+          myCoordinates.getCoordinates().then(function (position) {
+            $scope.latitude = position.lat
+            $scope.longitude = position.lng
+            console.log("HeaderController --> lat : ", $scope.latitude);
+            console.log("HeaderController --> lng : ", $scope.longitude);
+            $scope.coordonnees.push($scope.latitude, $scope.longitude)
+
           //myCoordinates.getCoordinates().then(function (position) {
-            SearchCommerce.query({name_query:item.name, lat_query:$scope.latitude, lng_query:$scope.longitude}).then(function (results) {
-                //console.log("donnée renseignée", results);
-                $scope.commercenear = results;
-                //console.log($scope.commercenear);
-                $uibModal.open({
-                    templateUrl: "<%= asset_path('Templates/myModalCommercelist.html') %>", // loads the template
-                    controller: 'modalCommercelist',
-                    size: 'large',
-                    resolve: {
-                      commercenear: function() {
-                        return { 
-                          listcommerce: $scope.commercenear
-                        };
-                      }
-                    }
-                });
-                deferred.resolve($scope.commercenear);
-            }, function (error) {
-                // do something about the error
-                console.log("Error Log",error.statusText);
-                deferred.reject(error);
-            });
-        };
-
-        // Récupération des commandes de l'utilisateur
-        GetUserOrders.get({userId: user.id}).then(function (orders) {
-            //console.log("orders :", orders)
-            $scope.nb_order = orders.length
-            $scope.orders = orders
-            angular.forEach($scope.orders, function(order) {
-                GetOrderDetails.get({userId: user.id, orderId: order.id}).then(function (orderdetails) {
-                    console.log("orderdetails :", orderdetails)
-                    $scope.nborderdetails = orderdetails.length
-                    $scope.orderdetails = orderdetails
+            GetAllProduct.query().then(function (results) { 
+              $scope.nb_produit_all = results.length
+              // Pour chaque produits on vérifie si celui-ci est proche de notre position
+              angular.forEach(results, function (item) {
+                SearchProduct.query({name_query:item.name, lat_query:$scope.latitude, lng_query:$scope.longitude}).then(function (retour) {
+                  var name = item.name;
+                  var stock = item.unitsinstock;
+                  var location_near = '';
+                  if  (retour.length > 0){
+                      location_near = true;
+                  } else {
+                      location_near = false;
+                  }
+                  $scope.records.push({name:name, unitsinstock:stock, result:location_near});
+                  //deferred.resolve($scope.records);
                 }, function (error) {
                     // do something about the error
                     console.log("Error Log",error.statusText);
                     deferred.reject(error);
                 });
+              });
+              console.log("HeaderController --> GetAllProduct : ", $scope.records);
+              //deferred.resolve($scope.records);
+            }, function (error) {
+                // do something about the error
+                console.log("Error Log",error.statusText);
+                deferred.reject(error);
+            });
+
+            GetAllCommerce.query().then(function (commerces) {
+              $scope.commerces = commerces
+              $scope.nb_commerce = commerces.length
             })
-        }, function (error) {
-            // do something about the error
-            console.log("Error Log",error.statusText);
-            deferred.reject(error);
-        });
+
+            $scope.productSelected = function (item) {
+              //Récupération de l'adresse IP
+                SearchCommerce.query({name_query:item.name, lat_query:$scope.latitude, lng_query:$scope.longitude}).then(function (results) {
+                    //console.log("donnée renseignée", results);
+                    $scope.commercenear = results;
+                    //console.log($scope.commercenear);
+                    $uibModal.open({
+                        templateUrl: "<%= asset_path('Templates/myModalCommercelist.html') %>", // loads the template
+                        controller: 'modalCommercelist',
+                        size: 'large',
+                        resolve: {
+                          commercenear: function() {
+                            return { 
+                              listcommerce: $scope.commercenear
+                            };
+                          }
+                        }
+                    });
+                    deferred.resolve($scope.commercenear);
+                }, function (error) {
+                    // do something about the error
+                    console.log("Error Log",error.statusText);
+                    deferred.reject(error);
+                });
+            };
+
+            
+          });
 
       }
+
     }, function (error) {
         // do something about the error
         console.log("Error Log",error.statusText);
     });
+
     //console.log("coordonnees : ", $scope.coordonnees)
 
     // Ouverture de la fenetre de souscription/authentification

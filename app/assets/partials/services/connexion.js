@@ -12,9 +12,11 @@ marketApp.factory("myConnexion", ['$q', 'Auth', function myConnexion($q, Auth) {
 					myUserinfo.name = user.name
 			    	if (user.seller_role == true){
 			          myUserinfo.isSeller = true;
+			          myUserinfo.isBuyer = false;
 			    	}
 			    	if (user.buyer_role == true){
 			    	    myUserinfo.isBuyer = true;
+			    	    myUserinfo.isSeller = false;
 			    	}
 			    	//console.log("myUserinfo : ",myUserinfo);
 			    	deferred.resolve(myUserinfo);

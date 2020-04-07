@@ -43,7 +43,8 @@ StatExo1::Application.routes.draw do
     resources :addresses
   end
   
-  resources :products, concerns: [:categorizable, :ordertable] do
+  resources :products, concerns: [:categorizable] do
+    resources :orders, concerns: [:ordertable]
     collection do
       get :listproduct
       get :listcommerce
@@ -51,6 +52,8 @@ StatExo1::Application.routes.draw do
   end
 
   resources :addresses
+  resources :orders
+  resources :orderdetails
 
 
   root "pages#home"

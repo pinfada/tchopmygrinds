@@ -10,9 +10,13 @@ marketApp.controller("modalProduct", [
     'GetCommerceProducts', 
     'SupCommerceProducts',
     'commerce', 
+    'user',
     'myFruitsliste', 
-    'moment',  
-    function ($q, $scope, $uibModalInstance, $log, $route, $window, GetAllCommerce, GetAllProduct, GetCommerceProducts, SupCommerceProducts, commerce, myFruitsliste, moment){
+    'moment',
+    'GetUserOrders',
+    'GetOrderDetails',
+    'GetUniqProduct',
+    function ($q, $scope, $uibModalInstance, $log, $route, $window, GetAllCommerce, GetAllProduct, GetCommerceProducts, SupCommerceProducts, commerce, user, myFruitsliste, moment, GetUserOrders, GetOrderDetails, GetUniqProduct){
 
     //var deferred = $q.defer();
     $scope.SeeGraph = false;
@@ -90,6 +94,36 @@ marketApp.controller("modalProduct", [
         deferred.reject(error);
     });
 
+    // Récupération des commandes de l'utilisateur
+    GetUserOrders.get({userId: user.id}).then(function (orders) {
+        console.log("modalproduct --> orders : ", orders)
+        $scope.nb_order = orders.length
+        //$scope.orders = orders
+        angular.forEach(orders, function(order) {
+            GetOrderDetails.get({userId: user.id, orderId: order.id}).then(function (orderdetail) {
+                console.log("orderdetail :", orderdetail)
+                //$scope.nborderdetails = orderdetails.length
+                //$scope.orderdetails = orderdetails
+                GetUniqProduct.get({Id: orderdetail.product_id}).then(function (product) {
+                    console.log("product : ", product)
+                    $scope.orders = {
+                        name: product.name,
+                        quantite: orderdetail.Quantity,
+                        price: orderdetail.UnitPrice,
+                        status: order.status
+                    }
+                })
+            }, function (error) {
+                // do something about the error
+                console.log("Error Log",error.statusText);
+                deferred.reject(error);
+            });
+        })
+    }, function (error) {
+        // do something about the error
+        console.log("Error Log",error.statusText);
+        deferred.reject(error);
+    });
 
     //vérification présence du commerce en base et récupération de l'id
     //GetAllCommerce.query().then(function(commerce){
@@ -118,7 +152,6 @@ marketApp.controller("modalProduct", [
         $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceId: commerce});
         $scope.name = $scope.prix = $scope.quantite ="";
         $scope.SeeGraph = true;
-    //    });
     };
     
     $scope.findValue = function(newValue, oldValue) { 
@@ -164,14 +197,17 @@ marketApp.controller("modalProduct", [
     $scope.remove = function(index){
         var delProduct = $scope.produits
         var data = delProduct[index]
-        //console.log("produit : ", data)
+        var product_id = data.id
         $scope.produits.splice(index, 1);
-        ind_suppression = true
-        $log.log('Remove product info.'); // kinda console logs this statement
-        $log.log(data);
-        new SupCommerceProducts(
-            data
-        ).remove();
+
+        if (typeof product_id !== "undefined") {
+            ind_suppression = true
+            $log.log('Remove product info.'); // kinda console logs this statement
+            $log.log(data);
+            new SupCommerceProducts(
+                data
+            ).remove();
+        }
     };
     
     //Observation changement d'état de la variable $scope.produits
@@ -182,23 +218,23 @@ marketApp.controller("modalProduct", [
     };
     
     $scope.submit = function () {
-        //console.log("ind_suppression", ind_suppression)
         if  (ind_suppression == false) {
             var total = $scope.produits.length;
             for(var i=0; i<total; i++) {
                 var result = $scope.produits[i];
-                $log.log('Submiting product info.'); // kinda console logs this statement
-                $log.log(result);
-                new GetCommerceProducts(
-                    result 
-                ).create();
-                //$uibModalInstance.close('cancel');
-                //$route.reload();
-                //$window.location.reload();
+                var result_id = result.id
+                if (typeof result_id !== "undefined") {
+                    $log.log('Submiting product info.'); // kinda console logs this statement
+                    $log.log(result);
+                    new GetCommerceProducts(
+                        result 
+                    ).create();
+                }
             }
         }
         $uibModalInstance.close('cancel');
-        $window.location.reload();
+        $route.reload();
+        //$window.location.reload();
     };
 
 }]);

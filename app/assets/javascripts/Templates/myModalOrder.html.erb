@@ -1,7 +1,7 @@
 <div class="modal-header">
 	<!--<h3 class="modal-title" id="modal-title">PRODUCTS</h3>-->
 	<div class="pull-right">
-		<ngcart-summary></ngcart-summary>
+		<ngcart-summary ng-if="nbproduit > 0"></ngcart-summary>
 	</div>
 </div>
 <div class="modal-body" id="modal-body">
@@ -24,7 +24,7 @@
 							</div>
 							-->
 
-								<div class="col-md-4">
+								<div class="col-md-3">
 									<figure class="card card-product">
 										<%= image_tag "ava1.png", class:"img-wrap" %>
 										<figcaption class="info-wrap">
@@ -58,9 +58,9 @@
 	
 <hr>
 
-<ngcart-cart></ngcart-cart>
+<ngcart-cart ng-if="nbproduit > 0"></ngcart-cart>
 
-<ngcart-checkout service="log">Checkout</ngcart-checkout>
+<ngcart-checkout ng-if="nbproduit > 0" service="log">Checkout</ngcart-checkout>
 
 <!--
 <a href="#/products" class="browse-link">Keep Browsing</a>

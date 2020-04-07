@@ -36,7 +36,7 @@ marketApp.factory("GetAllProduct", ['railsResourceFactory', function(railsResour
   });
 }]);
 
-// Renvoi la liste complete des produits
+// Renvoi la liste complete des adresses
 marketApp.factory("GetAllAddress", ['railsResourceFactory', function(railsResourceFactory) {
   return railsResourceFactory({ 
           url: "/addresses", 
@@ -49,6 +49,14 @@ marketApp.factory("GetAllUser", ['railsResourceFactory', function(railsResourceF
   return railsResourceFactory({ 
           url: "/users", 
           name: "user" 
+  });
+}]);
+
+// Renvoi les informations d'un utilisateur
+marketApp.factory("GetUniqProduct", ['railsResourceFactory', function(railsResourceFactory) {
+  return railsResourceFactory({ 
+          url: "/products/{{id}}", 
+          name: "product" 
   });
 }]);
 
@@ -74,10 +82,32 @@ marketApp.factory("GetUserOrders", ['railsResourceFactory', 'railsSerializer', f
   });
 }]);
 
+// Renvoi la liste complete des produits commandés
+marketApp.factory("GetProductOrders", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({ 
+          url: "/products/{{productId}}/orders", 
+          name: "order",
+          serializer: railsSerializer(function () {
+            this.resource('orders', 'Order');
+          })
+  });
+}]);
+
 // Renvoi la liste complete des commandes d'un utilisateur
 marketApp.factory("GetOrderDetails", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({ 
           url: "/users/{{userId}}/orders/{{orderId}}/orderdetails", 
+          name: "orderdetail",
+          serializer: railsSerializer(function () {
+            this.resource('orderdetails', 'Orderdetail');
+          })
+  });
+}]);
+
+// Renvoi la liste complete des commandes d'un utilisateur
+marketApp.factory("UpdateOrderDetails", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({ 
+          url: "/users/{{userId}}/orders/{{orderId}}/orderdetails/{{id}}", 
           name: "orderdetail",
           serializer: railsSerializer(function () {
             this.resource('orderdetails', 'Orderdetail');

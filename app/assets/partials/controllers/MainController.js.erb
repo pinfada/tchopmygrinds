@@ -27,7 +27,7 @@ module.controller('MainController', [
     'GetUserCommerces',
     'GetUserAddresses',
     'GetAllUser',
-    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser) {
+    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser, UpdateOrderDetails) {
 
         ngCart.setTaxRate(7.5);
         ngCart.setShipping(2.99);
@@ -105,7 +105,34 @@ module.controller('MainController', [
                                                     var latitude = address.latitude;
                                                     var longitude = address.longitude;
                                                     //console.log("adresse buyer : ", address)
-                                                    L.marker([latitude, longitude]).addTo(map);
+
+                                                    // Customisation des Icons utiliser pour la map
+                                                    //customIcon = L.mapquest.icons.marker({
+                                                    //    primaryColor: '#22407F',
+                                                    //    secondaryColor: '#3B5998',
+                                                    //    shadow: true,
+                                                    //    size: 'md'
+                                            //      //    symbol: 'A'
+                                                    //});
+
+                                                    // Customisation de l'Icon pour les commerces déjà presents en base
+                                                    customIcon = L.icon({
+                                                        iconUrl: 'https://icon-library.net//images/location-marker-icon/location-marker-icon-15.jpg',
+                                                        iconSize: [35, 35], // size of the icon
+                                                        });
+                                                    commentaire = "<div>Send message to the customer <br /><button class='btn' ng-click='btncustomer"+ address.id +"()'>Cliquez ici</button></div>";
+
+                                                    // Compile title DOM into a link function
+                                                    var linkFn = $compile(angular.element(commentaire));
+                                                    
+                                                    // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
+                                                    var popup = linkFn($scope);
+                                                    var customPopup = L.popup()
+                                                        .setLatLng([latitude, longitude])
+                                                        .setContent(popup[0])
+                                                        .openOn(map);
+
+                                                    L.marker([latitude, longitude], {icon: customIcon}).bindPopup(customPopup).addTo(map);
                                                 })
 
                                             }, function (error) {
@@ -115,13 +142,11 @@ module.controller('MainController', [
                                             });
                                         }
                                     })
-
                                 }, function (error) {
                                     // do something about the error
                                     console.log("Error GetAllUser : ",error.statusText);
                                     deferred.reject(error);
                                 });
-
 
                                 // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
                                 for(var i=0; i<nb_commerce; i++) {
@@ -145,6 +170,9 @@ module.controller('MainController', [
                                             resolve: {
                                                 commerce: function () {
                                                     return commerce_id; // Appel au controlleur modalProduct avec en entrée le nom du commerce
+                                                },
+                                                user: function () {
+                                                    return user; 
                                                 }
                                             }
                                         });
@@ -220,6 +248,7 @@ module.controller('MainController', [
                                             }
                                         }
                                     });
+
                                 };
 
                                 // Si le user est un acheteur

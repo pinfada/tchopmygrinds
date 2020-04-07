@@ -4,15 +4,16 @@ marketApp.controller("modalOrder", [
     '$uibModalInstance', 
     '$log', 
     '$route',
+    '$window',
     'boutique', 
     'user',
     'GetCommerceProducts',
-    'GetUserOrders',
-    'GetOrderDetails',
-    function ($q, $scope, $uibModalInstance, $log, $route, boutique, user, GetCommerceProducts, GetUserOrders, GetOrderDetails){
+    'GetProductOrders',
+    'myOrderdetails',
+    'UpdateOrderDetails',
+    function ($q, $scope, $uibModalInstance, $log, $route, $window, boutique, user, GetCommerceProducts, GetProductOrders, myOrderdetails, UpdateOrderDetails){
 
     var deferred = $q.defer();
-
 
     // Récupération de la liste des produits pour un commerce
     GetCommerceProducts.get({commerceId: boutique.id}).then(function (products) {
@@ -27,20 +28,74 @@ marketApp.controller("modalOrder", [
     });
 
     $scope.$on('ngCart:checkout_succeeded', function(event, cart) {
-        console.log("cart : ", cart)
-        var cart = {
-            OrderDate: new Date().toISOString().slice(0,10),
-            requiredate: new Date().toISOString().slice(0,10),
-            shippedate: '',
-            status: '0',
-            userId: user.id
-        }
-        $log.log('Submiting store info.'); // kinda console logs this statement
-        $log.log(cart);
-        //new GetUserOrders(
-        //    cart 
-        //).create();
+        //console.log("modalOrder --> cart : ", cart)
+        angular.forEach(cart, function(obj1, key) {
+            //console.log("modalOrder --> obj1 : ", obj1.items)
+            var product = obj1.items
+            var nbproduct = product.length
+
+            for(var i=0; i<nbproduct; i++) {
+                var result = product[i];
+                var result_id = result.id
+
+                var data = {
+                    orderdate: new Date().toISOString().slice(0,10),
+                    requiredate: new Date().toISOString().slice(0,10),
+                    shippedate: '',
+                    status: 0,
+                    userId: user.id,
+                    productId: result_id
+                }
+                $log.log('Submiting order info.'); // kinda console logs this statement
+                $log.log(data);
+                new GetProductOrders(data).create().then(function (order) {
+                    //console.log("modalOrder --> order : ", order)
+                    var userid = order.userId;
+                    var orderid = order.id;
+                    var price = result.total;
+                    var quantity = result.quantity;
+
+                    myOrderdetails.getOrderdetails(userid, orderid, price, quantity).then(function (response) {
+                        //console.log("modalOrder --> updatedetail : ", response)
+                        angular.forEach(response, function(detail, key) {
+                            console.log("modalOrder --> detail : ", detail)
+                            for(var p=0; p<detail.length; p++) {
+                                var data = detail[p];
+                                var data_id = data.id
+                                var updatedetail = {
+                                    unitprice: price,
+                                    quantity: quantity,
+                                    userId: userid,
+                                    orderId: orderid,
+                                    id: data_id
+                                }
+                                $log.log('Submiting orderdetail info.'); // kinda console logs this statement
+                                $log.log(updatedetail);
+                                new UpdateOrderDetails(updatedetail).update()
+                            } 
+
+                        })
+                    })
+
+                    //GetOrderDetails.get({userId: userid, orderId: orderid}).then(function (orderdetail) {
+                    //    //console.log("modalOrder --> orderdetail : ", orderdetail)
+                    //    var updatedetail = {
+                    //        unitprice: result.total,
+                    //        quantity: result.quantity,
+                    //        userId: order.userId,
+                    //        orderId: order.id,
+                    //        id: orderdetail.id
+                    //    }
+                    //})
+                    
+                })
+            }
+            $uibModalInstance.close('cancel');
+            $route.reload();
+            //$window.location.reload();
+        })
     });
+
 
     $scope.cancel = function () {
         $uibModalInstance.close(false); 

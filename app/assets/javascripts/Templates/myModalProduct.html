@@ -63,6 +63,28 @@
             <button type="button" class="btn" ng-click="visible = true"><i class="icon-plus"></i>Add</button>
         </div>
       </uib-tab>
+      <uib-tab index="1" heading="Traiter commandes" ng-if="nb_order > 0">
+        <div ng-repeat="order in orders">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Article</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantite</th>
+                        <th scope="col">Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in orders">
+                        <td>{{ x.name }}</td>
+                        <td>{{ x.price | currency }}</td>
+                        <td>{{ x.quantite}}</td>
+                        <td>{{ x.status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </uib-tab>
     </uib-tabset>
   </div>
   <div class="modal-footer">
