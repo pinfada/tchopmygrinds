@@ -5,7 +5,7 @@
 	</div>
 </div>
 <div class="modal-body" id="modal-body">
-	<div class="container">
+	<div class="container-fluid">
 		<div class="row" ng-switch="nbproduit">
 			<div ng-switch-when="0">
 				<div>
@@ -13,9 +13,9 @@
 				</div>
 			</div>
 			<div ng-switch-default>
-				<div class="row">
+				<div>
 					<uib-tabset active="active">
-						<uib-tab index="0" heading="Product">
+						<uib-tab index="0" heading="Products">
 							<div ng-repeat="produit in produits">
 							<!--
 							<div class="col-md-3 col-sm-4 col-xs-6">

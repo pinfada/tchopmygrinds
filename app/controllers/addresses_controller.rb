@@ -2,8 +2,8 @@ class AddressesController < ApplicationController
   authorize_resource
   
   before_action :set_address, only: [:show, :edit, :update, :destroy]
-  before_action :set_user, only: [:create, :new]
-  respond_to :html, :json
+  before_action :set_user, only: [:create, :new, :edit]
+  respond_to :json
 
   # GET /addresses
   # GET /addresses.json
@@ -43,6 +43,8 @@ class AddressesController < ApplicationController
 
   # GET /addresses/1/edit
   def edit
+    @address = @user.addresses.update(address_params)
+    respond_with(@address)
   end
 
   # POST /addresses

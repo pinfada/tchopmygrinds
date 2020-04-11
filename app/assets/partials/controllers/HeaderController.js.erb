@@ -8,6 +8,7 @@ marketApp.controller('HeaderController', [
   '$route', 
   '$window',
   '$log',
+  'GetUserAddresses',
   'GetUserCommerces',
   'GetCommerceProducts', 
   'SupCommerceProducts', 
@@ -19,7 +20,8 @@ marketApp.controller('HeaderController', [
   'myCoordinates', 
   'myConnexion',
   'myBoutiques',
-  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, myConnexion, boutiques, myBoutiques) {
+  'myUseraddress',
+  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserAddresses, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, myConnexion, myBoutiques, myUseraddress) {
 
     var deferred = $q.defer();
     //$window.location.reload();
@@ -68,6 +70,34 @@ marketApp.controller('HeaderController', [
       $scope.ShowHide = function () {
         $scope.IsVisible = $scope.IsVisible ? false : true;
       }
+
+      myUseraddress.Getuseraddress(userid).then(function (response) {
+          angular.forEach(response, function(address, key) {
+              if (address.length > 0) {
+                  console.log("HeaderController --> address : ", address) 
+              } else {
+                myCoordinates.getCoordinates().then(function (position) {
+                  var address = {
+                      address1: '',
+                      address2: 'non fournie',
+                      country: '',
+                      city: '',
+                      zipcode: '',
+                      state: '',
+                      latitude: position.lat,
+                      longitude: position.lng,
+                      userId: userid
+                  }
+
+                  $log.log('Submiting address info.'); // kinda console logs this statement
+                  $log.log(address);
+                  new GetUserAddresses(
+                      address 
+                  ).create();
+                })
+              }
+          })
+      })
 
       if (user.isSeller == true){
           $scope.isSeller = true;

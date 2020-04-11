@@ -108,7 +108,7 @@ marketApp.controller("modalRegistration", [
                 state: '',
                 latitude: coordinates[0],
                 longitude: coordinates[1],
-                userid: user.id
+                userId: user.id
             }
 
             $log.log('Submiting address info.'); // kinda console logs this statement

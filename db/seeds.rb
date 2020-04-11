@@ -33,6 +33,9 @@ Commerce.delete_all
 Commerce.reset_pk_sequence
 Orderdetail.delete_all
 Orderdetail.reset_pk_sequence
+Address.delete_all
+Address.reset_pk_sequence
+
 #2.times do
 # User.create(
 #   name: Faker::Name.name,
