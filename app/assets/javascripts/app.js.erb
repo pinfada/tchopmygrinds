@@ -20,8 +20,12 @@
 	marketApp.run(['Auth', function (Auth) {
 	    Auth.currentUser().then(function(user) {
 	      console.log(user);
-	      console.log(Auth._currentUser);
-	    });
+	      //console.log(Auth._currentUser);
+	    }, function (error) {
+            // do something about the error
+            //console.log("Error Log",error.statusText);
+            console.info("Tchopers have to login...");
+        });
 	}]);
 
 	marketApp.config([

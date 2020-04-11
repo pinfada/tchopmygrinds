@@ -13,12 +13,14 @@ marketApp.controller("modalProduct", [
     'user',
     'myFruitsliste', 
     'moment',
-    'GetUserOrders',
+    'GetAllOrder',
     'GetOrderDetails',
     'GetUniqProduct',
-    function ($q, $scope, $uibModalInstance, $log, $route, $window, GetAllCommerce, GetAllProduct, GetCommerceProducts, SupCommerceProducts, commerce, user, myFruitsliste, moment, GetUserOrders, GetOrderDetails, GetUniqProduct){
+    'GetProductOrders',
+    'myUseraddress',
+    function ($q, $scope, $uibModalInstance, $log, $route, $window, GetAllCommerce, GetAllProduct, GetCommerceProducts, SupCommerceProducts, commerce, user, myFruitsliste, moment, GetAllOrder, GetOrderDetails, GetUniqProduct, GetProductOrders, myUseraddress){
 
-    //var deferred = $q.defer();
+    var deferred = $q.defer();
     $scope.SeeGraph = false;
 
     $scope.onClick = function (points, evt) {
@@ -83,47 +85,7 @@ marketApp.controller("modalProduct", [
         //console.log(value)
     });
 
-    // On vérifie la présence de produit pour chaque commerce présent en base
-    GetCommerceProducts.get({commerceId: commerce}).then(function (products) {
-        //console.log("produits :", products)
-        $scope.nbproduit = products.length
-        $scope.produits = products;
-    }, function (error) {
-        // do something about the error
-        console.log("Error Log",error.statusText);
-        deferred.reject(error);
-    });
-
-    // Récupération des commandes de l'utilisateur
-    GetUserOrders.get({userId: user.id}).then(function (orders) {
-        console.log("modalproduct --> orders : ", orders)
-        $scope.nb_order = orders.length
-        //$scope.orders = orders
-        angular.forEach(orders, function(order) {
-            GetOrderDetails.get({userId: user.id, orderId: order.id}).then(function (orderdetail) {
-                console.log("orderdetail :", orderdetail)
-                //$scope.nborderdetails = orderdetails.length
-                //$scope.orderdetails = orderdetails
-                GetUniqProduct.get({Id: orderdetail.product_id}).then(function (product) {
-                    console.log("product : ", product)
-                    $scope.orders = {
-                        name: product.name,
-                        quantite: orderdetail.Quantity,
-                        price: orderdetail.UnitPrice,
-                        status: order.status
-                    }
-                })
-            }, function (error) {
-                // do something about the error
-                console.log("Error Log",error.statusText);
-                deferred.reject(error);
-            });
-        })
-    }, function (error) {
-        // do something about the error
-        console.log("Error Log",error.statusText);
-        deferred.reject(error);
-    });
+    $scope.orders = [];
 
     //vérification présence du commerce en base et récupération de l'id
     //GetAllCommerce.query().then(function(commerce){
@@ -149,9 +111,18 @@ marketApp.controller("modalProduct", [
         $scope.quantite = donnee.quantite;
         $scope.stock = donnee.stock;
         $scope.discontinued = donnee.discontinued;
-        $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceId: commerce});
-        $scope.name = $scope.prix = $scope.quantite ="";
-        $scope.SeeGraph = true;
+
+    //    var quantiteisnumber = angular.isNumber(donnee.quantite);
+    //    var stockisnumber = angular.isNumber(donnee.stock);
+    //    if (quantiteisnumber == true && stockisnumber == true) {
+            $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceId: commerce});
+            $scope.SeeGraph = true;
+    //    } else {
+    //        $scope.numb_invalide = true
+    //        $scope.message = " Number you enter is invalid. Please retry. "
+    //    }
+        $scope.name = $scope.prix = $scope.quantite = $scope.stock = " ";
+
     };
     
     $scope.findValue = function(newValue, oldValue) { 
@@ -218,12 +189,15 @@ marketApp.controller("modalProduct", [
     };
     
     $scope.submit = function () {
+        console.log("ind_suppression : ", ind_suppression)
+        console.log("produits: ", $scope.produits)
         if  (ind_suppression == false) {
             var total = $scope.produits.length;
             for(var i=0; i<total; i++) {
                 var result = $scope.produits[i];
                 var result_id = result.id
-                if (typeof result_id !== "undefined") {
+                console.log("result_id: ", result_id)
+                if (typeof result_id == "undefined") {
                     $log.log('Submiting product info.'); // kinda console logs this statement
                     $log.log(result);
                     new GetCommerceProducts(
@@ -236,5 +210,57 @@ marketApp.controller("modalProduct", [
         $route.reload();
         //$window.location.reload();
     };
+
+
+    // On vérifie la présence de produit pour chaque commerce présent en base
+    GetCommerceProducts.get({commerceId: commerce}).then(function (products) {
+        //console.log("produits :", products)
+        var quantite = 0
+        var price = 0
+        var data = []
+        $scope.nbproduit = products.length
+        $scope.produits = products;
+        angular.forEach(products, function(product)  {
+            var productid = product.id
+            var productname = product.name
+            GetProductOrders.get({productId: productid}).then(function (orders) {
+                $scope.nb_order = orders.length
+                angular.forEach(orders, function(order)  {
+                    //console.log("modalProduct --> order : ", order)
+                    var orderid = order.id
+                    var userid = order.userId
+                    myUseraddress.Getuseraddress(userid).then(function (response) {
+                        angular.forEach(response, function(address, key) {
+                            if (address.length > 0) {
+                               console.log("modalProduct --> address : ", address) 
+                            }
+                        })
+                    })
+                    GetOrderDetails.get({productId: productid, orderId: orderid}).then(function (orderdetails) {
+                        var nborderdetails = orderdetails.length
+                        if (nborderdetails > 0) {
+                            //console.log("modalProduct --> orderdetails : ", orderdetails)
+                            angular.forEach(orderdetails, function(orderdetail)  {
+                                data.push({
+                                    order: order.id,
+                                    name: productname,
+                                    quantite: orderdetail.quantity,
+                                    price: orderdetail.unitprice,
+                                    status: order.status
+                                })
+
+                            })
+                        }
+                    })
+                })
+            })
+        })
+        $scope.orders = data
+        //console.log("modalProduct --> orders : ", $scope.orders)
+    }, function (error) {
+        // do something about the error
+        console.log("Error Log",error.statusText);
+        deferred.reject(error);
+    });
 
 }]);

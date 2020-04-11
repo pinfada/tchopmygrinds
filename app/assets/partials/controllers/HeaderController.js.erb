@@ -60,7 +60,7 @@ marketApp.controller('HeaderController', [
     ];
 
     myConnexion.getConnexion().then(function (user) {
-      console.log("HeaderController --> myConnexion : ", user)
+      //console.log("HeaderController --> myConnexion : ", user)
       $scope.username = user.name;
       $scope.isAuthenticated = true;
       $scope.IsVisible = false;
@@ -134,8 +134,8 @@ marketApp.controller('HeaderController', [
           myCoordinates.getCoordinates().then(function (position) {
             $scope.latitude = position.lat
             $scope.longitude = position.lng
-            console.log("HeaderController --> lat : ", $scope.latitude);
-            console.log("HeaderController --> lng : ", $scope.longitude);
+            //console.log("HeaderController --> lat : ", $scope.latitude);
+            //console.log("HeaderController --> lng : ", $scope.longitude);
             $scope.coordonnees.push($scope.latitude, $scope.longitude)
 
           //myCoordinates.getCoordinates().then(function (position) {
@@ -160,7 +160,7 @@ marketApp.controller('HeaderController', [
                     deferred.reject(error);
                 });
               });
-              console.log("HeaderController --> GetAllProduct : ", $scope.records);
+              //console.log("HeaderController --> GetAllProduct : ", $scope.records);
               //deferred.resolve($scope.records);
             }, function (error) {
                 // do something about the error

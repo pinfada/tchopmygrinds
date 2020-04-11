@@ -44,7 +44,7 @@ marketApp.factory("GetAllAddress", ['railsResourceFactory', function(railsResour
   });
 }]);
 
-// Renvoi les informations d'un utilisateur
+// Renvoi la liste des utilisateurs
 marketApp.factory("GetAllUser", ['railsResourceFactory', function(railsResourceFactory) {
   return railsResourceFactory({ 
           url: "/users", 
@@ -52,7 +52,15 @@ marketApp.factory("GetAllUser", ['railsResourceFactory', function(railsResourceF
   });
 }]);
 
-// Renvoi les informations d'un utilisateur
+// Renvoi la liste des commandes enregistrées
+marketApp.factory("GetAllOrder", ['railsResourceFactory', function(railsResourceFactory) {
+  return railsResourceFactory({ 
+          url: "/orders", 
+          name: "order" 
+  });
+}]);
+
+// Renvoi les informations d'un produit
 marketApp.factory("GetUniqProduct", ['railsResourceFactory', function(railsResourceFactory) {
   return railsResourceFactory({ 
           url: "/products/{{id}}", 
@@ -94,9 +102,20 @@ marketApp.factory("GetProductOrders", ['railsResourceFactory', 'railsSerializer'
 }]);
 
 // Renvoi la liste complete des commandes d'un utilisateur
+//marketApp.factory("GetOrderDetails", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+//  return railsResourceFactory({ 
+//          url: "/users/{{userId}}/orders/{{orderId}}/orderdetails", 
+//          name: "orderdetail",
+//          serializer: railsSerializer(function () {
+//            this.resource('orderdetails', 'Orderdetail');
+//          })
+//  });
+//}]);
+
+// Renvoi la liste complete des commandes d'un utilisateur
 marketApp.factory("GetOrderDetails", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({ 
-          url: "/users/{{userId}}/orders/{{orderId}}/orderdetails", 
+          url: "/products/{{productId}}/orders/{{orderId}}/orderdetails",
           name: "orderdetail",
           serializer: railsSerializer(function () {
             this.resource('orderdetails', 'Orderdetail');
@@ -107,13 +126,24 @@ marketApp.factory("GetOrderDetails", ['railsResourceFactory', 'railsSerializer',
 // Renvoi la liste complete des commandes d'un utilisateur
 marketApp.factory("UpdateOrderDetails", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
   return railsResourceFactory({ 
-          url: "/users/{{userId}}/orders/{{orderId}}/orderdetails/{{id}}", 
+          url: "/products/{{productId}}/orders/{{orderId}}/orderdetails/{{id}}", 
           name: "orderdetail",
           serializer: railsSerializer(function () {
             this.resource('orderdetails', 'Orderdetail');
           })
   });
 }]);
+
+// Renvoi la liste complete des commandes d'un utilisateur
+//marketApp.factory("UpdateOrderDetails", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+//  return railsResourceFactory({ 
+//          url: "/users/{{userId}}/orders/{{orderId}}/orderdetails/{{id}}", 
+//          name: "orderdetail",
+//          serializer: railsSerializer(function () {
+//            this.resource('orderdetails', 'Orderdetail');
+//          })
+//  });
+//}]);
 
 // Renvoie la liste des produits pour un commerce
 marketApp.factory("GetCommerceProducts", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {

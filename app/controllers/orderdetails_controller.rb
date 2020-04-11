@@ -2,21 +2,21 @@ class OrderdetailsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_order
   before_action :set_orderdetail, only: [:show, :edit, :update, :destroy]
-  respond_to :html, :json
+  respond_to :json
 
   # GET /orderdetails
   # GET /orderdetails.json
   def index
-    userid = params[:user_id]
+    productid = params[:product_id]
     orderid = params[:order_id]
-    if userid.present? && orderid.present?
-      @user = User.find(userid)
-      @order = Order.find(orderid)
-      orders = @user.orders
-      @orderdetails = @order.orderdetails
-      #orders.each do |order|
-      #  @orderdetails = Orderdetail.where(order_id: order.id)
-      #end
+    if productid.present? && orderid.present?
+    #  @user = User.find(userid)
+    #  @order = Order.find(orderid)
+    #  orders = @user.orders
+    #  @orderdetails = @order.orderdetails
+    #  #orders.each do |order|
+      @orderdetails = Orderdetail.where(order_id: orderid, product_id: productid)
+    #  #end
     else
       @orderdetails = Orderdetail.all
     end
@@ -72,7 +72,12 @@ class OrderdetailsController < ApplicationController
   # PATCH/PUT /orderdetails/1
   # PATCH/PUT /orderdetails/1.json
   def update
-    respond_with(@orderdetail)
+    @orderdetail = Orderdetail.update(orderdetail_params)
+    if @orderdetail
+      render json: @orderdetail, status: :ok
+    else
+      render json: {}, status: :not_found
+    end
     #respond_to do |format|
     #  if @orderdetail.update(orderdetail_params)
     #    format.html { redirect_to @orderdetail, notice: 'Orderdetail was successfully updated.' }

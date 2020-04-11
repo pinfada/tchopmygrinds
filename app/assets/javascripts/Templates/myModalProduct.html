@@ -4,7 +4,7 @@
 <form ng-submit="submit()" novalidate>
   <div class="modal-body" id="modal-body">
     <uib-tabset active="active">
-      <uib-tab index="0" heading="Produit">
+      <uib-tab index="0" heading="Products">
         <br/>
         <table class="table" ng-if="nbproduit > 0">
             <thead>
@@ -28,7 +28,7 @@
             </tbody>
         </table>
         <br/>
-        <ng-form name="nestedForm" ng-show="visible">
+        <ng-form name="nestedForm" ng-show="visible" ng-trim="false">
             <div class="form-inline">
                 <div class="form-group">
                     <label class="control-label sr-only" id="InputName">Name</label>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label sr-only" id="InputQuantityPerUnit">Quantite</label>
-                    <input type="text" class="form-control" placeholder="Quantite per Unit" required ng-model="fruit.quantite" name="produitquantite" />
+                    <input type="text" class="form-control" placeholder="Quantite per Unit" required ng-model="fruit.quantite" name="produitquantite" numeric-only/>
                 </div>
                 <div class="form-group">
                     <label class="control-label sr-only" id="InputUnitInStock">Stock</label>
@@ -63,23 +63,36 @@
             <button type="button" class="btn" ng-click="visible = true"><i class="icon-plus"></i>Add</button>
         </div>
       </uib-tab>
-      <uib-tab index="1" heading="Traiter commandes" ng-if="nb_order > 0">
-        <div ng-repeat="order in orders">
+      <uib-tab index="1" heading="Orders" ng-if="nb_order > 0">
+        <div class="accordion" id="accordionExample">
             <table class="table">
                 <thead>
                     <tr>
+                        <th scope="col">N° Commande</th>
                         <th scope="col">Article</th>
                         <th scope="col">Price</th>
                         <th scope="col">Quantite</th>
                         <th scope="col">Statut</th>
+                        <th colspan="3"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="x in orders">
+                        <td>{{ x.order }}</td>
                         <td>{{ x.name }}</td>
                         <td>{{ x.price | currency }}</td>
                         <td>{{ x.quantite}}</td>
                         <td>{{ x.status}}</td>
+                        <td>
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ x.order }}" aria-expanded="true" aria-controls="collapse{{ x.order }}">
+                              details
+                            </button>
+                        </td>
+                        <div id="collapse{{ x.order }}" class="collapse show" aria-labelledby="heading{{ x.order }}" data-parent="#accordionExample">
+                          <div class="card-body">
+                            {{ x.name }}
+                          </div>
+                        </div>
                     </tr>
                 </tbody>
             </table>

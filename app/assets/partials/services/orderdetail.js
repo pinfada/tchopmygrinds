@@ -1,10 +1,10 @@
-marketApp.factory("myOrderdetails", ['$q', 'GetOrderDetails', function myOrderdetailss($q, GetOrderDetails) {
+marketApp.factory("myOrderdetails", ['$q', 'GetOrderDetails', function myOrderdetails($q, GetOrderDetails) {
 	
 	var deferredPromise = null;
 	return {
-		getOrderdetails: function(userid, orderid) {
+		getOrderdetails: function(productid, orderid) {
 			var deferred = $q.defer();
-			GetOrderDetails.get({userId: userid, orderId: orderid}).then(function(orderdetail) {
+			GetOrderDetails.get({productId: productid, orderId: orderid}).then(function(orderdetail) {
 				//console.log("myOrderdetails --> orderdetail : ", orderdetail)
 				deferred.resolve({orderdetail});
         	}, function (error) {

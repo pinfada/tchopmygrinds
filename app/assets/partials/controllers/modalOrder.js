@@ -50,12 +50,13 @@ marketApp.controller("modalOrder", [
                 $log.log(data);
                 new GetProductOrders(data).create().then(function (order) {
                     //console.log("modalOrder --> order : ", order)
+
                     var userid = order.userId;
                     var orderid = order.id;
                     var price = result.total;
                     var quantity = result.quantity;
 
-                    myOrderdetails.getOrderdetails(userid, orderid, price, quantity).then(function (response) {
+                    myOrderdetails.getOrderdetails(result_id, orderid).then(function (response) {
                         //console.log("modalOrder --> updatedetail : ", response)
                         angular.forEach(response, function(detail, key) {
                             console.log("modalOrder --> detail : ", detail)
@@ -65,7 +66,7 @@ marketApp.controller("modalOrder", [
                                 var updatedetail = {
                                     unitprice: price,
                                     quantity: quantity,
-                                    userId: userid,
+                                    productId: result_id,
                                     orderId: orderid,
                                     id: data_id
                                 }
@@ -76,17 +77,6 @@ marketApp.controller("modalOrder", [
 
                         })
                     })
-
-                    //GetOrderDetails.get({userId: userid, orderId: orderid}).then(function (orderdetail) {
-                    //    //console.log("modalOrder --> orderdetail : ", orderdetail)
-                    //    var updatedetail = {
-                    //        unitprice: result.total,
-                    //        quantity: result.quantity,
-                    //        userId: order.userId,
-                    //        orderId: order.id,
-                    //        id: orderdetail.id
-                    //    }
-                    //})
                     
                 })
             }

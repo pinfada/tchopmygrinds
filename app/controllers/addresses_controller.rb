@@ -20,7 +20,12 @@ class AddressesController < ApplicationController
       @addresses = Address.all.order("created_at ASC")
     end
 
-    respond_with(@addresses)
+    #respond_with(@addresses)
+    if @addresses
+      render json: @addresses, status: :ok
+    else
+      render json: {}, status: :not_found
+    end
 
   end
 

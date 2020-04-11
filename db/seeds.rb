@@ -27,8 +27,12 @@ Product.delete_all # suppression de la table produit
 Product.reset_pk_sequence # remise de l'id à 1 pour table produit
 Categorization.delete_all # suppression de la table produit
 Categorization.reset_pk_sequence # remise de l'id à 1 pour table produit
-
-
+Order.delete_all
+Order.reset_pk_sequence
+Commerce.delete_all
+Commerce.reset_pk_sequence
+Orderdetail.delete_all
+Orderdetail.reset_pk_sequence
 #2.times do
 # User.create(
 #   name: Faker::Name.name,

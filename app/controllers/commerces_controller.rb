@@ -50,7 +50,7 @@ class CommercesController < ApplicationController
 
   def search
     search_name = params[:name_query]
-    if search_name
+    if search_name.present? 
 #      commerces = Commerce.where('name LIKE ?',"%#{search_name}%").exists?
       recupcommerce = Commerce.where('name LIKE ?',"%#{search_name}%")
       commerces = recupcommerce.exists?

@@ -15,10 +15,14 @@ class OrdersController < ApplicationController
       @user = User.find(userid)
       @orders = @user.orders
     else
-      @orders = order.all.order("created_at ASC")
+      @orders = Order.all.order("created_at ASC")
     end
-
-    respond_with(@orders)
+    if @orders
+      render json: @orders, status: :ok
+    else
+      render json: {}, status: :not_found
+    end
+    #respond_with(@orders)
   end
 
   # GET /orders/1

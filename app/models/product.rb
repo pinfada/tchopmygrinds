@@ -8,7 +8,7 @@ class Product < ApplicationRecord
     validates :unitsonorder, presence: true
     
     has_many :categorizations
-    has_many :orderdetails
+    has_many :orderdetails, dependent: :destroy
     has_many :commerces, -> { distinct }, through: :categorizations
     has_many :orders, -> { distinct }, through: :orderdetails
     accepts_nested_attributes_for :commerces, :orders
