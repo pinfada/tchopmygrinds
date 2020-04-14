@@ -74,22 +74,23 @@ module.controller('MainController', [
                             if (nb_commerce == 0){
                                 if (user.statut_type == "sedentary"){
                                     // Récupération listes des commerces à proximité. Extraction données Mapquest
-                                    boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
+                                    //boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
                                         $uibModal.open({
                                             templateUrl: "<%= asset_path('Templates/myModalMarker.html') %>", // loads the template
                                             controller: 'modalMarker',
                                             backdrop: true,
+                                            size: 'sm',
                                             windowClass: 'modal',
                                             resolve: {
-                                                boutique: function () {
-                                                    return boutique; 
+                                                usercoord: function () {
+                                                    return resultcoord; 
                                                 },
                                                 user: function () {
                                                     return user; 
                                                 }
                                             }
                                         })
-                                    })
+                                    //})
                                 }
                             } else {
                                 // recuperation la liste des clients

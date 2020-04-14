@@ -4,14 +4,29 @@ marketApp.controller("modalMarker", [
     '$uibModalInstance', 
     '$log', 
     '$route', 
-    'boutique', 
+    'usercoord', 
     'user', 
-    'GetUserCommerces',  
-    function ($q, $scope, $uibModalInstance, $log, $route, boutique, user, GetUserCommerces){
+    'GetUserCommerces',
+    'myBoutiques',
+    function ($q, $scope, $uibModalInstance, $log, $route, usercoord, user, GetUserCommerces, myBoutiques){
 
     var deferred = $q.defer();
 
-    $scope.boutiques = boutique.searchResults
+    console.log("modalMarker --> usercoord : ", usercoord)
+
+    $scope.commerceaffiche = [5, 15, 30, 50]
+
+    $scope.affichage = function(item) {
+        if (item) {
+            //console.log("affichage item: ", item)
+            myBoutiques.getBoutiques([usercoord.lat, usercoord.lng], item).then(function (boutique) {
+                $scope.boutiques = boutique.searchResults
+            })
+        }
+    };
+
+
+
     $scope.data = {}
 
     $scope.cancel = function () {

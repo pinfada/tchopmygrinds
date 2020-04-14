@@ -64,7 +64,7 @@
         </div>
       </uib-tab>
       <uib-tab index="1" heading="Orders" ng-if="nb_order > 0">
-        <div class="accordion" id="accordionExample">
+        <div>
             <table class="table">
                 <thead>
                     <tr>
@@ -84,15 +84,20 @@
                         <td>{{ x.quantite}}</td>
                         <td>{{ x.status}}</td>
                         <td>
-                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ x.order }}" aria-expanded="true" aria-controls="collapse{{ x.order }}">
-                              details
-                            </button>
+                            <div class="btn-group" uib-dropdown>
+                              <button id="split-button" type="button" class="btn btn-light btn-sm">Action</button>
+                              <button type="button" class="btn btn-light btn-sm" uib-dropdown-toggle>
+                                <span class="caret"></span>
+                                <span class="sr-only">Split button!</span>
+                              </button>
+                              <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                                <li role="menuitem"><a href="#">Show details</a></li>
+                                <li role="menuitem"><a href="#">Update order</a></li>
+                                <li class="divider"></li>
+                                <li role="menuitem"><a href="#">Destroy</a></li>
+                              </ul>
+                            </div>
                         </td>
-                        <div id="collapse{{ x.order }}" class="collapse show" aria-labelledby="heading{{ x.order }}" data-parent="#accordionExample">
-                          <div class="card-body">
-                            {{ x.name }}
-                          </div>
-                        </div>
                     </tr>
                 </tbody>
             </table>

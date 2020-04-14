@@ -3,17 +3,13 @@
 	<hr>
 	<div class="input-group mb-0">
 	  <div class="input-group-prepend">
-	    <label class="input-group-text" for="inputGroupSelect01">Filter</label>
+	    <label class="input-group-text" for="inputGroupSelect01">Select number of shops to display</label>
 	  </div>
-	  <select class="custom-select" id="inputGroupSelect01">
-	    <option selected>Choose...</option>
-	    <option value="1">One</option>
-	    <option value="2">Two</option>
-	    <option value="3">Three</option>
-	  </select>
+	  <select ng-model="selectedItem" ng-options="item for item in commerceaffiche" ng-change="affichage(selectedItem)"></select>
 	</div>
 </div>
 <div class="modal-body" id="modal-body">
+	<p>Elément sélectionné : {{selectedItem}}</p>
 	<label for="boutiqueSelect"> Select your store on the list below</label><br>
 	<select name="boutiqueSelect" id="multipleSelect" ng-model="data.boutiqueSelect" multiple="">
 	  <option value="">---Please select---</option> <!-- not selected / blank option -->
