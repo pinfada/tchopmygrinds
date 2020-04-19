@@ -220,49 +220,52 @@ marketApp.controller("modalProduct", [
         var data = []
         $scope.nbproduit = products.length
         $scope.produits = products;
-        angular.forEach(products, function(product)  {
-            var productid = product.id
-            var productname = product.name
-            GetProductOrders.get({productId: productid}).then(function (orders) {
-                $scope.nb_order = orders.length
-                var usersave = ''
-                angular.forEach(orders, function(order)  {
-                    //console.log("modalProduct --> order : ", order)
-                    var orderid = order.id
-                    var userid = order.userId
-                    if (userid != usersave) {
-                        usersave = userid
-                        myUseraddress.Getuseraddress(userid).then(function (response) {
-                            angular.forEach(response, function(address, key) {
-                                if (address.length > 0) {
-                                    //console.log("modalProduct --> address : ", address) 
-                                    $scope.address = address
-                                } else {
-                                    console.log("modalProduct --> anomalie utilisateur sans adresse") 
-                                }
-                            })
-                        })
-                    }
-
-                    GetOrderDetails.get({productId: productid, orderId: orderid}).then(function (orderdetails) {
-                        var nborderdetails = orderdetails.length
-                        if (nborderdetails > 0) {
-                            //console.log("modalProduct --> orderdetails : ", orderdetails)
-                            angular.forEach(orderdetails, function(orderdetail)  {
-                                data.push({
-                                    order: order.id,
-                                    name: productname,
-                                    quantite: orderdetail.quantity,
-                                    price: orderdetail.unitprice,
-                                    status: order.status
+        if (products.length > 0) {
+            angular.forEach(products, function(product)  {
+                var productid = product.id
+                var productname = product.name
+                GetProductOrders.get({productId: productid}).then(function (orders) {
+                    $scope.nb_order = orders.length
+                    var usersave = ''
+                    angular.forEach(orders, function(order)  {
+                        //console.log("modalProduct --> order : ", order)
+                        var orderid = order.id
+                        var userid = order.userId
+                        if (userid != usersave) {
+                            usersave = userid
+                            myUseraddress.Getuseraddress(userid).then(function (response) {
+                                angular.forEach(response, function(address, key) {
+                                    if (address.length > 0) {
+                                        //console.log("modalProduct --> address : ", address) 
+                                        $scope.address = address
+                                    } else {
+                                        console.log("modalProduct --> anomalie utilisateur sans adresse") 
+                                    }
                                 })
-
                             })
                         }
+
+                        GetOrderDetails.get({productId: productid, orderId: orderid}).then(function (orderdetails) {
+                            var nborderdetails = orderdetails.length
+                            if (nborderdetails > 0) {
+                                //console.log("modalProduct --> orderdetails : ", orderdetails)
+                                angular.forEach(orderdetails, function(orderdetail)  {
+                                    data.push({
+                                        order: order.id,
+                                        name: productname,
+                                        quantite: orderdetail.quantity,
+                                        price: orderdetail.unitprice,
+                                        status: order.status
+                                    })
+
+                                })
+                            }
+                        })
                     })
                 })
             })
-        })
+        }
+
         $scope.orders = data
         //console.log("modalProduct --> orders : ", $scope.orders)
     }, function (error) {
