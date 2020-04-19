@@ -8,6 +8,7 @@ marketApp.controller('HeaderController', [
   '$route', 
   '$window',
   '$log',
+  'GetAllNewsletter',
   'GetUserAddresses',
   'GetUserCommerces',
   'GetCommerceProducts', 
@@ -21,7 +22,7 @@ marketApp.controller('HeaderController', [
   'myConnexion',
   'myBoutiques',
   'myUseraddress',
-  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetUserAddresses, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, myConnexion, myBoutiques, myUseraddress) {
+  function HeaderController($q, $scope, $uibModal, Auth, $http, $route, $window, $log, GetAllNewsletter, GetUserAddresses, GetUserCommerces, GetCommerceProducts, SupCommerceProducts, GetAllProduct, SearchProduct, GetAllCommerce, SearchCommerce, $timeout, myCoordinates, myConnexion, myBoutiques, myUseraddress) {
 
     var deferred = $q.defer();
     //$window.location.reload();
@@ -31,7 +32,7 @@ marketApp.controller('HeaderController', [
     $scope.MapOpen = false;
     $scope.OngletCommerce = false
     $scope.ProfileOpen = false;
-    $scope.credentials = { email: '', password: 'password1', password_confirmation: 'password1', buyer_role: 'true' };
+    $scope.credentials = { email: ''};
 
     $scope.records = [];
     $scope.coordonnees = [];
@@ -356,14 +357,14 @@ marketApp.controller('HeaderController', [
       });
     };
 
-    $scope.signup = function () {
-        Auth.register($scope.credentials).then(function(registeredUser) {
-            alert(registeredUser.email + " You'll receive confirmation email !");
-            $route.reload();
-        }, function(error) {
-            console.info('Error in user registration!');
-            alert('Error in user registration!');
-        });
+    $scope.newsletter = function () {
+      $log.log('Newsletter email info.'); // kinda console logs this statement
+      $log.log($scope.credentials);
+      new GetAllNewsletter(
+          $scope.credentials  
+      ).create();
+      $route.reload();
+      $scope.credentials = { email: ''};
     };
 
 }]);

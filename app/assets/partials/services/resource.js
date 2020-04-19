@@ -44,6 +44,14 @@ marketApp.factory("GetAllAddress", ['railsResourceFactory', function(railsResour
   });
 }]);
 
+// Renvoi la liste complete des newsletters
+marketApp.factory("GetAllNewsletter", ['railsResourceFactory', function(railsResourceFactory) {
+  return railsResourceFactory({ 
+          url: "/newsletters", 
+          name: "newsletter" 
+  });
+}]);
+
 // Renvoi la liste des utilisateurs
 marketApp.factory("GetAllUser", ['railsResourceFactory', function(railsResourceFactory) {
   return railsResourceFactory({ 
