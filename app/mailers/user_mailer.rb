@@ -44,5 +44,11 @@ class UserMailer < ApplicationMailer
     @user = user
     mail :to => user.email, :subject => "Mot de passe réinitialisé"
   end
-  
+
+  def newsletter_mailer
+    @newsletter = Newsletter.all
+    emails = @newsletter.collect(&:email).join(", ")
+    mail(to: emails, subject: "Hi, this is a test mail.")
+  end
+
 end

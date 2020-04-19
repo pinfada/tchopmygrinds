@@ -63,6 +63,7 @@ end
 group :development do
   gem 'better_errors'
   gem 'rails_layout'
+  gem "letter_opener"
   #gem 'sqlite3'
 end
 group :production do

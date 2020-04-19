@@ -19,6 +19,8 @@ StatExo1::Application.routes.draw do
   match '/aide', to: 'pages#aide', via: 'get'
   match '/agrimer', to: 'pages#agrimer', via: 'get'
 
+  resources :newsletters
+
   concern :productable do
     resources :products
   end

@@ -4,7 +4,7 @@ class CommercesController < ApplicationController
   before_action :set_commerce, only: [:show, :edit, :update, :destroy]
   before_action :set_user, only: [:create, :new]
 
-  respond_to :html, :json
+  respond_to :json
 
   def index
     userid = params[:user_id]

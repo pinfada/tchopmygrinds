@@ -9,8 +9,7 @@
     "leaflet": "latest",
     "ngcart": "latest",
     "angular-trix": "latest",
-    "ngGeolocation": "latest"
-  },
-  "resolutions": {
+    "ngGeolocation": "latest",
+    "angular-filter": "latest"
   }
 }

@@ -65,6 +65,13 @@
       </uib-tab>
       <uib-tab index="1" heading="Orders" ng-if="nb_order > 0">
         <div>
+            <ul class="list-group">
+              <li ng-repeat="(key, value) in orders | countBy: 'name'" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ key }}
+                <span class="badge badge-primary badge-pill">{{ value }}</span>
+              </li>
+            </ul>
+            <br>
             <table class="table">
                 <thead>
                     <tr>

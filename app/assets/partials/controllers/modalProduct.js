@@ -235,7 +235,8 @@ marketApp.controller("modalProduct", [
                         myUseraddress.Getuseraddress(userid).then(function (response) {
                             angular.forEach(response, function(address, key) {
                                 if (address.length > 0) {
-                                    console.log("modalProduct --> address : ", address) 
+                                    //console.log("modalProduct --> address : ", address) 
+                                    $scope.address = address
                                 } else {
                                     console.log("modalProduct --> anomalie utilisateur sans adresse") 
                                 }
