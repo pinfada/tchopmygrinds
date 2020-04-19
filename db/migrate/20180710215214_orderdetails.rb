@@ -1,4 +1,4 @@
-class OrderDetails < ActiveRecord::Migration[5.0]
+class Orderdetails < ActiveRecord::Migration[5.0]
   def change
     create_table :orderdetails do |t|
       t.decimal :UnitPrice, :precision => 8, :scale => 2
