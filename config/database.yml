@@ -82,6 +82,6 @@ test:
 #
 production:
   <<: *default
-  database: tchopmygrinds_production
-  username: tchopmygrinds
+  database: <%= ENV['TCHOPMYGRINDS_DATABASE_NAME'] %>
+  username: <%= ENV['TCHOPMYGRINDS_DATABASE_USERNAME'] %>
   password: <%= ENV['TCHOPMYGRINDS_DATABASE_PASSWORD'] %>
