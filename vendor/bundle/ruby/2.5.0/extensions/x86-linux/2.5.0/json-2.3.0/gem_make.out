@@ -1,0 +1,13 @@
+current directory: /home/m-olivier/tchopmygrinds/vendor/bundle/ruby/2.5.0/gems/json-2.3.0/ext/json
+/usr/bin/ruby2.5 -r ./siteconf20200422-5690-17k81ui.rb extconf.rb
+creating Makefile
+
+current directory: /home/m-olivier/tchopmygrinds/vendor/bundle/ruby/2.5.0/gems/json-2.3.0/ext/json
+make "DESTDIR=" clean
+
+current directory: /home/m-olivier/tchopmygrinds/vendor/bundle/ruby/2.5.0/gems/json-2.3.0/ext/json
+make "DESTDIR="
+make: rien à faire pour « all ».
+
+current directory: /home/m-olivier/tchopmygrinds/vendor/bundle/ruby/2.5.0/gems/json-2.3.0/ext/json
+make "DESTDIR=" install

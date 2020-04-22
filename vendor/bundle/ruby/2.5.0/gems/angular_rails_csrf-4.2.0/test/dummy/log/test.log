@@ -1,0 +1,859 @@
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 1ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+  Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+  Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+  Processing by ApplicationController#create as HTML
+WARNING: Can't verify CSRF token authenticity
+Completed 422 Unprocessable Entity in 0ms
+  Processing by ApplicationController#create as HTML
+WARNING: Can't verify CSRF token authenticity
+Completed 422 Unprocessable Entity in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 1ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 1ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 1ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 1ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 1ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 1ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 1ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 1ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 1ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 128)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 118)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 119)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 116)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 109)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms (Allocations: 136)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 116)
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 128)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 110)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms (Allocations: 135)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 120)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 106)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 118)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 104)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 172)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 119)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 117)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 116)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms (Allocations: 136)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 98)
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 71)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 183)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 111)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms (Allocations: 136)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 103)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 117)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 117)
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 71)
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 128)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 109)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 119)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 111)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 117)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 103)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms (Allocations: 136)
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 128)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 117)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 1ms (Allocations: 128)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 98)
+---------------------------------------------------------------
+AngularRailsCsrfTest: test_the_secure_flag_is_set_if_configured
+---------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms (Allocations: 106)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms (Allocations: 117)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 128)
+---------------------------------------------------------------
+AngularRailsCsrfTest: test_the_secure_flag_is_set_if_configured
+---------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 107)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms (Allocations: 131)
+-------------------------------------------------------------
+AngularRailsCsrfTest: test_same_site_is_set_to_Lax_by_default
+-------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms (Allocations: 106)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 110)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 117)
+------------------------------------------------------
+AngularRailsCsrfTest: test_same_site_can_be_configured
+------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_secure_is_set_automatically_when_same_site_is_set_to_none
+------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 98)
+----------------------------------------------------------------------------
+AngularRailsCsrfExceptionTest: test_a_get_does_not_set_the_XSRF-TOKEN_cookie
+----------------------------------------------------------------------------
+Processing by ExclusionsController#index as HTML
+Completed 200 OK in 0ms (Allocations: 128)
+--------------------------------------------------------
+AngularRailsCsrfTest: test_the_domain_is_used_if_present
+--------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 122)
+-----------------------------------------------------------
+AngularRailsCsrfTest: test_a_custom_name_is_used_if_present
+-----------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+---------------------------------------------------------------
+AngularRailsCsrfTest: test_the_secure_flag_is_set_if_configured
+---------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+-------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_without_the_X-XSRF-TOKEN_header_set
+-------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 111)
+--------------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_get_sets_the_XSRF-TOKEN_cookie_but_does_not_require_the_X-XSRF-TOKEN_header
+--------------------------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+------------------------------------------------------
+AngularRailsCsrfTest: test_same_site_can_be_configured
+------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+-------------------------------------------------------------
+AngularRailsCsrfTest: test_same_site_is_set_to_Lax_by_default
+-------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 0ms (Allocations: 106)
+-----------------------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_raises_an_error_with_the_X-XSRF-TOKEN_header_set_to_the_wrong_value
+-----------------------------------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Can't verify CSRF token authenticity.
+Completed 422 Unprocessable Entity in 0ms (Allocations: 103)
+------------------------------------------------------------------------------------
+AngularRailsCsrfTest: test_secure_is_set_automatically_when_same_site_is_set_to_none
+------------------------------------------------------------------------------------
+Processing by ApplicationController#index as HTML
+Completed 200 OK in 1ms (Allocations: 106)
+-----------------------------------------------------------------------------
+AngularRailsCsrfTest: test_a_post_is_accepted_if_X-XSRF-TOKEN_is_set_properly
+-----------------------------------------------------------------------------
+Processing by ApplicationController#create as HTML
+Completed 200 OK in 0ms (Allocations: 125)

@@ -1,0 +1,39 @@
+{
+  "name": "rails-assets-ng-cart",
+  "downloads": null,
+  "version": "1.0.0",
+  "version_downloads": null,
+  "platform": "ruby",
+  "authors": "rails-assets.org",
+  "info": "Shopping Cart built for AngularJS",
+  
+  "licenses": "MIT",
+  
+  "metadata": {
+
+  },
+  "sha": null,
+  "project_uri": "http://ngcart.snapjay.com/",
+  "gem_uri": null,
+  "homepage_uri": "http://ngcart.snapjay.com/",
+  "wiki_uri": null,
+  "documentation_uri": null,
+  "mailing_list_uri": null,
+  "source_code_uri": "http://ngcart.snapjay.com/",
+  "bug_tracker_uri": null,
+  "dependencies": {
+    "development": [
+    
+    
+    {
+      "name": "rails-assets-angular",
+      "requirements": ">= 1.2"
+    },
+    
+    
+    ],
+    "runtime": [
+
+    ]
+  }
+}
