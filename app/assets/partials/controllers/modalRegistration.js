@@ -57,7 +57,7 @@ marketApp.controller("modalRegistration", [
             //$route.reload();
             $window.location.reload()
         }, function(error) {
-            console.info('Error in authenticating user!');
+            //console.info('Error in authenticating user!');
             alert('Error in signing in user!');
         });
     };
@@ -90,7 +90,7 @@ marketApp.controller("modalRegistration", [
             alert(registeredUser.email + " You'll receive confirmation email !");
         //    $route.reload();
         }, function(error) {
-            console.info('Error in user registration!');
+            //console.info('Error in user registration!');
             alert('Error in user registration!');
         });
     };

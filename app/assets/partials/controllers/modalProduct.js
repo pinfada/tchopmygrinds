@@ -189,14 +189,14 @@ marketApp.controller("modalProduct", [
     };
     
     $scope.submit = function () {
-        console.log("ind_suppression : ", ind_suppression)
-        console.log("produits: ", $scope.produits)
+        //console.log("ind_suppression : ", ind_suppression)
+        //console.log("produits: ", $scope.produits)
         if  (ind_suppression == false) {
             var total = $scope.produits.length;
             for(var i=0; i<total; i++) {
                 var result = $scope.produits[i];
                 var result_id = result.id
-                console.log("result_id: ", result_id)
+                //console.log("result_id: ", result_id)
                 if (typeof result_id == "undefined") {
                     $log.log('Submiting product info.'); // kinda console logs this statement
                     $log.log(result);
