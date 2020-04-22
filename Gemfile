@@ -67,10 +67,12 @@ group :development do
   gem "letter_opener"
   #gem 'sqlite3'
 end
-group :production do
-  #gem 'pg', '~> 0.18'
-  gem 'rails_12factor'
-end
+
+#group :production do
+#  gem 'pg', '~> 0.18'
+#  gem 'rails_12factor'
+#end
+
 group :test do
   gem 'minitest-spec-rails'
   gem 'minitest-rails-capybara'
