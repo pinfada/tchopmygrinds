@@ -10,6 +10,9 @@
     "ngcart": "latest",
     "angular-trix": "latest",
     "ngGeolocation": "latest",
-    "angular-filter": "latest"
+    "angular-filter": "latest",
+    "angular-moment": "latest"
+  },
+  "resolutions": {
   }
 }

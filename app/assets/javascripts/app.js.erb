@@ -84,8 +84,7 @@
 			})	
 			
 			.when('/fail', {
-				controller: 'FailController',
-				templateUrl: 'fail.html',
+				templateUrl: "<%= asset_path('Templates/fail.html') %>",
 			})
 
         	.when('/cart', {

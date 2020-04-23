@@ -29,7 +29,6 @@
 //= require angularjs/rails/resource
 //= require angular-devise
 //= require js-routes
-//= require angular-moment.min
 //= require ngcart
 //= require ngGeolocation
 //= require angular-trix
