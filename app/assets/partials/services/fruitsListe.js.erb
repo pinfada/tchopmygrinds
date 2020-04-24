@@ -3,9 +3,16 @@ marketApp.factory('myFruitsliste', ['$q', '$http', function myFruitsliste($q, $h
 	//Liste des fruits et légumes récupérée via les données publiques du site Francagri
 	var deferred = $q.defer();
 
+    //PRODUCTION
+    var BASE_URL = 'https://young-meadow-31748.herokuapp.com/agrimer';
+
+    //TEST
+    //var BASE_URL = 'http://localhost:3000/agrimer';
+
     $http({
         method: 'GET',
-        url: 'http://localhost:3000/agrimer',
+        //url: 'http://localhost:3000/agrimer',
+        url: BASE_URL,
         responseType: 'json'
     }).then(function(response) {
     //        console.log(response.data);
