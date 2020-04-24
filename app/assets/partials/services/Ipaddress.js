@@ -4,12 +4,16 @@ marketApp.factory('myIp', ['$q', '$http', function myIp($q, $http) {
 
     $http({
         method: 'GET',
-        url: 'https://freegeoip.net/json/'
-    }).then(function(response) {
+        url: 'https://api.myip.com'
+    }).then(function onSuccess(response) {
+    		console.log("myIp : ", response)
 			var myIp = {};
-			myIp.ip = response.data.ip;
+			myIp.ip = response.ip;
 			deferred.resolve(myIp);
-    });
+    })
+	.catch(function onError(error) {
+	    console.log(error);
+	});
 	
 	return deferred.promise;
 
