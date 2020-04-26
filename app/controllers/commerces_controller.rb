@@ -58,6 +58,23 @@ class CommercesController < ApplicationController
     end
   end
 
+  # GET /commerces/listcommerce
+  # Recuperation de la liste des commerces à proximité '10km' en fonction :
+  # - Des coordonnées de l'utilisateur
+  def listcommerce
+    lat_name = params[:lat_query]
+    lng_name = params[:lng_query]
+    if lat_name.present? && lng_name.present?
+      recupcommerce = Commerce.includes(:categorizations).near([lat_name, lng_name], 50, units: :km, order: "")
+      #respond_with recupcommerce
+      if recupcommerce
+        render json: recupcommerce, status: :ok
+      else
+        render json: {}, status: :not_found
+      end
+    end
+  end
+
   private
     def set_commerce
       @commerce = Commerce.find(params[:id])

@@ -10,6 +10,13 @@ marketApp.factory("SearchProduct", ['railsResourceFactory', function(railsResour
   });
 }]);
 
+marketApp.factory("GetCommerceNear", ['railsResourceFactory', function(railsResourceFactory) {
+  return railsResourceFactory({ 
+          url: "/commerces/listcommerce", 
+          name: "Commercenear"
+  });
+}]);
+
 marketApp.factory("SearchCommerce", ['railsResourceFactory', function(railsResourceFactory) {
   return railsResourceFactory({ 
           url: "/products/listcommerce", 

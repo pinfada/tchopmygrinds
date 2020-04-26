@@ -1,4 +1,4 @@
-marketApp.factory("myUseraddress", ['$q', 'GetUserAddresses', function myOrderdetails($q, GetUserAddresses) {
+marketApp.factory("myUseraddress", ['$q', 'GetUserAddresses', function myUseraddress($q, GetUserAddresses) {
 	
 	var deferredPromise = null;
 	return {

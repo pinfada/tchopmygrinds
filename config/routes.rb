@@ -36,6 +36,7 @@ StatExo1::Application.routes.draw do
   resources :commerces, concerns: [:productable, :categorizable] do
     collection do
       get :search
+      get :listcommerce
     end
   end
   
