@@ -13,15 +13,15 @@
 # )
 #end
 
-#User.create(
-#  name: 'mitch',
-#  email: 'cali77@hotmail.fr',
-#  password: 'password'
-#)
+User.create(
+  name: 'mitch',
+  email: 'cali77@hotmail.fr',
+  password: 'password'
+)
 
-require 'faker'
-require 'open-uri'
-require 'nokogiri'
+#require 'faker'
+#require 'open-uri'
+#require 'nokogiri'
 
 Product.delete_all # suppression de la table produit
 Product.reset_pk_sequence # remise de l'id à 1 pour table produit
