@@ -19,7 +19,8 @@ marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', funct
 				console.log(error);
     			//Récupération de l'adresse IP
     			myIp.then(function(value) {
-    			    var ip = value.ip;
+                    var ip = value.ip;
+                    console.log("ip : ", value)
 				    $http({
 				        method: 'GET',
 				        url: "https://ipapi.co/"+ip+"/json/"

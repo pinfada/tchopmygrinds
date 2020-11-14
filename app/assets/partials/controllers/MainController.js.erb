@@ -64,17 +64,20 @@ module.controller('MainController', [
             if (Auth.isAuthenticated() )
             {
                 Auth.currentUser().then(function(user) {
-
+                    //--------------------------------------------------*
+                    //          S E L L E R   B L O C                   *
+                    //--------------------------------------------------*
                     // Si l'utilisateur a un role de vendeur on vérifie si il possède des commerces
                     if (user.seller_role == true){
                         //console.log("seller : ", user)
-                        //vérification de la présence des commerces en base et pour l'utilisateur connecté
+                        //vérification de la présence de commerces en base pour l'utilisateur connecté
                         GetUserCommerces.get({userId: user.id}).then(function(result){
                             // Si le vendeur sedentaire ne possède pas de commerce
                             var nb_commerce = result.length
                             if (nb_commerce == 0){
                                 if (user.statut_type == "sedentary"){
-                                    // Récupération listes des commerces à proximité. Extraction données Mapquest
+                                    //Transmission des coordonnées géo de l'utilisateur pour affichage liste de commerces à proximité
+                                    //La liste des commerces à proximité est issue d'une extraction des données Mapquest
                                     //boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
                                         $uibModal.open({
                                             templateUrl: "<%= asset_path('Templates/myModalMarker.html') %>", // loads the template
@@ -94,7 +97,7 @@ module.controller('MainController', [
                                     //})
                                 }
                             } else {
-                                // recuperation la liste des clients
+                                // récuperation la liste des clients
                                 GetAllUser.query().then(function (userdata) {
                                     angular.forEach(userdata, function(user, key) {
                                         // Si le client est un acheteur on récupère ses coordonnées
@@ -224,6 +227,9 @@ module.controller('MainController', [
                         var p = deferred.promise;
 
                     } else {
+                    //--------------------------------------------------*
+                    //            B U Y E R   B L O C                   *
+                    //--------------------------------------------------*
                         // L'utilisateur a un rôle d'acheteur
                         // Vérification de la présence de commerce en fonction des coordonnées
                         myCommercenear.Getcommercenear(resultcoord.lat, resultcoord.lng).then(function (commerces) {
@@ -233,7 +239,7 @@ module.controller('MainController', [
                                 console.log("pas de boutiques enregistrées à proximité de chez vous")
                                 $window.alert("Pas de boutiques enregistrées à proximité de chez vous");
                             } else {
-                        // Récupération de la liste des commerces en base
+                        //Récupération de la liste des commerces en base
                         //GetAllCommerce.query().then(function (boutiques) {
                             //console.log("boutiques : ", boutiques)
                                 angular.forEach(commerces, function(boutique, key) {

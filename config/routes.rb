@@ -18,6 +18,7 @@ StatExo1::Application.routes.draw do
   match '/propos', to: 'pages#propos', via: 'get'
   match '/aide', to: 'pages#aide', via: 'get'
   match '/agrimer', to: 'pages#agrimer', via: 'get'
+  match '/serveraddress', to: 'pages#serveraddress', via: 'get'
 
   resources :newsletters
 

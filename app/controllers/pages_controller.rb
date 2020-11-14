@@ -32,4 +32,14 @@ class PagesController < ApplicationController
     @data = File.read("#{Rails.root}/public/agrimer.json")
     render :json => @data
   end
+
+  def serveraddress
+    #require 'socket'
+    #ip = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}
+    ip = Net::HTTP.get(URI.parse('http://checkip.amazonaws.com/')).squish
+    @data = ip.to_json
+    puts "User IP : #{@data}"
+    render :json => @data
+  end
+
 end

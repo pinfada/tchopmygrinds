@@ -1,0 +1,1 @@
+json.partial! "pages/serveraddress", serveraddress: @data

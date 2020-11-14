@@ -95,7 +95,7 @@ marketApp.controller("modalRegistration", [
         });
     };
 
-    // A la souscription on stocke l'adresse de l'utilisation à partir de ses coordonnées
+    // A la souscription on stocke l'adresse de l'utilisateur à partir de ses coordonnées
     $scope.$on('devise:new-registration', function(event, user) {
     //$scope.$on('devise:login', function(event, user) {
         //coordinates.getCoordinates().then(function (position) {
