@@ -17,7 +17,7 @@ marketApp.factory("myBoutiques", ['$q', '$http', function myBoutiques($q, $http)
 					deferred.resolve(myBoutiques);
     		},
 	    		function(error){
-	    			console.log("Error Log",error.statusText);
+	    			console.log("myBoutiques --> Error Log", error);
         		}
     		);
 			deferredPromise = deferred.promise;

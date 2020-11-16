@@ -22,7 +22,7 @@ marketApp.factory("myConnexion", ['$q', 'Auth', function myConnexion($q, Auth) {
 			    	deferred.resolve(myUserinfo);
 				},
 	    		function(error){
-	    			console.log("Error Log",error.statusText);
+	    			console.log("Error Log " , error);
         		});
 			//}
 

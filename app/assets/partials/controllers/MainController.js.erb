@@ -97,27 +97,30 @@ module.controller('MainController', [
                                     //})
                                 }
                             } else {
-                                // récuperation la liste des clients
+                                // L'objectif est de donnée la possibilité au vendeur de communiquer avec les prospects à proximité de son point de vente
+                                // Pour cela, il faut :
+                                //  - Récupérer la liste des clients stockées et l'Afficher au niveau de la map
+                                //  - Mettre en place un bouton contact client (messagerie) [Inactif]
                                 GetAllUser.query().then(function (userdata) {
                                     angular.forEach(userdata, function(user, key) {
                                         // Si le client est un acheteur on récupère ses coordonnées
                                         //console.log("user info : ", user)
                                         var userid = user.id
                                         if (user.buyerRole == true) {
-                                            // recuperation adresses clients affichage sur la map
+                                            // récuperation des adresses des clients et affichage sur la map
                                             GetUserAddresses.get({userId: userid}).then(function (addresses) {
                                                 angular.forEach(addresses, function (address) {
                                                     var latitude = address.latitude;
                                                     var longitude = address.longitude;
                                                     //console.log("adresse buyer : ", address)
 
-                                                    // Customisation des Icons utiliser pour la map
+                                                    //Customisation des Icons utiliser pour la map
                                                     //customIcon = L.mapquest.icons.marker({
                                                     //    primaryColor: '#22407F',
                                                     //    secondaryColor: '#3B5998',
                                                     //    shadow: true,
                                                     //    size: 'md'
-                                            //      //    symbol: 'A'
+                                                    //    symbol: 'A'
                                                     //});
 
                                                     // Customisation de l'Icon pour les commerces déjà presents en base
@@ -231,15 +234,65 @@ module.controller('MainController', [
                     //            B U Y E R   B L O C                   *
                     //--------------------------------------------------*
                         // L'utilisateur a un rôle d'acheteur
-                        // Vérification de la présence de commerce en fonction des coordonnées
+                        // Vérification en base de la présence de commerce en fonction des coordonnées géo
                         myCommercenear.Getcommercenear(resultcoord.lat, resultcoord.lng).then(function (commerces) {
                             var result = angular.equals(commerces);
-
+                            // Si on ne trouve aucun commerce en base, extraction des données Mapquest
+                            console.log("MainController --> commerces ", commerces)
+                            console.log("MainController --> result ", result)
                             if (result == false) {
+                                var nb_commerce = 15
                                 console.log("pas de boutiques enregistrées à proximité de chez vous")
                                 $window.alert("Pas de boutiques enregistrées à proximité de chez vous");
+                                myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], nb_commerce).then(function (boutique) {
+                                    var boutiques = boutique.searchResults
+                                    angular.forEach(boutiques, function (boutique) {
+                                        //console.log("getBoutiques --> boutique : ", boutique)
+                                        var coord = boutique.shapePoints
+                                        //console.log("getBoutiques --> coord : ", coord)
+                                        var boutique_id = boutique.resultNumber
+                                        var latitude = coord[0];
+                                        var longitude = coord[1];
+                                        
+                                        //console.log("adresse buyer : ", address)
+
+                                        //Customisation des Icons utiliser pour la map
+                                        //customIcon = L.mapquest.icons.marker({
+                                        //    primaryColor: '#22407F',
+                                        //    secondaryColor: '#3B5998',
+                                        //    shadow: true,
+                                        //    size: 'md'
+                                        //    symbol: 'A'
+                                        //});
+
+                                        // Customisation de l'Icon pour les commerces déjà presents en base
+                                        var customIcon = L.icon({
+                                            iconUrl: 'https://icon-library.net//images/icon-stores/icon-stores-22.jpg',
+                                            iconSize: [35, 35], // size of the icon
+                                            });
+                                        var commentaire = "<div>Send message to the seller <br /><button class='btn' ng-click='btnseller"+ boutique_id +"()'>Cliquez ici</button></div>";
+
+                                        // Compile title DOM into a link function
+                                        var linkFn = $compile(angular.element(commentaire));
+                                        
+                                        // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
+                                        var popup = linkFn($scope);
+                                        var customPopup = L.popup()
+                                            .setLatLng([latitude, longitude])
+                                            .setContent(popup[0])
+                                            .openOn(map);
+
+                                        L.marker([latitude, longitude], {icon: customIcon}).bindPopup(customPopup).addTo(map);
+                                    })
+
+                                }, function (error) {
+                                    // do something about the error
+                                    console.log("Error getBoutiques : ", error);
+                                    deferred.reject(error);
+                                });
+
                             } else {
-                        //Récupération de la liste des commerces en base
+                        //Affichage de la liste des commerces récupérée sur la MAP
                         //GetAllCommerce.query().then(function (boutiques) {
                             //console.log("boutiques : ", boutiques)
                                 angular.forEach(commerces, function(boutique, key) {

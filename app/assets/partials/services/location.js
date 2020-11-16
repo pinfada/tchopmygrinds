@@ -29,7 +29,10 @@ marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', funct
 							myCoordinates.lat = response.data.latitude;
 							myCoordinates.lng = response.data.longitude;
 							deferred.resolve(myCoordinates);
-				    });
+                    })
+	                .catch(function onError(error) {
+	                    console.log(error);
+	                });
     			});
     		});
     		

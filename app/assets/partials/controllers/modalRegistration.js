@@ -67,6 +67,7 @@ marketApp.controller("modalRegistration", [
         if (data.userSelect.name == "buyer") {
             $scope.data.buyer_role = true
             $scope.data.seller_role = false
+            $scope.data.statut_type = 2;
         }
         else {
             $scope.data.seller_role = true
@@ -111,8 +112,8 @@ marketApp.controller("modalRegistration", [
                 userId: user.id
             }
 
-            $log.log('Submiting address info.'); // kinda console logs this statement
-            $log.log(address);
+            $log.log("new-registration --> address : ", address); // kinda console logs this statement
+            //$log.log(address);
             new GetUserAddresses(
                 address 
             ).create();
