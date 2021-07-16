@@ -5,11 +5,11 @@
       </a>
       <ul>
         <!--<li ng-show="isAuthenticated"><a href="#" ng-click="logout()" class="gradientmenu" ng-class="{'active': activemenu === true}"><i class="fa fa-user-times"></i></a></li>--> 
-        <li ng-hide="isAuthenticated"><a href="#" ng-click="OpenRegistration()" class="gradientmenu" ng-class="{'active': activemenu === true}"><i class="fa fa-user"></i></a></li>
+        <li ng-hide="isAuthenticated"><a href="#" ng-click="OpenRegistration(); activemenu = !activemenu" class="gradientmenu" ng-class="{'active': activemenu === true}"><i class="fa fa-user"></i></a></li>
         <li><a href="/" ng-click="MapOpen = !MapOpen" class="gradientmenu" ng-class="{'active': MapOpen === true}"><i class="fa fa-home"></i></a></li>
         <li ng-if="nb_produit > 0" ng-show="isBuyer"><a href="/" ng-click="SeeSearch = !SeeSearch" class="gradientmenu" ng-class="{'active': SeeSearch === true}"><i class="fa fa-sliders"></i></a></li>
 
-        <li ng-show="isSeller"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-tasks"></i></a></li>
+        <li ng-show="isSeller && nb_produit > 0"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-tasks"></i></a></li>
 
       </ul>
     </div>

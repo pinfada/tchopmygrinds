@@ -244,12 +244,15 @@ marketApp.controller('HeaderController', [
 
     // Ouverture de la fenetre de souscription/authentification
     $scope.OpenRegistration = function () {
-        $scope.activemenu = true;
+        //$scope.activemenu = true;
         $uibModal.open({
             templateUrl: "<%= asset_path('Templates/myModalRegistration.html') %>", // loads the template
+            ariaLabelledBy: 'modal-title-top',
+            ariaDescribedBy: 'modal-body-top',
             controller: 'modalRegistration',
             backdrop: true,
             windowClass: 'modal',
+            size: 'md',
             resolve: {
                 coordinates: function () {
                   return $scope.coordonnees; 

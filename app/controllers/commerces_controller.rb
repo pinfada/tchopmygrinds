@@ -35,7 +35,8 @@ class CommercesController < ApplicationController
 #   @commerce = Commerce.create(commerce_params)
     @commerce = @user.commerces.create(commerce_params)
     @commerce.save
-    respond_with(@commerce)
+    redirect_to root_url
+#    respond_with(@commerce)
   end
 
   def update

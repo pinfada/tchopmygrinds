@@ -1,4 +1,4 @@
-marketApp.controller("modalMarker", [
+marketApp.controller("modalBoutiqueSedentaire", [
     '$q', 
     '$scope',
     '$uibModalInstance', 
@@ -12,7 +12,7 @@ marketApp.controller("modalMarker", [
 
     var deferred = $q.defer();
 
-    //console.log("modalMarker --> usercoord : ", usercoord)
+    //console.log("modalBoutiqueSedentaire --> usercoord : ", usercoord)
 
     $scope.commerceaffiche = [5, 15, 30, 50]
 
@@ -24,8 +24,6 @@ marketApp.controller("modalMarker", [
             })
         }
     };
-
-
 
     $scope.data = {}
 

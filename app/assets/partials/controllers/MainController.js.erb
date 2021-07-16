@@ -67,7 +67,10 @@ module.controller('MainController', [
                     //--------------------------------------------------*
                     //          S E L L E R   B L O C                   *
                     //--------------------------------------------------*
-                    // Si l'utilisateur a un role de vendeur on vérifie si il possède des commerces
+                    // Si l'utilisateur a un role de vendeur on vérifie si :
+                    // C'est un vendeur du type 
+                    //    - sedentaire : Vérification de la présence des commerces
+                    //    - itinérant  : 
                     if (user.seller_role == true){
                         //console.log("seller : ", user)
                         //vérification de la présence de commerces en base pour l'utilisateur connecté
@@ -79,22 +82,41 @@ module.controller('MainController', [
                                     //Transmission des coordonnées géo de l'utilisateur pour affichage liste de commerces à proximité
                                     //La liste des commerces à proximité est issue d'une extraction des données Mapquest
                                     //boutiques.getBoutiques([resultcoord.lat, resultcoord.lng]).then(function (boutique) {
-                                        $uibModal.open({
-                                            templateUrl: "<%= asset_path('Templates/myModalMarker.html') %>", // loads the template
-                                            controller: 'modalMarker',
-                                            backdrop: true,
-                                            size: 'md',
-                                            windowClass: 'modal',
-                                            resolve: {
-                                                usercoord: function () {
-                                                    return resultcoord; 
-                                                },
-                                                user: function () {
-                                                    return user; 
-                                                }
+                                    $uibModal.open({
+                                        templateUrl: "<%= asset_path('Templates/myModalBoutiqueSedentaire.html') %>", // loads the template
+                                        controller: 'modalBoutiqueSedentaire',
+                                        backdrop: true,
+                                        size: 'md',
+                                        windowClass: 'modal',
+                                        resolve: {
+                                            usercoord: function () {
+                                                return resultcoord; 
+                                            },
+                                            user: function () {
+                                                return user; 
                                             }
-                                        })
+                                        }
+                                    })
                                     //})
+                                }
+                                else {
+
+                                    $uibModal.open({
+                                        templateUrl: "<%= asset_path('Templates/myModalBoutiqueItinerant.html') %>", // loads the template
+                                        controller: 'modalBoutiqueItinerant',
+                                        backdrop: true,
+                                        size: 'md',
+                                        windowClass: 'modal',
+                                        resolve: {
+                                            usercoord: function () {
+                                                return resultcoord; 
+                                            },
+                                            user: function () {
+                                                return user; 
+                                            }
+                                        }
+                                    })
+
                                 }
                             } else {
                                 // L'objectif est de donnée la possibilité au vendeur de communiquer avec les prospects à proximité de son point de vente
@@ -125,8 +147,8 @@ module.controller('MainController', [
 
                                                     // Customisation de l'Icon pour les commerces déjà presents en base
                                                     customIcon = L.icon({
-                                                        iconUrl: 'https://icon-library.net//images/location-marker-icon/location-marker-icon-15.jpg',
-                                                        iconSize: [35, 35], // size of the icon
+                                                        iconUrl: "<%= image_url('buyer.png') %>",
+                                                        iconSize: [25, 25], // size of the icon
                                                         });
                                                     commentaire = "<div>Send message to the customer <br /><button class='btn' ng-click='btncustomer"+ address.id +"()'>Cliquez ici</button></div>";
 
