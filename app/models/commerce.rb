@@ -1,4 +1,8 @@
 class Commerce < ApplicationRecord
+	validates :name, presence: true, uniqueness: true, on: :create
+	validates :name, length: {minimum: 2}
+	before_save { self.name = name.downcase }
+
 	belongs_to :user
 	has_many :categorizations
 	has_many :products, -> { distinct }, through: :categorizations
