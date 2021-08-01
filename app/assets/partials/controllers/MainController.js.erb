@@ -14,6 +14,8 @@ module.controller('MainController', [
     'nemSimpleLogger',
     'leafletData',
     'coordinates', 
+    '$geolocation',
+    'myPosition',
     'myCoordinates', 
     'markers', 
     'boutiques',
@@ -28,7 +30,7 @@ module.controller('MainController', [
     'GetUserCommerces',
     'GetUserAddresses',
     'GetAllUser',
-    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, myCoordinates, markers, boutiques, myBoutiques, myCommercenear, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser, UpdateOrderDetails) {
+    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, $geolocation, myPosition, myCoordinates, markers, boutiques, myBoutiques, myCommercenear, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser, UpdateOrderDetails) {
 
         ngCart.setTaxRate(7.5);
         ngCart.setShipping(2.99);
@@ -39,6 +41,37 @@ module.controller('MainController', [
         //    layers: [tileLayer],
         //    zoom: 12
         //});
+        var watchposOptions = {
+            timeout: 60000,
+            maximumAge: 250, //Accept a cached position whose age is no greater than the specified time in milliseconds
+            enableHighAccuracy: true
+        };
+
+        myPosition.getPosition({watchposOptions})
+        console.log("myPosition : ", myPosition)
+        //var myPosition = {}
+        //var myPosition = $geolocation.position.coords
+
+        //console.log("type of data: "+typeof(myPosition));
+        //console.log("myPosition : ", myPosition)
+        //for(var key in myPosition) {
+        //   if(myPosition.hasOwnProperty(key)) {
+        //        console.log(key, myPosition[key])
+        //        //do something with value;
+        //    }
+        //}
+        //console.log("coords : ", myPosition.coords)
+        //$scope.$watch('myPosition.coords', function (newValue, oldValue) {
+        //    console.log("new position value : ", newValue)
+        //    console.log("old position value : ", oldValue)
+            //$scope.map = {
+            //  center: {
+            //    latitude: newValue.latitude,
+            //    longitude: newValue.longitude
+            //  },
+            //  zoom: 16
+            //};                      
+        //}, true);
 
         coordinates.getCoordinates().then(function (resultcoord) {
             var map = null;

@@ -1,4 +1,4 @@
-marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', '$window',, function myCoordinates($q, $http, myIp, $geolocation, $window) {
+marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', '$window', function myCoordinates($q, $http, myIp, $geolocation, $window) {
 	//Requete https permettant de recupérer mes coordonnées géographiques
 	var deferredPromise = null;
 
@@ -6,12 +6,6 @@ marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', '$win
 		timeout: 60000,
 		//maximumAge: 30000, //Accept a cached position whose age is no greater than the specified time in milliseconds
 		enableHighAccuracy: false
-	};
-
-	var watchposOptions = {
-		timeout: 60000,
-		maximumAge: 250, //Accept a cached position whose age is no greater than the specified time in milliseconds
-		enableHighAccuracy: true
 	};
 
 	var deferred = $q.defer();
