@@ -42,13 +42,23 @@ module.controller('MainController', [
         //    zoom: 12
         //});
         var watchposOptions = {
-            timeout: 60000,
+            timeout: 6000,
             maximumAge: 250, //Accept a cached position whose age is no greater than the specified time in milliseconds
             enableHighAccuracy: true
         };
 
         myPosition.getPosition({watchposOptions})
-        console.log("myPosition : ", myPosition)
+        //console.log("myPosition : ", myPosition)
+
+        $scope.$on("geolocationStateChanged", function(evt, data) {
+            if (data) {
+                console.log("latitude  : ", data.latitude)
+                console.log("longitude : ", data.longitude)
+            } else {
+                console.log("KO : ", data)
+            }
+        })
+        
         //var myPosition = {}
         //var myPosition = $geolocation.position.coords
 

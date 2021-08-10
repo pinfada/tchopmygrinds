@@ -18,14 +18,16 @@
 	];
 	var marketApp = angular.module('marketApp', modules);
 
-	marketApp.run(['Auth', function (Auth) {
+	marketApp.run(['Auth', '$window', function (Auth, $window) {
+		//console.log("Auth : ", Auth);
 	    Auth.currentUser().then(function(user) {
-	      console.log(user);
+	      console.log("User sign in : ", user);
 	      //console.log(Auth._currentUser);
 	    }, function (error) {
             // do something about the error
             //console.log("Error Log",error.statusText);
-            console.info("Tchopers have to login first...");
+			$window.alert("Welcome, Please Tchopers have to login first to use the App");
+            //console.info("Tchopers have to login first...");
         });
 	}]);
 

@@ -4,21 +4,20 @@ marketApp.factory('myPosition', ['$window', '$rootScope', function myPosition($w
 		return 'geolocation' in $window.navigator;
 	}
     // GeoLocation
-    var coordinates = []
 	var retVal = {
 		getPosition: function(options) {
 			if(supported()) {
 				if(!this.watchId) {
 					this.watchId = $window.navigator.geolocation.watchPosition(
 						function(position) {
-							//coordinates.push([position.coords.latitude, position.coords.longitude]);
-							//console.log("coordinates : ", coordinates)
 							$rootScope.$apply(function() {
 								retVal.latitude = position.coords.latitude;
 								retVal.longitude = position.coords.longitude;
 								retVal.timestamp = position.timestamp;
+								//console.log("retval apply : ", retVal)
 								delete retVal.error;
-								$rootScope.$broadcast('$geolocation.position.changed', position);
+								$rootScope.$broadcast('geolocationStateChanged', retVal);
+								//$rootScope.$broadcast('$geolocation.position.changed', retVal);
 							});
 						},
 						function(error) {
