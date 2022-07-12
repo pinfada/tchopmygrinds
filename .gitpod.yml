@@ -2,7 +2,7 @@ image:
   file: .gitpod.Dockerfile
 tasks:
   - before: gem install rails
-    init: bundler install && psql -c "create role myapp with createdb login password 'password1';" && yarn install --check-files && rake db:setup && rails db:migrate && rails db:seed
+    init: bundler install && psql -c "create role gitpod with createdb login password 'password1';" && yarn install --check-files && rake db:setup && rails db:migrate && rails db:seed
     command: rails s   
 vscode:
   extensions:
