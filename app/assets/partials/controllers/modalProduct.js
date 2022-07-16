@@ -29,37 +29,40 @@ marketApp.controller("modalProduct", [
 
     var ind_suppression = false
     
-    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }, { yAxisID: 'y-axis-3' }];
+    //$scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }, { yAxisID: 'y-axis-3' }];
+    $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
     
-    $scope.series = ['min', 'max', 'moyen'];
+    //$scope.series = ['min', 'max', 'moyen'];
+    $scope.series = ['moyen'];
     
     $scope.options = {
+      responsive: true,
       title: {
         display: true,
-        text: 'Prix fruits et légumes',
+        text: 'fruit and vegetable prices',
         fontColor: 'lightblue',
         fontSize: 16
       },
       scales: {
         yAxes: [
+        //  {
+        //    id: 'y-axis-1',
+        //    type: 'linear',
+        //    display: true,
+        //    position: 'right'
+        //  },
           {
             id: 'y-axis-1',
             type: 'linear',
             display: true,
-            position: 'right'
-          },
-          {
-            id: 'y-axis-2',
-            type: 'linear',
-            display: true,
             position: 'left'
-          },
-          {
-            id: 'y-axis-3',
-            type: 'linear',
-            display: false,
-            position: 'right'
           }
+        //  {
+        //    id: 'y-axis-3',
+        //    type: 'linear',
+        //    display: false,
+        //    position: 'right'
+        //  }
         ],
         xAxes: [{
             type: 'time',
@@ -154,8 +157,8 @@ marketApp.controller("modalProduct", [
         }
 
         $scope.data = [
-          mini,
-          maxi,
+    //      mini,
+    //      maxi,
           moyen
         ];
 

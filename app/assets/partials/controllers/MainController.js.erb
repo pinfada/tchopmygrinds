@@ -238,8 +238,9 @@ module.controller('MainController', [
                                         $uibModal.open({
                                             templateUrl: "<%= asset_path('Templates/myModalProduct.html') %>", // loads the template
                                             controller: "modalProduct",
-                                            backdrop: false, // setting backdrop allows us to close the modal window on clicking outside the modal window
+                                            backdrop: "static", // setting backdrop allows us to close the modal window on clicking outside the modal window
                                             size: 'lg',
+                                            windowClass: "hmodal-info",
                                             resolve: {
                                                 commerce: function () {
                                                     return commerce_id; // Appel au controlleur modalProduct avec en entrée le nom du commerce

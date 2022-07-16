@@ -1,7 +1,7 @@
 marketApp.filter('productFilter', ['SearchProduct', 'myIp', function(SearchProduct, myIp) {
 
     return function(input){
-        console.log("donnée en entrée : ", input);
+        //console.log("donnée en entrée : ", input);
         // verifier que la donnée fournie est renseignée
         if (!input || input.length === 0) {
             console.log("donnée vide", input);

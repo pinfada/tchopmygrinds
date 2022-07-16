@@ -1,6 +1,8 @@
+<!--
 <div class="modal-header">
-  <h3 class="modal-title" id="modal-title">Section Produit</h3>
+  <h3 class="modal-title" id="modal-title">Product section</h3>
 </div>
+-->
 <form ng-submit="submit()" novalidate>
   <div class="modal-body" id="modal-body">
     <uib-tabset active="active">
@@ -30,7 +32,7 @@
         <br/>
         <ng-form name="nestedForm" ng-show="visible" ng-trim="false">
             <div class="form-inline">
-                <div class="form-group">
+                <div class="form-group mb-2">
                     <label class="control-label sr-only" id="InputName">Name</label>
                     <input type="text" class="form-control" placeholder="nom produit" required ng-model="fruit.name" name="produitname" uib-typeahead="option.produit for option in fruits | filter:$viewValue | limitTo:8">
                 </div>
@@ -50,16 +52,20 @@
                     <label class="control-label sr-only" id="InputDiscontinued">discontinued</label>
                     <input type="checkbox" class="form-control" placeholder="Discontinued" required ng-model="fruit.discontinued" name="produitdiscontinued" />
                 </div>
-                <input type="button" ng-click="newProduit(fruit)" class="btn btn-primary mb-2" value="Save">
+                <div class="form-group">
+                    <input type="button" ng-click="newProduit(fruit)" class="btn btn-primary mb-2" value="Save" />
+                </div>
             </div>
         </ng-form>
         <br/>
         <div ng-show="SeeGraph">
+          <!--
           <h3>Graphe Statistiques</h3>
+          -->
           <canvas id="line" width="500px" height="300px" class="chart chart-line" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride" chart-click="onClick"></canvas>
         </div>
         <br/>
-        <div class="col-auto">
+        <div ng-hide="SeeGraph" class="col-auto">
             <button type="button" class="btn" ng-click="visible = true"><i class="icon-plus"></i>Add</button>
         </div>
       </uib-tab>

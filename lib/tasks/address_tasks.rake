@@ -1,4 +1,4 @@
-namespace :db do
+namespace :address_tasks do
   desc "Erase and fill database"
     task :populate => :environment do 
     require 'faker'
