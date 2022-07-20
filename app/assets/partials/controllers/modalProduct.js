@@ -32,6 +32,20 @@ marketApp.controller("modalProduct", [
     //$scope.datasetOverride = [{ yAxisID: 'y-axis-1' }, { yAxisID: 'y-axis-2' }, { yAxisID: 'y-axis-3' }];
     $scope.datasetOverride = [{ yAxisID: 'y-axis-1' }];
     
+    $scope.plugins = {
+        legend: {
+          position: "top",
+          align: "end",
+          labels: {
+            font: {
+              size: 15,
+              family: "Helvetica Neue",
+              style: "italic",
+              weight: 300
+            }
+          }
+        }
+    },
     //$scope.series = ['min', 'max', 'moyen'];
     $scope.series = ['moyen'];
     
