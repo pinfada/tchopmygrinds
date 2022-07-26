@@ -11,9 +11,9 @@
         <table class="table" ng-if="nbproduit > 0">
             <thead>
                 <tr>
-                    <th scope="col">Produit</th>
-                    <th scope="col">Prix</th>
-                    <th scope="col">Quantite par unité</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity per unit</th>
                     <th scope="col">Stock</th>
                     <th scope="col">Obsolète</th>
                 </tr>
@@ -36,25 +36,25 @@
                   <label class="control-label sr-only" id="InputDiscontinued">discontinued</label>
                   <input type="checkbox" class="form-control" placeholder="Discontinued" required ng-model="fruit.discontinued" name="produitdiscontinued" />
                 </div>
-                <div class="form-group mb-2">
+                <div class="form-group">
                     <label class="control-label sr-only" id="InputName">Name</label>
-                    <input type="text" class="form-control" placeholder="Product" required ng-model="fruit.name" name="produitname" uib-typeahead="option.produit for option in fruits | filter:$viewValue | limitTo:8">
+                    <input type="text" class="form-control" placeholder="Product" ng-required ng-model="fruit.name" name="produitname" uib-typeahead="option.produit for option in fruits | filter:$viewValue | limitTo:8">
                 </div>
                 <div class="form-group">
                     <label class="control-label sr-only" id="InputPrice">Price</label>
-                    <input type="number" class="form-control" placeholder="Price" required ng-model="fruit.prix" name="produitprix" />
+                    <input type="number" class="form-control" placeholder="Price" ng-required ng-keyup="EnableDisable(fruit.prix)" ng-model="fruit.prix" name="produitprix" />
                 </div>
                 <div class="form-group">
                     <label class="control-label sr-only" id="InputQuantityPerUnit">Quantity</label>
-                    <input type="text" class="form-control" placeholder="Quantity per Unit" required ng-model="fruit.quantite" name="produitquantite" numeric-only/>
+                    <input type="text" class="form-control" placeholder="Quantity per Unit" ng-required ng-model="fruit.quantite" name="produitquantite" numeric-only/>
                 </div>
                 <div class="form-group">
                     <label class="control-label sr-only" id="InputUnitInStock">Stock</label>
-                    <input type="number" class="form-control" placeholder="Unit in Stock" required ng-model="fruit.stock" name="produitstock" />
+                    <input type="number" class="form-control" placeholder="Unit in Stock" ng-required ng-model="fruit.stock" name="produitstock" />
                 </div>
                 <div class="form-group">
                     <!--<input type="button" ng-click="newProduit(fruit)" class="btn btn-default btn-sm" value="Save" /> -->
-                    <button type="button" ng-click="newProduit(fruit)" class="btn btn-default btn-sm">
+                    <button type="button" ng-click="newProduit(fruit)" ng-disabled="IsDisabled" class="btn btn-default btn-sm">
                       <span class="glyphicon glyphicon-ok"></span>
                     </button> 
                 </div>
@@ -81,11 +81,11 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th scope="col">N° Commande</th>
+                        <th scope="col">N° Order</th>
                         <th scope="col">Article</th>
                         <th scope="col">Price</th>
-                        <th scope="col">Quantite</th>
-                        <th scope="col">Statut</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Status</th>
                         <th colspan="3"></th>
                     </tr>
                 </thead>

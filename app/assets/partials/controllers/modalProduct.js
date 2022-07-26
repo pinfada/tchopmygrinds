@@ -132,8 +132,8 @@ marketApp.controller("modalProduct", [
     //    var quantiteisnumber = angular.isNumber(donnee.quantite);
     //    var stockisnumber = angular.isNumber(donnee.stock);
     //    if (quantiteisnumber == true && stockisnumber == true) {
-            $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceId: commerce});
-            $scope.SeeGraph = true;
+        $scope.produits.push({name:$scope.name, unitprice:$scope.prix, quantityperunit:$scope.quantite, discontinued:$scope.discontinued, unitsinstock:$scope.stock, commerceId: commerce});
+        $scope.SeeGraph = true;
     //    } else {
     //        $scope.numb_invalide = true
     //        $scope.message = " Number you enter is invalid. Please retry. "
@@ -228,9 +228,17 @@ marketApp.controller("modalProduct", [
         //$window.location.reload();
     };
 
+    //This will disable the Button by default.
+    $scope.IsDisabled = true;
+
+    $scope.EnableDisable = function (price) {
+        //If TextBox has value, the Button will be enabled else vice versa.
+        console.log("test alimentation : ", price)
+        $scope.IsDisabled = price.length == 0;
+    }
 
     // On vérifie la présence de produit pour chaque commerce présent en base
-    if (user.statut_type == "sedentary"){
+    if (user.statut_type == "sedentary" || user.statut_type == "itinerant"){
         GetCommerceProducts.get({commerceId: commerce}).then(function (products) {
             //console.log("produits :", products)
             var quantite = 0

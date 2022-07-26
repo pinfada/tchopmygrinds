@@ -16,7 +16,7 @@ marketApp.controller("modalOrder", [
     var deferred = $q.defer();
 
     // Récupération de la liste des produits pour un commerce
-    GetCommerceProducts.get({commerceId: boutique.id}).then(function (products) {
+    GetCommerceProducts.get({commerceId: boutique}).then(function (products) {
         //console.log("produits :", products)
         $scope.nbproduit = products.length
         $scope.produits = products
