@@ -303,125 +303,128 @@ module.controller('MainController', [
                         // Vérification en base de la présence de commerce en fonction des coordonnées géo
                         myCommercenear.Getcommercenear(resultcoord.lat, resultcoord.lng).then(function (commerces) {
                             //var result = angular.equals({}, commerces);
-                            var nb_commerce = Object.keys(commerces).length;
-                            //let result = commerces.hasOwnProperty('name')
                             // Si on ne trouve aucun commerce en base, extraction des données Mapquest
-                            //console.log("MainController --> commerces ", commerces)
-                            //console.log("MainController --> nb_commerce ", nb_commerce)
-                            if (nb_commerce == 0) {
-                                var list_commerce = 15
-                                console.log("pas de boutiques enregistrées à proximité de chez vous")
-                                $window.alert("Pas de boutiques enregistrées à proximité de chez vous");
-                                myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], list_commerce).then(function (boutique) {
-                                    var boutiques = boutique.searchResults
-                                    angular.forEach(boutiques, function (boutique) {
-                                        //console.log("getBoutiques --> boutique : ", boutique)
-                                        var coord = boutique.shapePoints
-                                        //console.log("getBoutiques --> coord : ", coord)
-                                        var boutique_id = boutique.resultNumber
-                                        var latitude = coord[0];
-                                        var longitude = coord[1];
-                                        
-                                        //console.log("adresse buyer : ", address)
-                                        //Customisation des Icons utiliser pour la map
-                                        //customIcon = L.mapquest.icons.marker({
-                                        //    primaryColor: '#22407F',
-                                        //    secondaryColor: '#3B5998',
-                                        //    shadow: true,
-                                        //    size: 'md'
-                                        //    symbol: 'A'
-                                        //});
-
-                                        // Customisation de l'Icon pour les commerces déjà presents en base
-                                        var customIcon = L.icon({
-                                            iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
-                                            iconSize: [35, 35], // size of the icon
-                                            });
-                                        var commentaire = "<div>Send message to the seller <br /><button class='btn btn-info' ng-click='btnseller"+ boutique_id +"()'>Click here</button></div>";
-
-                                        // Compile title DOM into a link function
-                                        var linkFn = $compile(angular.element(commentaire));
-                                        
-                                        // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
-                                        var popup = linkFn($scope);
-                                        var customPopup = L.popup()
-                                            .setLatLng([latitude, longitude])
-                                            .setContent(popup[0])
-                                            .openOn(map);
-
-                                        L.marker([latitude, longitude], {icon: customIcon}).bindPopup(customPopup).addTo(map);
-                                    })
-
-                                }, function (error) {
-                                    // do something about the error
-                                    console.log("Error getBoutiques : ", error);
-                                    deferred.reject(error);
-                                });
-
-                            } else {
-                        //Affichage de la liste des commerces récupérée sur la MAP
-                        //GetAllCommerce.query().then(function (boutiques) {
-                            //console.log("boutiques : ", boutiques)
-                                angular.forEach(commerces, function(boutique, key) {
-                                    //console.log("boutique trouvée : ", boutique)
-                                    // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
-                                    for(var i=0; i<nb_commerce; i++) {
-                                        //boutique_place = [boutique[i].latitude, boutique[i].longitude]
-                                        //console.log("boutique_place test : ", boutique_place)
-
-                                        var commentaire = "";
-                                        var boutique_place = " ";
-                                        var customIcon = "";
-                                        var boutique_id = boutique[i].id
-                                        var btnorder = 'btnorder'+boutique_id;
-
-                                        $scope[btnorder] = function () {
-                                            $uibModal.open({
-                                                templateUrl: "<%= asset_path('Templates/myModalOrder.html') %>", // loads the template
-                                                controller: "modalOrder",
-                                                backdrop: true, // setting backdrop allows us to close the modal window on clicking outside the modal window
-                                                size: 'lg',
-                                                resolve: {
-                                                    boutique: function () {
-                                                        return boutique_id; // Appel au controlleur modalOrder avec en entrée le nom du commerce
-                                                    },
-                                                    user: function () {
-                                                        return user; 
-                                                    }
-                                                }
-                                            });
-
-                                        };
-
-                                        // Si le user est un acheteur
-                                        boutique_place = [boutique[i].latitude, boutique[i].longitude];
-
-                                        // Customisation de l'Icon pour les commerces déjà presents en base
-                                        customIcon = L.icon({
-                                            iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/74/Fruit_Stand_-_The_Noun_Project.svg',
-                                            iconSize: [35, 35], // size of the icon
-                                        });
-
-                                        commentaire = "<div>Commerce adh&eacuterent.<br /> Pour Commandez vos produits <br /><button class='btn' ng-click='btnorder"+ boutique_id +"()'>Cliquez ici</button></div>";
-                                        // Compile title DOM into a link function
-                                        var linkFn = $compile(angular.element(commentaire));
-                                                
-                                        // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
-                                        var popup = linkFn($scope);
-
-                                        console.log("coordonnées :", boutique_place )
-                                        if (boutique_place !== " ") {
+                            angular.forEach(commerces, function (commerce) {
+                                //console.log("MainController --> commerces : ", commerces)
+                                //console.log("MainController --> commerce length : ", commerce.length)
+                                let nb_commerce = commerce.length;
+                                if (nb_commerce === 0) {
+                                    var list_commerce = 15
+                                    console.log("pas de boutiques enregistrées à proximité de chez vous")
+                                    $window.alert("Pas de boutiques enregistrées à proximité de chez vous");
+                                    myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], list_commerce).then(function (boutique) {
+                                        var boutiques = boutique.searchResults
+                                        angular.forEach(boutiques, function (boutique) {
+                                            //console.log("getBoutiques --> boutique : ", boutique)
+                                            var coord = boutique.shapePoints
+                                            //console.log("getBoutiques --> coord : ", coord)
+                                            var boutique_id = boutique.resultNumber
+                                            var latitude = coord[0];
+                                            var longitude = coord[1];
+                                            
+                                            //console.log("adresse buyer : ", address)
+                                            //Customisation des Icons utiliser pour la map
+                                            //customIcon = L.mapquest.icons.marker({
+                                            //    primaryColor: '#22407F',
+                                            //    secondaryColor: '#3B5998',
+                                            //    shadow: true,
+                                            //    size: 'md'
+                                            //    symbol: 'A'
+                                            //});
+    
+                                            // Customisation de l'Icon pour les commerces déjà presents en base
+                                            var customIcon = L.icon({
+                                                iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
+                                                iconSize: [35, 35], // size of the icon
+                                                });
+                                            var commentaire = "<div><b ng-click='btnseller"+ boutique_id +"()'>"+boutique.name+"</b> is not yet register on Tchopmygrinds."+
+                                                              "<br /> You can tell them to join the adventure below"+
+                                                              "<br /><span class='glyphicon glyphicon-phone'> : "+boutique.fields.phone+"</span>"+
+                                                              "<br /><span class='glyphicon glyphicon-envelope'> : </span></div>";
+                                            // Compile title DOM into a link function
+                                            var linkFn = $compile(angular.element(commentaire));
+                                            
+                                            // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
+                                            var popup = linkFn($scope);
                                             var customPopup = L.popup()
-                                                .setLatLng(boutique_place)
+                                                .setLatLng([latitude, longitude])
                                                 .setContent(popup[0])
                                                 .openOn(map);
-                                            //map.removeLayer(result);
-                                            L.marker(boutique_place, {icon: customIcon}).bindPopup(customPopup).addTo(map);
+    
+                                            L.marker([latitude, longitude], {icon: customIcon}).bindPopup(customPopup).addTo(map);
+                                        })
+    
+                                    }, function (error) {
+                                        // do something about the error
+                                        console.log("Error getBoutiques : ", error);
+                                        deferred.reject(error);
+                                    });
+    
+                                } else {
+                            //Affichage de la liste des commerces récupérée sur la MAP
+                            //GetAllCommerce.query().then(function (boutiques) {
+                                //console.log("boutiques : ", boutiques)
+                                    angular.forEach(commerces, function(boutique, key) {
+                                        //console.log("boutique trouvée : ", boutique)
+                                        // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
+                                        for(var i=0; i<nb_commerce; i++) {
+                                            //boutique_place = [boutique[i].latitude, boutique[i].longitude]
+                                            //console.log("boutique_place test : ", boutique_place)
+    
+                                            var commentaire = "";
+                                            var boutique_place = " ";
+                                            var customIcon = "";
+                                            var boutique_id = boutique[i].id
+                                            var btnorder = 'btnorder'+boutique_id;
+    
+                                            $scope[btnorder] = function () {
+                                                $uibModal.open({
+                                                    templateUrl: "<%= asset_path('Templates/myModalOrder.html') %>", // loads the template
+                                                    controller: "modalOrder",
+                                                    backdrop: true, // setting backdrop allows us to close the modal window on clicking outside the modal window
+                                                    size: 'lg',
+                                                    resolve: {
+                                                        boutique: function () {
+                                                            return boutique_id; // Appel au controlleur modalOrder avec en entrée le nom du commerce
+                                                        },
+                                                        user: function () {
+                                                            return user; 
+                                                        }
+                                                    }
+                                                });
+    
+                                            };
+    
+                                            // Si le user est un acheteur
+                                            boutique_place = [boutique[i].latitude, boutique[i].longitude];
+    
+                                            // Customisation de l'Icon pour les commerces déjà presents en base
+                                            customIcon = L.icon({
+                                                iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/74/Fruit_Stand_-_The_Noun_Project.svg',
+                                                iconSize: [35, 35], // size of the icon
+                                            });
+    
+                                            commentaire = "<div>Commerce adh&eacuterent.<br /> Pour Commandez vos produits <br /><button class='btn' ng-click='btnorder"+ boutique_id +"()'>Cliquez ici</button></div>";
+                                            // Compile title DOM into a link function
+                                            var linkFn = $compile(angular.element(commentaire));
+                                                    
+                                            // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
+                                            var popup = linkFn($scope);
+    
+                                            console.log("coordonnées :", boutique_place )
+                                            if (boutique_place !== " ") {
+                                                var customPopup = L.popup()
+                                                    .setLatLng(boutique_place)
+                                                    .setContent(popup[0])
+                                                    .openOn(map);
+                                                //map.removeLayer(result);
+                                                L.marker(boutique_place, {icon: customIcon}).bindPopup(customPopup).addTo(map);
+                                            }
                                         }
-                                    }
-                                });
-                        //});
-                            }
+                                    });
+                            //});
+                                }
+                            })
                         })
 
 
