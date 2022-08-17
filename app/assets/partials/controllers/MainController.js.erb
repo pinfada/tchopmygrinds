@@ -99,10 +99,19 @@ module.controller('MainController', [
                 layers: [tileLayer],
                 zoom: 12
             });
-
+           
             // Controle de la map (localisation, zoom etc...)
             map.addControl(L.mapquest.control());
             
+            let directionsControl = L.mapquest.directionsControl().addTo(map);
+
+            directionsControl.setFirstDestination({
+                latLng: {
+                    lat: resultcoord.lat,
+                    lng: resultcoord.lng
+                }
+            });
+
             // Affichage des commerces à proximité si l'utilisateur s'est authentifié
             if (Auth.isAuthenticated() )
             {

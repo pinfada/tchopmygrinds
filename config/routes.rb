@@ -1,5 +1,7 @@
 StatExo1::Application.routes.draw do
-  
+
+  root "pages#home"
+
   get 'users/index'
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   devise_for :users, controllers: { 
@@ -58,9 +60,6 @@ StatExo1::Application.routes.draw do
   resources :addresses
   resources :orders
   resources :orderdetails
-
-
-  root "pages#home"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
