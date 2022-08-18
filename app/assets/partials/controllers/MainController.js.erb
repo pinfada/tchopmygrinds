@@ -103,7 +103,47 @@ module.controller('MainController', [
             // Controle de la map (localisation, zoom etc...)
             map.addControl(L.mapquest.control());
             
-            let directionsControl = L.mapquest.directionsControl().addTo(map);
+            let directionsControl = L.mapquest.directionsControl({
+                directionsLayer: {
+                    startMarker: {
+                      title: 'Drag to change location',
+                      draggable: true,
+                      icon: 'marker-start',
+                      iconOptions: {
+                        size: 'sm'
+                      }
+                    },
+                    endMarker: {
+                      draggable: true,
+                      title: 'Drag to change location',
+                      icon: 'marker-end',
+                      iconOptions: {
+                        size: 'sm'
+                      }
+                    },
+                    viaMarker: {
+                      title: 'Drag to change route'
+                    },
+                    routeRibbon: {
+                      showTraffic: true
+                    },
+                    alternateRouteRibbon: {
+                      showTraffic: true
+                    },
+                    paddingTopLeft: [450, 20],
+                    paddingBottomRight: [180, 20],
+                  },
+                endInput: {
+                    compactResults: true,
+                    disabled: false,
+                    location: {},
+                    placeholderText: 'Destination',
+                    geolocation: {
+                      enabled: true
+                    },
+                    clearTitle: 'Remove this destination'
+                  }
+            }).addTo(map);
 
             directionsControl.setFirstDestination({
                 latLng: {
