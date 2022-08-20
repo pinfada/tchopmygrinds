@@ -283,7 +283,7 @@ module.controller('MainController', [
                                     var btnproduct = 'btnproduct'+result[i].id;
                                     var commerce_id = result[i].id;
 
-                                    $scope[btnproduct] = function () {
+                                    $scope[btnproduct] = function (id) {
                                         $uibModal.open({
                                             templateUrl: "<%= asset_path('Templates/myModalProduct.html') %>", // loads the template
                                             controller: "modalProduct",
@@ -292,7 +292,7 @@ module.controller('MainController', [
                                             windowClass: "hmodal-info",
                                             resolve: {
                                                 commerce: function () {
-                                                    return commerce_id; // Appel au controlleur modalProduct avec en entrée le nom du commerce
+                                                    return id; // Appel au controlleur modalProduct avec en entrée le nom du commerce
                                                 },
                                                 user: function () {
                                                     return user; 
@@ -315,7 +315,7 @@ module.controller('MainController', [
                                         iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
                                         iconSize: [35, 35], // size of the icon
                                         });
-                                    commentaire = "<div><b>D&eacuteja adh&eacuterent</b>.<br /> Pour ajouter vos produits <br /><button class='btn' ng-click='btnproduct"+ result[i].id +"()'>Cliquez ici</button></div>";
+                                    commentaire = "<div><b>D&eacuteja adh&eacuterent</b>.<br /> Pour ajouter vos produits <br /><button class='btn' ng-click='btnproduct"+ commerce_id +"("+commerce_id+")'>Cliquez ici</button></div>";
 
                                     // Compile title DOM into a link function
                                     var linkFn = $compile(angular.element(commentaire));
@@ -361,7 +361,7 @@ module.controller('MainController', [
                                     var list_commerce = 15
                                     console.log("pas de boutiques enregistrées à proximité de chez vous")
                                     $window.alert("Pas de boutiques enregistrées à proximité de chez vous");
-                                    myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], list_commerce).then(function (boutique) {
+                                    myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], list_commerce, mapquest_key).then(function (boutique) {
                                         var boutiques = boutique.searchResults
                                         angular.forEach(boutiques, function (boutique) {
                                             //console.log("getBoutiques --> boutique : ", boutique)
@@ -418,23 +418,24 @@ module.controller('MainController', [
                                         // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
                                         for(var i=0; i<nb_commerce; i++) {
                                             //boutique_place = [boutique[i].latitude, boutique[i].longitude]
-                                            //console.log("boutique_place test : ", boutique_place)
-    
+                                            //console.log("boutique test : ", boutique)
+                                                
                                             var commentaire = "";
                                             var boutique_place = " ";
                                             var customIcon = "";
                                             var boutique_id = boutique[i].id
                                             var btnorder = 'btnorder'+boutique_id;
     
-                                            $scope[btnorder] = function () {
+                                            $scope[btnorder] = function (id) {
+                                                //console.log("data return : ", id)
                                                 $uibModal.open({
-                                                    templateUrl: "<%= asset_path('Templates/myModalOrder.html') %>", // loads the template
+                                                    templateUrl: "<%= asset_path('Templates/myModalOrder.html.erb') %>", // loads the template
                                                     controller: "modalOrder",
                                                     backdrop: true, // setting backdrop allows us to close the modal window on clicking outside the modal window
                                                     size: 'lg',
                                                     resolve: {
                                                         boutique: function () {
-                                                            return boutique_id; // Appel au controlleur modalOrder avec en entrée le nom du commerce
+                                                            return id; // Appel au controlleur modalOrder avec en entrée le nom du commerce
                                                         },
                                                         user: function () {
                                                             return user; 
@@ -453,7 +454,7 @@ module.controller('MainController', [
                                                 iconSize: [35, 35], // size of the icon
                                             });
     
-                                            commentaire = "<div>Commerce adh&eacuterent.<br /> Pour Commandez vos produits <br /><button class='btn' ng-click='btnorder"+ boutique_id +"()'>Cliquez ici</button></div>";
+                                            commentaire = "<div>Commerce adh&eacuterent.<br /> Pour Commandez vos produits <br /><button class='btn' ng-click='btnorder"+ boutique_id +"("+boutique_id+")'>Cliquez ici</button></div>";
                                             // Compile title DOM into a link function
                                             var linkFn = $compile(angular.element(commentaire));
                                                     

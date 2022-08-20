@@ -17,7 +17,8 @@ marketApp.controller("modalOrder", [
 
     // Récupération de la liste des produits pour un commerce
     GetCommerceProducts.get({commerceId: boutique}).then(function (products) {
-        //console.log("produits :", products)
+        //console.log("modalOrder : --> commerceId :", boutique)
+        //console.log("modalOrder : --> produits :", products)
         $scope.nbproduit = products.length
         $scope.produits = products
         
