@@ -97,7 +97,7 @@ module.controller('MainController', [
             map = L.mapquest.map('map', {
                 center: [resultcoord.lat, resultcoord.lng],
                 layers: [tileLayer],
-                zoom: 12
+                zoom: 14
             });
            
             // Controle de la map (localisation, zoom etc...)
@@ -128,14 +128,14 @@ module.controller('MainController', [
                       showTraffic: true
                     },
                     alternateRouteRibbon: {
-                      showTraffic: true
+                      showTraffic: false
                     },
                     paddingTopLeft: [450, 20],
                     paddingBottomRight: [180, 20],
                   },
                 endInput: {
                     compactResults: true,
-                    disabled: false,
+                    disabled: true,
                     location: {},
                     placeholderText: 'Destination',
                     geolocation: {
@@ -186,6 +186,9 @@ module.controller('MainController', [
                                             },
                                             user: function () {
                                                 return user; 
+                                            },
+                                            mapquestkey: function () {
+                                                return mapquest_key; 
                                             }
                                         }
                                     })
@@ -360,6 +363,8 @@ module.controller('MainController', [
                                 if (nb_commerce === 0) {
                                     var list_commerce = 15
                                     console.log("pas de boutiques enregistrées à proximité de chez vous")
+                                    console.log("MainController --> list_commerce : ", list_commerce)
+                                    console.log("MainController --> mapquest_key : ", mapquest_key)
                                     $window.alert("Pas de boutiques enregistrées à proximité de chez vous");
                                     myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], list_commerce, mapquest_key).then(function (boutique) {
                                         var boutiques = boutique.searchResults

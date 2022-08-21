@@ -233,7 +233,7 @@ marketApp.controller("modalProduct", [
 
     $scope.EnableDisable = function (price) {
         //If TextBox has value, the Button will be enabled else vice versa.
-        console.log("test alimentation : ", price)
+        //console.log("test alimentation : ", price)
         $scope.IsDisabled = price.length == 0;
     }
 

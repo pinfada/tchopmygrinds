@@ -5,12 +5,13 @@ marketApp.factory("myBoutiques", ['$q', '$http', function myBoutiques($q, $http)
 		getBoutiques: function(position, item, mapkey) {
 //			console.log("position:"+position);
 //			console.log("item:"+item);
+//			console.log("marketApp --> getboutiques : ", mapkey);
 			if(position.includes(" "))
             	position=position.replace(" ","+");
 			var deferred = $q.defer();
     		$http({
     		    method: 'GET',
-    		    url: "https://www.mapquestapi.com/search/v2/search?key="+mapkey+"&maxMatches="+item+"&shapePoints="+position+"&hostedData=mqap.internationalpois|navsics=?|549910"
+    		    url: "https://www.mapquestapi.com/search/v2/search?key="+mapkey+"&maxMatches="+item+"&shapePoints="+position+"&hostedData=mqap.internationalpois|navsics=?|549999"
     		}).then(function(response) {
 					var myBoutiques = {};
 					myBoutiques.searchResults = response.data.searchResults;

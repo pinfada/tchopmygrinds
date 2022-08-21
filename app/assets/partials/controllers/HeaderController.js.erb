@@ -68,10 +68,6 @@ marketApp.controller('HeaderController', [
       $scope.isAuthenticated = true;
       $scope.IsVisible = false;
       var userid = user.id;
-      $scope.ShowHide = function () {
-        $scope.IsVisible = $scope.IsVisible ? false : true;
-      }
-
       myUseraddress.Getuseraddress(userid).then(function (response) {
           angular.forEach(response, function(address, key) {
               if (address.length > 0) {
@@ -108,6 +104,25 @@ marketApp.controller('HeaderController', [
             $scope.nb_commerce = commerces.length
 
             var calc_nbproduct = 0
+
+            $scope.ShowProduct = function (commerce) {
+              $scope.IsVisible = $scope.IsVisible ? false : true;
+              GetCommerceProducts.get({commerceId: commerce.id}).then(function(products){
+                $scope.products = products
+                calc_nbproduct = calc_nbproduct + products.length
+                $scope.nb_produit = calc_nbproduct
+                //console.log("produits : ", $scope.nb_produit)
+                //console.log("nbre produits : ", $scope.nb_produit)
+              }, function(error) {
+                  // Log on console to check out what the error is.
+                  console.info('Error recuperation liste produits! : ', error);
+              })
+            }
+
+            $scope.ShowHide = function () {
+              $scope.IsVisible = $scope.IsVisible ? false : true;
+            }
+
             angular.forEach(commerces, function (commerce) {
               GetCommerceProducts.get({commerceId: commerce.id}).then(function(products){
                 $scope.products = products
@@ -117,12 +132,13 @@ marketApp.controller('HeaderController', [
                 //console.log("nbre produits : ", $scope.nb_produit)
               }, function(error) {
                   // Log on console to check out what the error is.
-                  console.info('Error recuperation liste produits!');
+                  console.info('Error recuperation liste produits! : ', error);
               })
             });
+
           }, function(error) {
               // Log on console to check out what the error is.
-              console.info('Error recuperation liste commerces!');
+              console.info('Error recuperation liste commerces! : ', error);
           });
 
           $scope.delCommerce = function (data) {
