@@ -869,13 +869,24 @@ h5.cat {
   }
 }
 
-#backColor {
+#AddbackColor {
   text-decoration: none;
   padding: 0 15px;
   transition: all .9s;
 }
 
-#backColor:hover {
+#AddbackColor:hover {
   color: #fff;
   background-color: green;
+}
+
+#RemovebackColor {
+  text-decoration: none;
+  padding: 0 30px;
+  transition: all .9s;
+}
+
+#RemovebackColor:hover {
+  color: #fff;
+  background-color: red;
 }

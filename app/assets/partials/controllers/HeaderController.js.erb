@@ -99,11 +99,20 @@ marketApp.controller('HeaderController', [
       if (user.isSeller == true){
           $scope.isSeller = true;
 
-          var calc_nbcommerce = $scope.nbnew_commerce = 0
+          var calc_nbcommerce = $scope.nb_new_commerce = 0
+          $scope.new_commerce = [];
           $scope.AddCommerce = function () {
             calc_nbcommerce++
-            $scope.nbnew_commerce = calc_nbcommerce
-            console.log($scope.nbnew_commerce)
+            $scope.nb_new_commerce = calc_nbcommerce
+            $scope.new_commerce.push({name: "", address: "", city: ""});
+            console.log("nb commerce : ", calc_nbcommerce)
+          }
+
+          $scope.RemoveCommerce = function () {
+            calc_nbcommerce--
+            $scope.nb_new_commerce = calc_nbcommerce
+            $scope.new_commerce.pop();
+            console.log("nb commerce : ", calc_nbcommerce)
           }
 
           // Récupération de la liste des commerces du user
