@@ -98,6 +98,14 @@ marketApp.controller('HeaderController', [
 
       if (user.isSeller == true){
           $scope.isSeller = true;
+
+          var calc_nbcommerce = $scope.nbnew_commerce = 0
+          $scope.AddCommerce = function () {
+            calc_nbcommerce++
+            $scope.nbnew_commerce = calc_nbcommerce
+            console.log($scope.nbnew_commerce)
+          }
+
           // Récupération de la liste des commerces du user
           GetUserCommerces.get({userId: user.id}).then(function(commerces){
             $scope.commerces = commerces
@@ -118,7 +126,7 @@ marketApp.controller('HeaderController', [
                   console.info('Error recuperation liste produits! : ', error);
               })
             }
-
+            
             $scope.ShowHide = function () {
               $scope.IsVisible = $scope.IsVisible ? false : true;
             }

@@ -9,7 +9,7 @@
         <li><a href="/" ng-click="MapOpen = !MapOpen" class="gradientmenu" ng-class="{'active': MapOpen === true}"><i class="fa fa-home"></i></a></li>
         <li ng-if="nb_produit > 0" ng-show="isBuyer"><a href="/" ng-click="SeeSearch = !SeeSearch" class="gradientmenu" ng-class="{'active': SeeSearch === true}"><i class="fa fa-sliders"></i></a></li>
 
-        <li ng-show="isSeller && nb_produit > 0"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-tasks"></i></a></li>
+        <li ng-show="isSeller && nb_commerce > 0"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-tasks"></i></a></li>
 
       </ul>
     </div>
@@ -180,7 +180,8 @@
         <!--Commerce info-->
         <div class="container-fluid" ng-hide = "IsVisible">
             <!--div class="row"-->
-            <h5 class="cat">Commerce List</h5>
+            <h5 class="cat">Shop List</h5> 
+            <a id='backColor' href="#" class="badge text-uppercase" ng-click="AddCommerce()">Add new shop</a>
             <div ng-repeat="commerce in commerces">
                 <div class="col-md-4">
                     <div class="card">
@@ -195,8 +196,27 @@
                             <li class="list-group-item">Catégorie d'établissement : Siège et établissement principal</li>
                         </ul>
                         <div class="card-body">
-                            <button type="button" class="btn btn-sm btn-primary" ng-click="ShowProduct(commerce)">Show product</button>
-                            <button type="button" ng-click="delCommerce(commerce)" class="btn btn-sm btn-outline-primary text-uppercase"> <i class="fas fa-trash-alt"></i> Delete</button>
+                            <button type="button" class="btn btn-sm btn-primary" ng-click="ShowProduct(commerce)" ng-show="isSeller && nb_produit > 0">Show product</button>
+                            <button type="button" ng-click="delCommerce(commerce)" class="btn-danger btn-sm btn-outline-primary text-uppercase"> <i class="fas fa-trash-alt"></i> Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div ng-repeat="newcommerce in nbnew_commerce">
+                <div class="col-md-4">
+                    <div class="card">
+                        <%= image_tag "ava1.png", class:"card-img-top" %>
+                        <div class="card-body">
+                            <h5 class="card-title">xxxxxx</h5>
+                            <p class="card-text">Commerce localisé à l'adresse xxxxxx dans la ville de yyyy</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Siren : 999 999 999 99999</li>
+                            <li class="list-group-item">Etat : Actif depuis le 20/09/2017</li>
+                            <li class="list-group-item">Catégorie d'établissement : Siège et établissement principal</li>
+                        </ul>
+                        <div class="card-body">
+                            <button type="button" ng-click="CreateCommerce(commerce)" class="btn-success btn-sm btn-outline-primary text-uppercase"> <i class="fas fa-trash-alt"></i> Create</button>
                         </div>
                     </div>
                 </div>
