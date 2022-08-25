@@ -104,15 +104,32 @@ marketApp.controller('HeaderController', [
           $scope.AddCommerce = function () {
             calc_nbcommerce++
             $scope.nb_new_commerce = calc_nbcommerce
-            $scope.new_commerce.push({name: "", address: "", city: ""});
-            console.log("nb commerce : ", calc_nbcommerce)
+            var address = {
+              name: '',
+              address1: '',
+              address2: 'non fournie',
+              country: '',
+              city: '',
+              zipcode: '',
+              state: '',
+              latitude: '',
+              longitude: '',
+              userId: userid}
+
+            $scope.new_commerce.push(address);
+            //console.log("nb commerce : ", calc_nbcommerce)
           }
 
           $scope.RemoveCommerce = function () {
             calc_nbcommerce--
             $scope.nb_new_commerce = calc_nbcommerce
             $scope.new_commerce.pop();
-            console.log("nb commerce : ", calc_nbcommerce)
+            //console.log("nb commerce : ", calc_nbcommerce)
+          }
+
+          //create commerce 
+          $scope.CreateCommerce = function (commerces) {
+            console.log("HeaderControler --> CreateCommerce : ", commerces)
           }
 
           // Récupération de la liste des commerces du user
@@ -390,6 +407,7 @@ marketApp.controller('HeaderController', [
         $route.reload();
       }, function(error) {
         // An error occurred logging out.
+        console.log("HeaderControler --> Error : ", error)
       });
     };
 

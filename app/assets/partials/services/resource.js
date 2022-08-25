@@ -191,4 +191,17 @@ marketApp.factory("GetUserCommerces", ['railsResourceFactory', 'railsSerializer'
             this.nestedAttribute('users', 'User');
           })
   });
+  
+}]);
+
+// Suppression commerce
+marketApp.factory("DeleteUserCommerces", ['railsResourceFactory', 'railsSerializer', function(railsResourceFactory, railsSerializer) {
+  return railsResourceFactory({
+          url: "/users/{{userId}}/commerces/{{id}}", 
+          name: "commerce",
+          serializer: railsSerializer(function () {
+            this.nestedAttribute('users', 'User');
+          })
+  });
+  
 }]);

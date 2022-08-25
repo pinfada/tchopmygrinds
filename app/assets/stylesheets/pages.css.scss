@@ -890,3 +890,49 @@ h5.cat {
   color: #fff;
   background-color: red;
 }
+
+.card-title input {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #1e1a1a;
+  margin-bottom: 15px;
+  border: none;
+  border-bottom: 1px solid #1e1a1a;
+  outline: none;
+  background: transparent;
+}
+
+.card-title label {
+  position: absolute;
+  top:0;
+  left: 0;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #1e1a1a;
+  pointer-events: none;
+  transition: .5s;
+}
+
+.card-text input {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #1e1a1a;
+  margin-bottom: 15px;
+  border: none;
+  border-bottom: 1px solid #1e1a1a;
+  outline: none;
+  background: transparent;
+}
+
+.card-text label {
+  position: absolute;
+  top:0;
+  left: 0;
+  padding: 10px 0;
+  font-size: 16px;
+  color: #1e1a1a;
+  pointer-events: none;
+  transition: .5s;
+}

@@ -4,6 +4,8 @@ namespace :user_tasks do
   desc "Ajout nouveaux utilisateurs"
   task :populate => :environment do
     #Rake::Task['db:reset'].invoke
+    Orderdetail.delete_all
+    Orderdetail.reset_pk_sequence
     Product.delete_all # suppression de la table produit
     Product.reset_pk_sequence # remise de l'id à 1 pour table produit
     Categorization.delete_all # suppression de la table produit
@@ -12,8 +14,6 @@ namespace :user_tasks do
     Order.reset_pk_sequence
     Commerce.delete_all
     Commerce.reset_pk_sequence
-    Orderdetail.delete_all
-    Orderdetail.reset_pk_sequence
     Address.delete_all
     Address.reset_pk_sequence
     User.delete_all # suppression de la table user
