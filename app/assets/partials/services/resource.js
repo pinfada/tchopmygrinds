@@ -1,6 +1,6 @@
 //Permet de faire un requete sur à partir du nom du commerce
-marketApp.factory("SearchCommerce", ['railsResourceFactory', function(railsResourceFactory) {
-  return railsResourceFactory({ url: "/commerces/search", name: "Searchcommerce" });
+marketApp.factory("GetMarkers", ['railsResourceFactory', function(railsResourceFactory) {
+  return railsResourceFactory({ url: "/commerces/search", name: "GetMarkers" });
 }]);
 
 marketApp.factory("SearchProduct", ['railsResourceFactory', function(railsResourceFactory) {

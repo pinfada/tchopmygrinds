@@ -60,7 +60,7 @@ class CommercesController < ApplicationController
   end
 
   # GET /commerces/listcommerce
-  # Recuperation de la liste des commerces à proximité '10km' en fonction :
+  # Recuperation de la liste des commerces dans un rayon de '50km' en fonction :
   # - Des coordonnées de l'utilisateur
   def listcommerce
     lat_name = params[:lat_query]
