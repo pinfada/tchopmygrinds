@@ -26,10 +26,10 @@ html, body {
 */
 
 .map {
-  min-width: 100%;
+  min-width: -webkit-fill-available;
   min-height: 100%;
   background: #ebe6dc;
-  /*margin-left: 50px;*/
+  margin-left: 50px;
   position: fixed !important;
 }
 
@@ -935,4 +935,8 @@ h5.cat {
   color: #1e1a1a;
   pointer-events: none;
   transition: .5s;
+}
+
+trix-toolbar {
+  white-space: normal;
 }

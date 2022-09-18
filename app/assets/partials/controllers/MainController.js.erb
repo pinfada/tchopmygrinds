@@ -426,7 +426,7 @@ module.controller('MainController', [
                                                         });
                                                     var commentaire = "<div><b ng-click='btnseller"+ boutique_id +"()'>"+data.name+"</b> is not yet register on Tchopmygrinds."+
                                                                     "<br /> You can tell them to join the adventure below"+
-                                                                    "<br /><span class='glyphicon glyphicon-phone'> : "+data.fields.phone+"</span>"+
+                                                                    "<br /><span class='glyphicon glyphicon-phone'> : <a href=tel:"+data.fields.phone+"></a>"+data.fields.phone+"</span>"+
                                                                     "<br /><span class='glyphicon glyphicon-envelope'> : </span></div>";
                                                     // Compile title DOM into a link function
                                                     var linkFn = $compile(angular.element(commentaire));
