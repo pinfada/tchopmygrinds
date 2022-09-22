@@ -8,7 +8,10 @@ StatExo1::Application.routes.draw do
   #  sessions: 'users/sessions',
     registrations: 'registrations'
   }
-  
+
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
   #resources :commerces do
   #  collection do
   #    get :search
@@ -20,6 +23,7 @@ StatExo1::Application.routes.draw do
   match '/propos', to: 'pages#propos', via: 'get'
   match '/aide', to: 'pages#aide', via: 'get'
   match '/agrimer', to: 'pages#agrimer', via: 'get'
+  match '/fail', to: 'pages#fail', via: 'get'
   match '/serveraddress', to: 'pages#serveraddress', via: 'get'
 
   resources :newsletters

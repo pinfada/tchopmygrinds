@@ -71,6 +71,8 @@ GEM
       erubi (>= 1.0.0)
       rack (>= 0.9.0)
     bindex (0.8.1)
+    bootsnap (1.13.0)
+      msgpack (~> 1.2)
     bootstrap-sass (3.4.1)
       autoprefixer-rails (>= 5.2.1)
       sassc (>= 2.0.0)
@@ -183,6 +185,11 @@ GEM
       rails (>= 4.2.0)
     letter_opener (1.7.0)
       launchy (~> 2.2)
+    letter_opener_web (2.0.0)
+      actionmailer (>= 5.2)
+      letter_opener (~> 1.7)
+      railties (>= 5.2)
+      rexml
     listen (3.0.8)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -215,6 +222,7 @@ GEM
       railties (>= 4.1)
     money (6.16.0)
       i18n (>= 0.6.4, <= 2)
+    msgpack (1.5.6)
     multi_json (1.15.0)
     multipart-post (2.1.1)
     nested_form (0.3.2)
@@ -288,6 +296,7 @@ GEM
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
+    rexml (3.2.5)
     ruby2_keywords (0.0.5)
     ruby_http_client (3.5.2)
     sass (3.7.4)
@@ -367,6 +376,7 @@ DEPENDENCIES
   angularjs-rails (~> 1.6, >= 1.6.1)
   angularjs-rails-resource (~> 2.2, >= 2.2.2)
   better_errors
+  bootsnap
   bootstrap-sass
   bower-rails
   byebug
@@ -387,6 +397,7 @@ DEPENDENCIES
   leaflet-awesome-markers-rails (~> 2.0, >= 2.0.2)
   leaflet-rails (~> 1.0, >= 1.0.2)
   letter_opener
+  letter_opener_web
   listen (~> 3.0.5)
   minitest-rails-capybara
   minitest-spec-rails

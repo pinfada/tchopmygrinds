@@ -33,6 +33,11 @@ class PagesController < ApplicationController
     render :json => @data
   end
 
+  def fail
+  	@titre = "Fail"
+  	respond_with(@titre)
+  end
+
   def serveraddress
     #require 'socket'
     #ip = Socket.ip_address_list.detect{|intf| intf.ipv4_private?}

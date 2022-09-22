@@ -9,7 +9,9 @@ marketApp.controller("modalRegistration", [
     'coordinates', 
     'boutiques', 
     'GetUserAddresses',
-    function ($scope, $uibModal, $uibModalInstance, $log, Auth, $route, $window, coordinates, boutiques, GetUserAddresses){
+    '$location', 
+    '$routeParams',
+    function ($scope, $uibModal, $uibModalInstance, $log, Auth, $route, $window, coordinates, boutiques, GetUserAddresses, $location, $routeParams){
 
     $scope.credentials = {
         email: '', 
@@ -26,6 +28,11 @@ marketApp.controller("modalRegistration", [
         seller_role: '', 
         statut_type: ''
     };
+
+    $scope.checkboxModel = {
+        value1 : false
+    }
+    //console.log('checkbox', $scope.checkboxModel)
 
     $scope.seller_role = 'false'; 
     $scope.buyer_role = 'false';
@@ -49,15 +56,43 @@ marketApp.controller("modalRegistration", [
 //        $log.log($scope.credentials);
 //    };
 
+    $scope.resetpassword = function (data) {
+        
+        if (data.password === data.password_confirmation) {
+            var parameters = {
+                password: data.password,
+                password_confirmation: data.password_confirmation,
+                reset_password_token: $routeParams.resetToken
+            };
+
+            console.log('modalRegistration : ', parameters);
+
+            Auth.resetPassword(parameters).then(function(data) {
+                // Sended email if user found otherwise email not sended...
+                $log.log('modalRegistration reset password :', data);
+            }, function(error) {
+                console.info('Error reset password!', error);
+                alert('Error reset password!');
+            });
+
+            $scope.$on('devise:reset-password-successfully', function(event) {
+                // ...
+                alert("Password Changed Successfully");
+                $location.path("/sign_in");
+            });
+        }
+
+    }
+
     $scope.signIn = function () {
         $log.log('Sign in user info.'); // kinda console logs this statement
-        $log.log($scope.credentials);
+        $log.log('modalRegistration signIn :', $scope.credentials);
         Auth.login($scope.credentials).then(function(user) {
             $uibModalInstance.close('cancel');
             //$route.reload();
             $window.location.reload()
         }, function(error) {
-            //console.info('Error in authenticating user!');
+            console.info('Error in authenticating user!', error);
             alert('Error in signing in user!');
         });
     };
@@ -82,7 +117,6 @@ marketApp.controller("modalRegistration", [
                 default:
                     $scope.data.statut_type = 2;
             }
-
         }
         delete $scope.data.userSelect
         delete $scope.data.myMobility
@@ -90,13 +124,14 @@ marketApp.controller("modalRegistration", [
         Auth.register($scope.data).then(function(registeredUser) {
             alert(registeredUser.email + " You'll receive confirmation email !");
         //    $route.reload();
+            $window.location.reload()
         }, function(error) {
-            //console.info('Error in user registration!');
+            console.info('Error in user registration!', error);
             alert('Error in user registration!');
         });
     };
 
-    // A la souscription on stocke l'adresse de l'utilisateur à partir de ses coordonnées
+    // Gestion evenement à la souscription : on stocke l'adresse de l'utilisateur à partir de ses coordonnées
     $scope.$on('devise:new-registration', function(event, user) {
     //$scope.$on('devise:login', function(event, user) {
         //coordinates.getCoordinates().then(function (position) {

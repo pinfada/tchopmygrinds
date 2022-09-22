@@ -24,6 +24,8 @@ group :development do
 end
 
 # learn-rails
+# Reduces boot times through caching; required in config/boot.rb
+gem 'bootsnap', require: false
 gem 'bootstrap-sass'
 gem 'gibbon'
 gem 'bower-rails'
@@ -54,6 +56,7 @@ gem 'database_cleaner', '~> 1.4.0'
 gem 'sendgrid'
 gem 'sendgrid-ruby'
 gem "figaro"
+gem 'letter_opener_web'
 
 source "https://rails-assets.org" do
   gem "rails-assets-angular-devise"
