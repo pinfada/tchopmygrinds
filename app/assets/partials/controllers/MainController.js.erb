@@ -453,6 +453,7 @@ module.controller('MainController', [
                                                             var customIcon = "";
                                                             var boutique_id = boutique[i].id
                                                             var btnorder = 'btnorder'+boutique_id;
+                                                            var btnprofil = 'btnprofil'+boutique_id;
                     
                                                             $scope[btnorder] = function (id) {
                                                                 //console.log("data return : ", id)
@@ -470,7 +471,24 @@ module.controller('MainController', [
                                                                         }
                                                                     }
                                                                 });
-                    
+                                                            };
+
+                                                            $scope[btnprofil] = function (id) {
+                                                                //console.log("data return : ", id)
+                                                                $uibModal.open({
+                                                                    templateUrl: "<%= asset_path('Templates/myModalProfil.html.erb') %>", // loads the template
+                                                                    controller: "modalProfil",
+                                                                    backdrop: true, // setting backdrop allows us to close the modal window on clicking outside the modal window
+                                                                    size: 'lg',
+                                                                    resolve: {
+                                                                        boutique: function () {
+                                                                            return id; // Appel au controlleur modalOrder avec en entrée le nom du commerce
+                                                                        },
+                                                                        user: function () {
+                                                                            return user; 
+                                                                        }
+                                                                    }
+                                                                });
                                                             };
                     
                                                             // Si le user est un acheteur
@@ -482,7 +500,10 @@ module.controller('MainController', [
                                                                 iconSize: [35, 35], // size of the icon
                                                             });
                     
-                                                            commentaire = "<div>Commerce adh&eacuterent.<br /> Pour Commandez vos produits <br /><button class='btn' ng-click='btnorder"+ boutique_id +"("+boutique_id+")'>Cliquez ici</button></div>";
+                                                            commentaire = "<div><B>Commerce adh&eacuterent</B>."+
+                                                                          "<br /> Pour Commandez vos produits "+
+                                                                          "<br /><button class='btn' ng-click='btnorder"+ boutique_id +"("+boutique_id+")'>Order</button> "+
+                                                                          "<button class='btn' ng-click='btnprofil"+ boutique_id +"("+boutique_id+")'>Profil</button></div>";
                                                             // Compile title DOM into a link function
                                                             var linkFn = $compile(angular.element(commentaire));
                                                                     
