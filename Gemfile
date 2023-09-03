@@ -1,7 +1,8 @@
 source 'https://rubygems.org'
 
 #ruby "2.7.4"
-gem 'rails', '~> 5.0', '>= 5.0.1'
+gem 'rails', '~> 6.0'
+gem 'puma'
 gem 'rack'
 gem 'rack-cors'
 
@@ -12,7 +13,7 @@ gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
-gem 'pg', '~> 0.18'
+gem 'pg'
 group :development, :test do
   gem 'byebug', platform: :mri
 end
@@ -81,3 +82,4 @@ group :test do
   gem 'minitest-spec-rails'
   gem 'minitest-rails-capybara'
 end
+gem 'sassc-rails'
