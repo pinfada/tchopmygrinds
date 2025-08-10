@@ -71,7 +71,7 @@
             // ===================================
             
             $scope.init = function() {
-                console.log('🚀 Initializing Modern TchopMyGrinds Interface');
+                // Initializing Modern TchopMyGrinds Interface
                 
                 // Initialize modern map
                 initModernMap();
@@ -85,7 +85,7 @@
                 // Auto-detect user location if permitted
                 $scope.getCurrentLocation();
                 
-                console.log('✅ Modern interface initialized');
+                // Modern interface initialized successfully
             };
             
             function initModernMap() {
@@ -103,7 +103,7 @@
                             });
                         });
                         
-                        console.log('🗺️ Modern map initialized');
+                        // Modern map initialized successfully
                     }
                 }, 500);
             }
@@ -138,7 +138,7 @@
                     return;
                 }
                 
-                console.log('🔍 Searching for:', $scope.searchQuery, 'within', $scope.searchRadius, 'km');
+                // Starting product search with specified radius
                 
                 $scope.isSearching = true;
                 $scope.hasSearched = true;
@@ -167,12 +167,12 @@
                     radius: $scope.searchRadius
                 };
                 
-                console.log('📡 API Search params:', searchParams);
+                // API search parameters configured
                 
                 $http.get('/products/search_nearby.json', {
                     params: searchParams
                 }).then(function(response) {
-                    console.log('✅ Search results:', response.data);
+                    // Search results received from API
                     
                     $scope.searchResults = response.data.results || [];
                     $scope.noResults = $scope.searchResults.length === 0;
@@ -194,7 +194,7 @@
                     $scope.isSearching = false;
                     
                 }).catch(function(error) {
-                    console.error('❌ Search error:', error);
+                    // Search API error - showing mock results as fallback
                     $scope.noResults = true;
                     $scope.isSearching = false;
                     
@@ -317,7 +317,7 @@
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         function(position) {
-                            console.log('📍 User position:', position.coords);
+                            // User geolocation position obtained
                             
                             $scope.$apply(function() {
                                 $scope.userPosition = [
@@ -339,7 +339,7 @@
                             deferred.resolve($scope.userPosition);
                         },
                         function(error) {
-                            console.error('❌ Geolocation error:', error);
+                            // Geolocation permission denied or error occurred
                             
                             // Default to Yaoundé
                             $scope.$apply(function() {
@@ -356,7 +356,7 @@
                         }
                     );
                 } else {
-                    console.warn('⚠️ Geolocation not supported');
+                    // Browser geolocation API not supported
                     deferred.reject('Geolocation not supported');
                 }
                 
@@ -373,12 +373,12 @@
             // ===================================
             
             $scope.selectMerchant = function(merchant) {
-                console.log('🏪 Merchant selected:', merchant);
+                // Merchant selection event triggered
                 // Could open merchant detail modal or navigate
             };
             
             $scope.addToCartFromSearch = function(result) {
-                console.log('🛒 Adding to cart:', result);
+                // Adding product to shopping cart
                 
                 // Add to ngCart
                 ngCart.addItem(result.id, result.commerceName + ' - ' + result.searchQuery, result.prix, 1);
@@ -388,12 +388,12 @@
             };
             
             $scope.notifyWhenAvailable = function(result) {
-                console.log('🔔 Notify when available:', result);
+                // Setting up product availability notification
                 showNotification('Vous serez alerté quand le produit sera disponible! 📲', 'info');
             };
             
             $scope.viewMerchantDetails = function(merchant) {
-                console.log('👁️ View merchant details:', merchant);
+                // Opening merchant details view
                 // Open merchant detail modal
             };
 
@@ -425,17 +425,17 @@
                     message: $scope.interestMessage
                 };
                 
-                console.log('💌 Submitting interest:', interestData);
+                // Submitting product interest to merchants
                 
                 $http.post('/product_interests.json', {product_interest: interestData})
                     .then(function(response) {
-                        console.log('✅ Interest submitted:', response.data);
+                        // Product interest successfully submitted
                         
                         showNotification('Votre intérêt a été enregistré! Nous vous alerterons dès qu\'un vendeur sera disponible. 📧', 'success');
                         $scope.hideInterestModal();
                         
                     }).catch(function(error) {
-                        console.error('❌ Interest submission error:', error);
+                        // Error submitting product interest
                         showNotification('Erreur lors de l\'enregistrement. Veuillez réessayer. ❌', 'error');
                         $scope.isSubmittingInterest = false;
                     });
@@ -468,12 +468,12 @@
             };
             
             $scope.toggleProfile = function() {
-                console.log('👤 Toggle profile');
+                // User profile toggle requested
                 // Implement profile toggle
             };
             
             $scope.openCart = function() {
-                console.log('🛒 Open cart');
+                // Shopping cart view requested
                 // Implement cart modal
             };
 
@@ -486,7 +486,7 @@
                     window.TchopMaps.showNotification(message, type, duration);
                 } else {
                     // Fallback notification
-                    console.log('📢', type.toUpperCase() + ':', message);
+                    // Notification fallback: displaying in console
                     
                     // Simple browser notification
                     if ('Notification' in window && Notification.permission === 'granted') {
@@ -506,7 +506,7 @@
                 // Clean up event listeners
                 angular.element(document).off('keydown');
                 document.removeEventListener('merchantSelected');
-                console.log('🧹 Modern controller cleaned up');
+                // Modern controller cleanup completed
             });
 
             // ===================================

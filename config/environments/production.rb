@@ -24,10 +24,19 @@ Rails.application.configure do
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
-  # config.assets.css_compressor = :sass
+  config.assets.css_compressor = :sass
 
   # Do not fallback to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
+  
+  # Enable asset digests for caching
+  config.assets.digest = true
+  
+  # Add additional assets for precompilation
+  config.assets.precompile += %w( app.js )
+  
+  # Configure asset versioning
+  config.assets.version = ENV['ASSETS_VERSION'] || '1.0'
 
   # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
 
@@ -73,6 +82,15 @@ Rails.application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
+  
+  # Enable HTTP compression
+  config.force_ssl = false # Set to true in production with SSL
+  
+  # Configure asset serving
+  config.public_file_server.headers = {
+    'Cache-Control' => 'public, max-age=31536000',  # 1 year
+    'Expires' => 1.year.from_now.to_formatted_s(:rfc822)
+  }
 
   # Use a different logger for distributed setups.
   # require 'syslog/logger'

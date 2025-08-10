@@ -4,7 +4,7 @@ marketApp.factory("myConnexion", ['$q', 'Auth', function myConnexion($q, Auth) {
 	return {
 		getConnexion: function() {
 			var deferred = $q.defer();
-			//console.log("Auth : ", Auth)
+			// Debug: Auth service object
 			//if (Auth.isAuthenticated() ) {
 				Auth.login().then(function(user) {
 					var myUserinfo = {};
@@ -18,11 +18,11 @@ marketApp.factory("myConnexion", ['$q', 'Auth', function myConnexion($q, Auth) {
 			    	    myUserinfo.isBuyer = true;
 			    	    myUserinfo.isSeller = false;
 			    	}
-			    	//console.log("myUserinfo : ",myUserinfo);
+			    	// Debug: user info object created
 			    	deferred.resolve(myUserinfo);
 				},
 	    		function(error){
-	    			console.log("Error Log " , error);
+	    			// Error during user authentication
         		});
 			//}
 

@@ -17,21 +17,20 @@ marketApp.controller("modalOrder", [
 
     // Récupération de la liste des produits pour un commerce
     GetCommerceProducts.get({commerceId: boutique}).then(function (products) {
-        //console.log("modalOrder : --> commerceId :", boutique)
-        //console.log("modalOrder : --> produits :", products)
+        // Debug: modalOrder commerce and products data
         $scope.nbproduit = products.length
         $scope.produits = products
         
     }, function (error) {
         // do something about the error
-        console.log("Error Log",error.statusText);
+        // Error getting commerce products
         deferred.reject(error);
     });
 
     $scope.$on('ngCart:checkout_succeeded', function(event, cart) {
-        //console.log("modalOrder --> cart : ", cart)
+        // Debug: modalOrder cart data
         angular.forEach(cart, function(obj1, key) {
-            //console.log("modalOrder --> obj1 : ", obj1.items)
+            // Debug: modalOrder cart items
             var product = obj1.items
             var nbproduct = product.length
 
@@ -50,7 +49,7 @@ marketApp.controller("modalOrder", [
                 $log.log('Submiting order info.'); // kinda console logs this statement
                 $log.log(data);
                 new GetProductOrders(data).create().then(function (order) {
-                    //console.log("modalOrder --> order : ", order)
+                    // Debug: modalOrder created order
 
                     var userid = order.userId;
                     var orderid = order.id;
@@ -58,9 +57,9 @@ marketApp.controller("modalOrder", [
                     var quantity = result.quantity;
 
                     myOrderdetails.getOrderdetails(result_id, orderid).then(function (response) {
-                        //console.log("modalOrder --> updatedetail : ", response)
+                        // Debug: modalOrder order detail update
                         angular.forEach(response, function(detail, key) {
-                            console.log("modalOrder --> detail : ", detail)
+                            // Debug: modalOrder processing order detail
                             for(var p=0; p<detail.length; p++) {
                                 var data = detail[p];
                                 var data_id = data.id

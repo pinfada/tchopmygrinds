@@ -24,7 +24,7 @@ marketApp.controller("modalProduct", [
     $scope.SeeGraph = false;
 
     $scope.onClick = function (points, evt) {
-      console.log(points, evt);
+      // Chart click event handler
     };
 
     var ind_suppression = false
@@ -99,7 +99,7 @@ marketApp.controller("modalProduct", [
     //Liste des produits selectionnables par les commercants
     myFruitsliste.then(function(value) {
         $scope.fruits = value;
-        //console.log(value)
+        // Debug: fruits list value
     });
 
     $scope.orders = [];
@@ -112,7 +112,7 @@ marketApp.controller("modalProduct", [
     //    deferred.resolve(recupid);
     //}, function (error) {
     //    // do something about the error
-    //    console.log("Error Log",error.statusText);
+    // Error getting fruits list
     //    deferred.reject(error);
     //});
     
@@ -157,7 +157,7 @@ marketApp.controller("modalProduct", [
 
         if  (typeof last !== "undefined") {
             var nom_produit = last.name;
-            //console.log(nom_produit);
+            // Debug: product name
             angular.forEach($scope.fruits, function(item) {
                 if (item.produit === nom_produit) {
                     $scope.results.push({produit: item.produit, prix: item.moyen, date: item.date});
@@ -206,14 +206,13 @@ marketApp.controller("modalProduct", [
     };
     
     $scope.submit = function () {
-        //console.log("ind_suppression : ", ind_suppression)
-        //console.log("produits: ", $scope.produits)
+        // Debug: product deletion and products data
         if  (ind_suppression == false) {
             var total = $scope.produits.length;
             for(var i=0; i<total; i++) {
                 var result = $scope.produits[i];
                 var result_id = result.id
-                //console.log("result_id: ", result_id)
+                // Debug: product result ID
                 if (typeof result_id == "undefined") {
                     $log.log('Submiting product info.'); // kinda console logs this statement
                     $log.log(result);
@@ -233,14 +232,14 @@ marketApp.controller("modalProduct", [
 
     $scope.EnableDisable = function (price) {
         //If TextBox has value, the Button will be enabled else vice versa.
-        //console.log("test alimentation : ", price)
+        // Debug: price calculation test
         $scope.IsDisabled = price.length == 0;
     }
 
     // On vérifie la présence de produit pour chaque commerce présent en base
     if (user.statut_type == "sedentary" || user.statut_type == "itinerant"){
         GetCommerceProducts.get({commerceId: commerce}).then(function (products) {
-            //console.log("produits :", products)
+            // Debug: products data
             var quantite = 0
             var price = 0
             var data = []
@@ -254,7 +253,7 @@ marketApp.controller("modalProduct", [
                         $scope.nb_order = orders.length
                         var usersave = ''
                         angular.forEach(orders, function(order)  {
-                            //console.log("modalProduct --> order : ", order)
+                            // Debug: modalProduct order created
                             var orderid = order.id
                             var userid = order.userId
                             if (userid != usersave) {
@@ -262,10 +261,10 @@ marketApp.controller("modalProduct", [
                                 myUseraddress.Getuseraddress(userid).then(function (response) {
                                     angular.forEach(response, function(address, key) {
                                         if (address.length > 0) {
-                                            //console.log("modalProduct --> address : ", address) 
+                                            // Debug: modalProduct user address
                                             $scope.address = address
                                         } else {
-                                            console.log("modalProduct --> anomalie utilisateur sans adresse") 
+                                            // Error: User has no address configured
                                         }
                                     })
                                 })
@@ -274,7 +273,7 @@ marketApp.controller("modalProduct", [
                             GetOrderDetails.get({productId: productid, orderId: orderid}).then(function (orderdetails) {
                                 var nborderdetails = orderdetails.length
                                 if (nborderdetails > 0) {
-                                    //console.log("modalProduct --> orderdetails : ", orderdetails)
+                                    // Debug: modalProduct order details
                                     angular.forEach(orderdetails, function(orderdetail)  {
                                         data.push({
                                             order: order.id,
@@ -293,10 +292,10 @@ marketApp.controller("modalProduct", [
             }
 
             $scope.orders = data
-            //console.log("modalProduct --> orders : ", $scope.orders)
+            // Debug: modalProduct orders data
         }, function (error) {
             // do something about the error
-            console.log("Error Log",error.statusText);
+            // Error getting product orders
             deferred.reject(error);
         });
     }

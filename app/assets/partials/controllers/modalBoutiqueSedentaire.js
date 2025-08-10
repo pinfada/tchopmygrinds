@@ -11,7 +11,7 @@ marketApp.controller("modalBoutiqueSedentaire", [
 
     var deferred = $q.defer();
 
-    //console.log("modalBoutiqueSedentaire --> usercoord : ", usercoord)
+    // Debug: modalBoutiqueSedentaire user coordinates
 
     $scope.commerceaffiche = [5, 15, 30, 50]
 
@@ -34,7 +34,7 @@ marketApp.controller("modalBoutiqueSedentaire", [
         for(var i=0; i<total; i++) {
             if(result[i] !== "") {
                 var store = angular.fromJson(result[i])
-                //console.log("store : ", store)
+                // Debug: selected store data
                 var commerce = {
                     name: store.fields.name,
                     adress1: store.fields.address,

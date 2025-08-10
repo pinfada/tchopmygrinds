@@ -1,0 +1,86 @@
+<!-- Section utilisateur réutilisable avec helper DRY -->
+<div class="<%= classes || 'absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200' %>">
+  <!-- État non connecté -->
+  <%= render_if_guest do %>
+    <div class="space-y-3" data-auth-state="guest">
+      <%= link_to new_user_session_path, class: "btn-primary w-full text-center" do %>
+        <i class="fas fa-sign-in-alt mr-2"></i>
+        Se connecter
+      <% end %>
+      <%= link_to new_user_registration_path, class: "btn-secondary w-full text-center" do %>
+        <i class="fas fa-user-plus mr-2"></i>
+        S'inscrire
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- État connecté -->
+  <%= render_if_authenticated do %>
+    <div class="space-y-3" data-auth-state="authenticated">
+      <!-- Profil utilisateur -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+          <% if current_user.name.present? %>
+            <span class="text-primary-600 font-semibold text-sm">
+              <%= current_user.name.split.map(&:first).join.upcase %>
+            </span>
+          <% else %>
+            <i class="fas fa-user text-primary-600"></i>
+          <% end %>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-gray-900 truncate">
+            <%= current_user.name || "Utilisateur" %>
+          </p>
+          <p class="text-sm text-gray-500 truncate">
+            <%= current_user.email %>
+          </p>
+          <!-- Badge de rôle -->
+          <% if current_user.seller_role? %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-plantain-100 text-plantain-800 mt-1">
+              <i class="fas fa-store mr-1"></i>
+              <%= current_user.statut_type&.humanize || "Vendeur" %>
+            </span>
+          <% elsif current_user.buyerRole? %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 mt-1">
+              <i class="fas fa-shopping-basket mr-1"></i>
+              Acheteur
+            </span>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Actions utilisateur -->
+      <div class="space-y-2">
+        <!-- Liens spécifiques au rôle -->
+        <%= render_if_seller do %>
+          <%= link_to commerces_path, class: "btn-secondary w-full text-sm" do %>
+            <i class="fas fa-store mr-2"></i>
+            Mes commerces
+          <% end %>
+        <% end %>
+        
+        <%= render_if_buyer do %>
+          <%= link_to orders_path, class: "btn-secondary w-full text-sm" do %>
+            <i class="fas fa-shopping-bag mr-2"></i>
+            Mes commandes
+          <% end %>
+        <% end %>
+        
+        <!-- Déconnexion -->
+        <%= link_to destroy_user_session_path, method: :delete, 
+            class: "btn-secondary w-full text-sm text-gray-600 hover:text-gray-800",
+            data: { confirm: "Êtes-vous sûr de vouloir vous déconnecter ?" } do %>
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          Déconnexion
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  // Données utilisateur sécurisées disponibles pour JavaScript
+  window.currentUserData = <%= raw safe_user_data.to_json %>;
+  window.isAuthenticated = <%= user_signed_in? %>;
+</script>

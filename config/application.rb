@@ -26,5 +26,8 @@ module StatExo1
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
+    
+    # Add app/controllers/concerns to autoload paths
+    config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
   end
 end

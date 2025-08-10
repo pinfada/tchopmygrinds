@@ -32,7 +32,7 @@ angular.module('marketApp').controller('MerchantInterestsController', [
                 $http.get('/users/' + user.id + '/commerces').then(function(response) {
                     $scope.userCommerces = response.data;
                 }).catch(function(error) {
-                    console.error('Erreur chargement commerces:', error);
+                    // Error loading user commerces
                 });
             });
         };
@@ -46,11 +46,11 @@ angular.module('marketApp').controller('MerchantInterestsController', [
                 $scope.loadingInterests = false;
                 
                 if (response.data.message) {
-                    console.log(response.data.message);
+                    // API returned a message: response.data.message
                 }
             }).catch(function(error) {
                 $scope.loadingInterests = false;
-                console.error('Erreur chargement intérêts:', error);
+                // Error loading merchant interests
                 
                 if (error.status === 403) {
                     alert('Accès refusé. Cette fonctionnalité est réservée aux marchands.');
@@ -176,7 +176,7 @@ angular.module('marketApp').controller('AddProductModalController', [
                 })
                 .catch(function(error) {
                     $scope.savingProduct = false;
-                    console.error('Erreur création produit:', error);
+                    // Error creating product - display user-friendly error message
                     alert('Erreur lors de la création du produit.');
                 });
         };
@@ -185,7 +185,7 @@ angular.module('marketApp').controller('AddProductModalController', [
         $scope.notifyClientOfAvailability = function() {
             // TODO: Implémenter la notification au client
             // Cela pourrait marquer l'intérêt comme "fulfilled" et envoyer un email
-            console.log('Notification client pour:', interest);
+            // Client notification would be sent for this interest
         };
     }
 ]);

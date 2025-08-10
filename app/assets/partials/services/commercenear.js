@@ -4,14 +4,13 @@ marketApp.factory("myCommercenear", ['$q', 'GetCommerceNear', function myCommerc
 	return {
 		Getcommercenear: function(latcoord, lngcoord) {
 			var deferred = $q.defer();
-			//console.log("myCommercenear --> latcoord : ", latcoord)
-			//console.log("myCommercenear --> lngcoord : ", lngcoord)
+			// Debug: coordinates for nearby commerce search
 			GetCommerceNear.query({lat_query:latcoord, lng_query:lngcoord}).then(function(response) {
-				//console.log("myCommercenear --> response : ", response)
+				// Debug: commerce search response
 				deferred.resolve({response});
         	}, function (error) {
         	    // do something about the error
-        	    console.log("Error Log",error.statusText);
+        	    // Error getting nearby commerces
         	    deferred.reject(error);
         	});
 

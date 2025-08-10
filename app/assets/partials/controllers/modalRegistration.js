@@ -32,7 +32,7 @@ marketApp.controller("modalRegistration", [
     $scope.checkboxModel = {
         value1 : false
     }
-    //console.log('checkbox', $scope.checkboxModel)
+    // Debug: checkbox model state
 
     $scope.seller_role = 'false'; 
     $scope.buyer_role = 'false';
@@ -65,7 +65,7 @@ marketApp.controller("modalRegistration", [
                 reset_password_token: $routeParams.resetToken
             };
 
-            console.log('modalRegistration : ', parameters);
+            // Debug: modalRegistration password reset parameters
 
             Auth.resetPassword(parameters).then(function(data) {
                 // Sended email if user found otherwise email not sended...

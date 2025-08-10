@@ -64,7 +64,7 @@ marketApp.controller('HeaderController', [
     ];
 
     myConnexion.getConnexion().then(function (user) {
-      //console.log("HeaderController --> myConnexion : ", user)
+      // Debug: HeaderController user connection data
       $scope.username = user.name;
       $scope.isAuthenticated = true;
       $scope.IsVisible = false;
@@ -72,7 +72,7 @@ marketApp.controller('HeaderController', [
       myUseraddress.Getuseraddress(userid).then(function (response) {
           angular.forEach(response, function(address, key) {
               if (address.length > 0) {
-                  console.log("HeaderController --> address : ", address) 
+                  // Debug: HeaderController user address
               } else {
                 myCoordinates.getCoordinates().then(function (position) {
                   var address = {
@@ -118,19 +118,19 @@ marketApp.controller('HeaderController', [
               userId: userid}
 
             $scope.new_commerce.push(address);
-            //console.log("nb commerce : ", calc_nbcommerce)
+            // Debug: number of commerce calculations
           }
 
           $scope.RemoveCommerce = function () {
             calc_nbcommerce--
             $scope.nb_new_commerce = calc_nbcommerce
             $scope.new_commerce.pop();
-            //console.log("nb commerce : ", calc_nbcommerce)
+            // Debug: number of commerce calculations
           }
 
           //create commerce 
           $scope.CreateCommerce = function (commerces) {
-            console.log("HeaderControler --> CreateCommerce : ", commerces)
+            // Debug: HeaderController commerce creation
           }
 
           // Récupération de la liste des commerces du user
@@ -146,8 +146,7 @@ marketApp.controller('HeaderController', [
                 $scope.products = products
                 calc_nbproduct = calc_nbproduct + products.length
                 $scope.nb_produit = calc_nbproduct
-                //console.log("produits : ", $scope.nb_produit)
-                //console.log("nbre produits : ", $scope.nb_produit)
+                // Debug: product count data
               }, function(error) {
                   // Log on console to check out what the error is.
                   console.info('Error recuperation liste produits! : ', error);
@@ -163,8 +162,7 @@ marketApp.controller('HeaderController', [
                 $scope.products = products
                 calc_nbproduct = calc_nbproduct + products.length
                 $scope.nb_produit = calc_nbproduct
-                //console.log("produits : ", $scope.nb_produit)
-                //console.log("nbre produits : ", $scope.nb_produit)
+                // Debug: product count data
               }, function(error) {
                   // Log on console to check out what the error is.
                   console.info('Error recuperation liste produits! : ', error);
@@ -189,7 +187,7 @@ marketApp.controller('HeaderController', [
           $scope.delProduct = function (index) {
             var delProduct = $scope.products
             var data = delProduct[index]
-            //console.log("produit : ", data)
+            // Debug: product data
             $scope.products.splice(index, 1);
             $log.log('Remove product info.'); // kinda console logs this statement
             $log.log(data);
@@ -204,20 +202,19 @@ marketApp.controller('HeaderController', [
 
           // Récupération des commandes de l'utilisateur
           //GetUserOrders.get({userId: userid}).then(function (orders) {
-          //    console.log("HeaderController--> orders :  :", orders)
+          // Debug: HeaderController orders data
           //    $scope.nb_order = orders.length
           //    //$scope.orders = orders
           //}, function (error) {
           //    // do something about the error
-          //    console.log("Error Log",error.statusText);
+          // Error getting orders
           //    deferred.reject(error);
           //});
           // recuperation des coordonnees de l'utilisateur
           myCoordinates.getCoordinates().then(function (position) {
             $scope.latitude = position.lat
             $scope.longitude = position.lng
-            //console.log("HeaderController --> lat : ", $scope.latitude);
-            //console.log("HeaderController --> lng : ", $scope.longitude);
+            // Debug: HeaderController latitude and longitude coordinates
             $scope.coordonnees.push($scope.latitude, $scope.longitude)
 
           //myCoordinates.getCoordinates().then(function (position) {
@@ -238,15 +235,15 @@ marketApp.controller('HeaderController', [
                   //deferred.resolve($scope.records);
                 }, function (error) {
                     // do something about the error
-                    console.log("Error Log",error.statusText);
+                    // Error in HeaderController operation
                     deferred.reject(error);
                 });
               });
-              //console.log("HeaderController --> GetAllProduct : ", $scope.records);
+              // Debug: HeaderController all products data
               //deferred.resolve($scope.records);
             }, function (error) {
                 // do something about the error
-                console.log("Error Log",error.statusText);
+                // Error in HeaderController operation
                 deferred.reject(error);
             });
 
@@ -258,9 +255,9 @@ marketApp.controller('HeaderController', [
             $scope.productSelected = function (item) {
               //Récupération de l'adresse IP
                 SearchCommerce.query({name_query:item.name, lat_query:$scope.latitude, lng_query:$scope.longitude}).then(function (results) {
-                    //console.log("donnée renseignée", results);
+                    // Debug: commerce data populated
                     $scope.commercenear = results;
-                    //console.log($scope.commercenear);
+                    // Debug: commerce near scope data
                     $uibModal.open({
                         templateUrl: "<%= asset_path('Templates/myModalCommercelist.html') %>", // loads the template
                         controller: 'modalCommercelist',
@@ -276,7 +273,7 @@ marketApp.controller('HeaderController', [
                     deferred.resolve($scope.commercenear);
                 }, function (error) {
                     // do something about the error
-                    console.log("Error Log",error.statusText);
+                    // Error in HeaderController operation
                     deferred.reject(error);
                 });
             };
@@ -288,10 +285,10 @@ marketApp.controller('HeaderController', [
 
     }, function (error) {
         // do something about the error
-        console.log("Error Log",error.statusText);
+        // Error in HeaderController operation
     });
 
-    //console.log("coordonnees : ", $scope.coordonnees)
+    // Debug: coordinates data
 
     // Ouverture de la fenetre de souscription/authentification
     $scope.OpenRegistration = function () {
@@ -325,7 +322,7 @@ marketApp.controller('HeaderController', [
     $scope.selectedIndex = 0;
     
     $scope.itemClicked = function ($index) {
-    //  console.log($index);
+    // Debug: index value
       $scope.selectedIndex = $index;
     };
 
@@ -366,7 +363,7 @@ marketApp.controller('HeaderController', [
     });
     
     $scope.$on('devise:new-session', function(event, currentUser) {
-      //console.log("nouvelle session")
+      // Debug: new session created
       $scope.isAuthenticated = true;
       if (currentUser.seller_role == true){
           $scope.isSeller = true;
@@ -409,7 +406,7 @@ marketApp.controller('HeaderController', [
         $route.reload();
       }, function(error) {
         // An error occurred logging out.
-        console.log("HeaderControler --> Error : ", error)
+        // Error in HeaderController operation
       });
     };
 

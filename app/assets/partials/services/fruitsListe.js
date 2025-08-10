@@ -14,7 +14,7 @@ marketApp.factory('myFruitsliste', ['$q', '$http', '$location', function myFruit
 		deferred.resolve(response.data);
     })
     .catch(function onError(error) {
-        console.log(error);
+        // Error getting fruits list
     });
 	
 	return deferred.promise;

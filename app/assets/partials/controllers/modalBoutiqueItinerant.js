@@ -12,7 +12,7 @@ marketApp.controller("modalBoutiqueItinerant", [
 
     var deferred = $q.defer();
 
-    //console.log("modalBoutiqueItinerant coord --> usercoord : ", usercoord)
+    // Debug: modalBoutiqueItinerant user coordinates
 
     $scope.CommerceName= "Enter commerce name here..."
 
@@ -21,7 +21,7 @@ marketApp.controller("modalBoutiqueItinerant", [
     };
     
     $scope.submit = function (CommerceName) {
-        console.log("commerce name : ", CommerceName)
+        // Commerce name entered by user
         if(CommerceName !== "") {
             var commerce = {
                 name: CommerceName,

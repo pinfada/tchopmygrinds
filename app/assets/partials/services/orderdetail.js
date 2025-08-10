@@ -5,11 +5,11 @@ marketApp.factory("myOrderdetails", ['$q', 'GetOrderDetails', function myOrderde
 		getOrderdetails: function(productid, orderid) {
 			var deferred = $q.defer();
 			GetOrderDetails.get({productId: productid, orderId: orderid}).then(function(orderdetail) {
-				//console.log("myOrderdetails --> orderdetail : ", orderdetail)
+				// Debug: order details retrieved
 				deferred.resolve({orderdetail});
         	}, function (error) {
         	    // do something about the error
-        	    console.log("Error Log",error.statusText);
+        	    // Error getting order details
         	    deferred.reject(error);
         	});
 

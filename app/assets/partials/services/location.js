@@ -16,9 +16,7 @@ marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', '$win
 			getCoordinates: function() {
 				$geolocation.getCurrentPosition({posOptions}).then(function (position) {
 					// This will be executed when the location is accessed
-					//console.log("position : ",position);
-					//console.log("latitude : ",position.coords.latitude);
-					//console.log("longitude : ",position.coords.longitude);
+					// Debug: position coordinates obtained from geolocation
 					var myCoordinates = {};
 					myCoordinates.lat = position.coords.latitude;
 					myCoordinates.lng = position.coords.longitude;
@@ -26,11 +24,11 @@ marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', '$win
 				}, function (error) {
 					// This will be executed if the user denies access
 					// or the browser doesn't support the Geolocation API
-					console.log(error);
+					// Geolocation error - falling back to IP-based location
 					//Récupération de l'adresse IP
 					myIp.then(function(value) {
 						var ip = value.ip;
-						console.log("ip : ", value)
+						// Debug: IP address for fallback location
 						$http({
 							method: 'GET',
 							url: "https://ipapi.co/"+ip+"/json/"
@@ -41,7 +39,7 @@ marketApp.factory('myCoordinates', ['$q', '$http', 'myIp', '$geolocation', '$win
 								deferred.resolve(myCoordinates);
 						})
 						.catch(function onError(error) {
-							console.log(error);
+							// Error getting IP-based location
 						});
 					});
 				});

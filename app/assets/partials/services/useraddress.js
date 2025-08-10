@@ -4,13 +4,13 @@ marketApp.factory("myUseraddress", ['$q', 'GetUserAddresses', function myUseradd
 	return {
 		Getuseraddress: function(userid) {
 			var deferred = $q.defer();
-			//console.log("myUseraddress --> userid : ", userid)
+			// Debug: user ID for address lookup
 			GetUserAddresses.get({userId: userid}).then(function(address) {
-				//console.log("myUseraddress --> address : ", address)
+				// Debug: user address retrieved
 				deferred.resolve({address});
         	}, function (error) {
         	    // do something about the error
-        	    console.log("Error Log",error.statusText);
+        	    // Error getting user address
         	    deferred.reject(error);
         	});
 

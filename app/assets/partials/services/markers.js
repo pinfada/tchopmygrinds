@@ -13,7 +13,7 @@ marketApp.factory("myMarkers", ['$q', 'GetMarkers', function myMarkers($q, GetMa
 				deferred.resolve({dataReturned: markers, dataName: nom, allData: enseigne});
         	}, function (error) {
         	    // do something about the error
-        	    console.log("Error Log",error.statusText);
+        	    // Error getting marker data
         	    deferred.reject(error);
         	});
 

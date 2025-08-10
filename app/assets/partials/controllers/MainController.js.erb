@@ -26,11 +26,12 @@ module.controller('MainController', [
     '$route',
     '$routeParams',
     'Auth',
+    'AuthService',
     'ngCart',
     'GetUserCommerces',
     'GetUserAddresses',
     'GetAllUser',
-    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, $geolocation, myPosition, myCoordinates, myMarkers, boutiques, myBoutiques, myCommercenear, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser) {
+    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, $geolocation, myPosition, myCoordinates, myMarkers, boutiques, myBoutiques, myCommercenear, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, AuthService, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser) {
 
         ngCart.setTaxRate(7.5);
         ngCart.setShipping(2.99);
@@ -133,7 +134,7 @@ module.controller('MainController', [
                     
                 }).catch(function(error) {
                     $scope.isSearching = false;
-                    console.error('Erreur recherche produits:', error);
+                    // Product search API error - fallback to general search
                     $scope.pushToast('error', "Erreur lors de la recherche des produits");
                     // Fallback : rechercher dans tous les produits
                     $scope.searchAllProducts();
@@ -141,7 +142,7 @@ module.controller('MainController', [
                 
             }).catch(function(error) {
                 $scope.isSearching = false;
-                console.error('Erreur géolocalisation:', error);
+                // Geolocation error - user needs to enable location services
                 alert('Impossible de vous géolocaliser. Veuillez autoriser la géolocalisation.');
             });
         };
@@ -235,7 +236,7 @@ module.controller('MainController', [
         // Mettre à jour la carte avec les résultats de recherche
         $scope.updateMapWithResults = function() {
             // Cette fonction sera implémentée pour afficher les marqueurs des résultats
-            console.log('Mise à jour carte avec', $scope.searchResults.length, 'résultats');
+            // Mise à jour carte avec les résultats
         };
 
         // Ajouter un produit au panier depuis les résultats de recherche
@@ -259,7 +260,7 @@ module.controller('MainController', [
 
         // Système de manifestation d'intérêt
         $scope.showInterestModal = function() {
-            if (!Auth.isAuthenticated()) {
+            if (!AuthService.isAuthenticated()) {
                 $scope.pushToast('info', 'Veuillez vous connecter pour manifester votre intérêt.');
                 return;
             }
@@ -331,20 +332,15 @@ module.controller('MainController', [
                     }
                 })
                 .catch(function(error) {
-                    console.error('Erreur sauvegarde intérêt:', error);
+                    // Error saving product interest
                     $scope.pushToast('error', 'Erreur lors de l\'enregistrement.');
                 });
         };
 
         // Alerter quand le produit sera disponible
         $scope.notifyWhenAvailable = function(result) {
-            if (!Auth.isAuthenticated()) {
-                $scope.pushToast('info', 'Veuillez vous connecter pour activer les alertes.');
-                return;
-            }
-            
-            // Enregistrer l'alerte
-            Auth.currentUser().then(function(user) {
+            AuthService.requireAuth(function(user) {
+                // Enregistrer l'alerte
                 var alertData = {
                     user_id: user.id,
                     commerce_id: result.commerceId,
@@ -358,6 +354,8 @@ module.controller('MainController', [
                 localStorage.setItem('stockAlerts', JSON.stringify(alerts));
                 
                 $scope.showSuccessMessage('Vous serez alerté quand ce produit sera à nouveau disponible chez ' + result.commerceName);
+            }, function() {
+                $scope.pushToast('info', 'Veuillez vous connecter pour activer les alertes.');
             });
         };
 
@@ -386,32 +384,22 @@ module.controller('MainController', [
         };
 
         myPosition.getPosition({watchposOptions})
-        //console.log("myPosition : ", myPosition)
+        // Position de l'utilisateur récupérée
 
         $scope.$on("geolocationStateChanged", function(evt, data) {
             if (data) {
-                console.log("latitude  : ", data.latitude)
-                console.log("longitude : ", data.longitude)
+                // Coordonnées reçues: lat/lng
             } else {
-                console.log("KO : ", data)
+                // Erreur de géolocalisation
             }
         })
         
         //var myPosition = {}
         //var myPosition = $geolocation.position.coords
 
-        //console.log("type of data: "+typeof(myPosition));
-        //console.log("myPosition : ", myPosition)
-        //for(var key in myPosition) {
-        //   if(myPosition.hasOwnProperty(key)) {
-        //        console.log(key, myPosition[key])
-        //        //do something with value;
-        //    }
-        //}
-        //console.log("coords : ", myPosition.coords)
-        //$scope.$watch('myPosition.coords', function (newValue, oldValue) {
-        //    console.log("new position value : ", newValue)
-        //    console.log("old position value : ", oldValue)
+        // Legacy position debugging code - commented out
+        // Debug position data type and coordinates
+        // Position data monitoring with watch function
             //$scope.map = {
             //  center: {
             //    latitude: newValue.latitude,
@@ -439,9 +427,7 @@ module.controller('MainController', [
             }).addTo(map);
 
             // Affichage des commerces à proximité si l'utilisateur s'est authentifié
-            if (Auth.isAuthenticated() )
-            {
-                Auth.currentUser().then(function(user) {
+            AuthService.requireAuth(function(user) {
                     //--------------------------------------------------*
                     //          S E L L E R   B L O C                   *
                     //--------------------------------------------------*
@@ -450,7 +436,7 @@ module.controller('MainController', [
                     //    - sedentaire : Vérification de la présence des commerces
                     //    - itinérant  : 
                     if (user.seller_role == true){
-                        //console.log("seller : ", user)
+                        // Debug: seller user data
                         //vérification de la présence de commerces en base pour l'utilisateur connecté
                         GetUserCommerces.get({userId: user.id}).then(function(result){
                             // Si le vendeur sedentaire ne possède pas de commerce
@@ -504,7 +490,7 @@ module.controller('MainController', [
                                 GetAllUser.query().then(function (userdata) {
                                     angular.forEach(userdata, function(user, key) {
                                         // Si le client est un acheteur on récupère ses coordonnées
-                                        //console.log("user info : ", user)
+                                        // Debug: user information
                                         var userid = user.id
                                         if (user.buyerRole == true) {
                                             // récuperation des adresses des clients et affichage sur la map
@@ -512,7 +498,7 @@ module.controller('MainController', [
                                                 angular.forEach(addresses, function (address) {
                                                     var latitude = address.latitude;
                                                     var longitude = address.longitude;
-                                                    //console.log("adresse buyer : ", address)
+                                                    // Debug: buyer address data
 
                                                     //Customisation des Icons utiliser pour la map
                                                     //customIcon = L.mapquest.icons.marker({
@@ -545,20 +531,20 @@ module.controller('MainController', [
 
                                             }, function (error) {
                                                 // do something about the error
-                                                console.log("Error GetAllAddress : ",error.statusText);
+                                                // Error getting all addresses
                                                 deferred.reject(error);
                                             });
                                         }
                                     })
                                 }, function (error) {
                                     // do something about the error
-                                    console.log("Error GetAllUser : ",error.statusText);
+                                    // Error getting all users
                                     deferred.reject(error);
                                 });
 
                                 // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
                                 for(var i=0; i<nb_commerce; i++) {
-                                    //console.log("commerces : ", result[i])
+                                    // Debug: commerce data
 
                                     var boutique_place = "";
                                     var customIcon = "";
@@ -607,7 +593,7 @@ module.controller('MainController', [
                                     // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
                                     var popup = linkFn($scope);
 
-                                    //console.log("coordonnées :", boutique_place )
+                                    // Debug: boutique coordinates
                                     if (boutique_place !== " ") {
                                     //if (boutique_place.length > 0) {
                                         var customPopup = L.popup()
@@ -623,7 +609,7 @@ module.controller('MainController', [
                             deferred.resolve($scope.commerces);
                         }, function (error) {
                             // do something about the error
-                            console.log("Error Log",error.statusText);
+                            // Error in main controller operation
                             deferred.reject(error);
                         });
                         var p = deferred.promise;
@@ -638,21 +624,19 @@ module.controller('MainController', [
                             //var result = angular.equals({}, commerces);
                             // Si on ne trouve aucun commerce en base, extraction des données Mapquest
                             angular.forEach(commerces, function (commerce) {
-                                //console.log("MainController --> commerces : ", commerces)
-                                //console.log("MainController --> commerce length : ", commerce.length)
+                                // Debug: MainController commerces data and length
                                 let nb_commerce = commerce.length;
                                 if (nb_commerce === 0) {
                                     var list_commerce = 15
-                                    //console.log("pas de boutiques enregistrées à proximité de chez vous")
-                                    //console.log("MainController --> list_commerce : ", list_commerce)
-                                    //console.log("MainController --> mapquest_key : ", mapquest_key)
+                                    // Debug: No shops registered nearby
+                                    // Debug: commerce list and mapquest key data
                                     //$window.alert("Pas de boutiques enregistrées à proximité de chez vous");
                                     myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], list_commerce, mapquest_key).then(function (boutique) {
                                         var boutiques = boutique.searchResults
                                         angular.forEach(boutiques, function (boutique) {
-                                            //console.log("getBoutiques --> boutique : ", boutique)
+                                            // Debug: getBoutiques boutique data
                                             var coord = boutique.shapePoints
-                                            //console.log("getBoutiques --> coord : ", coord)
+                                            // Debug: getBoutiques coordinates
                                             var boutique_id = boutique.resultNumber
                                             var latitude = coord[0];
                                             var longitude = coord[1];
@@ -681,7 +665,7 @@ module.controller('MainController', [
     
                                     }, function (error) {
                                         // do something about the error
-                                        console.log("Error getBoutiques : ", error);
+                                        // Error in getBoutiques operation
                                         deferred.reject(error);
                                     });
     
@@ -690,16 +674,16 @@ module.controller('MainController', [
                                     myBoutiques.getBoutiques([resultcoord.lat, resultcoord.lng], list_commerce, mapquest_key).then(function (data) {
                                         var boutiques = data.searchResults
                                         angular.forEach(boutiques, function (data) {
-                                            //console.log("getBoutiques --> boutique : ", boutique)
+                                            // Debug: getBoutiques boutique data
                                             var coord = data.shapePoints
-                                            //console.log("getBoutiques --> coord : ", coord)
+                                            // Debug: getBoutiques coordinates
                                             var boutique_id = data.resultNumber
                                             var latitude = coord[0];
                                             var longitude = coord[1];
                                             
                                             myMarkers.getMarkers(data).then(function (markers) {
                                                 if (markers.dataReturned === false) {
-                                                    //console.log("MainController : ", data.name)
+                                                    // Debug: MainController commerce name
                                                     // Customisation de l'Icon pour les commerces déjà presents en base
                                                     var customIcon = L.icon({
                                                         iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
@@ -723,11 +707,11 @@ module.controller('MainController', [
                                                 } else {
                                                     // Affichage des magasins présents en base
                                                     angular.forEach(commerces, function(boutique) {
-                                                        //console.log("boutique trouvée : ", boutique)
+                                                        // Debug: boutique found
                                                         // boucle sur l'ensemble des commerces de l'utilisateur et affichage sur la map
                                                         for(var i=0; i<nb_commerce; i++) {
                                                             //boutique_place = [boutique[i].latitude, boutique[i].longitude]
-                                                            //console.log("boutique test : ", boutique)
+                                                            // Debug: boutique test data
                                                                 
                                                             var commentaire = "";
                                                             var boutique_place = " ";
@@ -737,7 +721,7 @@ module.controller('MainController', [
                                                             var btnprofil = 'btnprofil'+boutique_id;
                     
                                                             $scope[btnorder] = function (id) {
-                                                                //console.log("data return : ", id)
+                                                                // Debug: order modal data ID
                                                                 $uibModal.open({
                                                                     templateUrl: "<%= asset_path('Templates/myModalOrder.html.erb') %>", // loads the template
                                                                     controller: "modalOrder",
@@ -755,7 +739,7 @@ module.controller('MainController', [
                                                             };
 
                                                             $scope[btnprofil] = function (id) {
-                                                                //console.log("data return : ", id)
+                                                                // Debug: order modal data ID
                                                                 $uibModal.open({
                                                                     templateUrl: "<%= asset_path('Templates/myModalProfil.html.erb') %>", // loads the template
                                                                     controller: "modalProfil",
@@ -791,7 +775,7 @@ module.controller('MainController', [
                                                             // Return a jQuery DOM tree fully controlled by AngularJS so that ng directives will work
                                                             var popup = linkFn($scope);
                     
-                                                            //console.log("coordonnées :", boutique_place )
+                                                            // Debug: boutique coordinates
                                                             if (boutique_place !== " ") {
                                                                 var customPopup = L.popup()
                                                                     .setLatLng(boutique_place)
@@ -808,7 +792,7 @@ module.controller('MainController', [
     
                                     }, function (error) {
                                         // do something about the error
-                                        console.log("Error getBoutiques : ", error);
+                                        // Error in getBoutiques operation
                                         deferred.reject(error);
                                     });
 
@@ -817,12 +801,11 @@ module.controller('MainController', [
                             })
                         })
                     }
-                }, function(error) {
-                    // unauthenticated error
-                    console.log("MainController error : ", error)
-                    deferred.reject(error);
-                });
-            }
+            }, function(error) {
+                // unauthenticated error - utilisateur non connecté
+                // MainController: unauthenticated user - showing basic map
+                // On peut afficher une carte basique sans les fonctionnalités avancées
+            });
         });
 
     }]);

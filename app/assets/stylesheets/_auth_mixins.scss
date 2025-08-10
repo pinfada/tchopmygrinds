@@ -1,0 +1,80 @@
+// Mixins pour éviter la répétition des styles d'authentification
+
+// États d'authentification
+@mixin auth-state-hidden {
+  display: none !important;
+}
+
+@mixin auth-state-visible {
+  display: block;
+}
+
+// Styles pour utilisateurs connectés
+@mixin authenticated-only {
+  [data-auth-state="guest"] & {
+    @include auth-state-hidden;
+  }
+  
+  [data-auth-state="authenticated"] & {
+    @include auth-state-visible;
+  }
+}
+
+// Styles pour utilisateurs non connectés
+@mixin guest-only {
+  [data-auth-state="authenticated"] & {
+    @include auth-state-hidden;
+  }
+  
+  [data-auth-state="guest"] & {
+    @include auth-state-visible;
+  }
+}
+
+// Styles pour vendeurs
+@mixin seller-only {
+  .user-role:not(.seller) & {
+    @include auth-state-hidden;
+  }
+}
+
+// Styles pour acheteurs
+@mixin buyer-only {
+  .user-role:not(.buyer) & {
+    @include auth-state-hidden;
+  }
+}
+
+// Avatar utilisateur réutilisable
+@mixin user-avatar($size: 40px) {
+  width: $size;
+  height: $size;
+  @apply bg-primary-100 rounded-full flex items-center justify-center;
+  
+  .user-initials {
+    @apply text-primary-600 font-semibold;
+    font-size: calc(#{$size} * 0.35);
+  }
+  
+  .user-icon {
+    @apply text-primary-600;
+    font-size: calc(#{$size} * 0.5);
+  }
+}
+
+// Badge de rôle utilisateur
+@mixin user-role-badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  
+  &.seller {
+    @apply bg-plantain-100 text-plantain-800;
+  }
+  
+  &.buyer {
+    @apply bg-primary-100 text-primary-800;
+  }
+  
+  &.admin {
+    @apply bg-red-100 text-red-800;
+  }
+}

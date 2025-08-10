@@ -14,7 +14,7 @@ marketApp.factory('myPosition', ['$window', '$rootScope', function myPosition($w
 								retVal.latitude = position.coords.latitude;
 								retVal.longitude = position.coords.longitude;
 								retVal.timestamp = position.timestamp;
-								//console.log("retval apply : ", retVal)
+								// Debug: position watch updated
 								delete retVal.error;
 								$rootScope.$broadcast('geolocationStateChanged', retVal);
 								//$rootScope.$broadcast('$geolocation.position.changed', retVal);
@@ -49,6 +49,6 @@ marketApp.factory('myPosition', ['$window', '$rootScope', function myPosition($w
 
 		position: {}
 	};
-	//console.log("retval : ", retVal)
+	// Debug: position service initialized
 	return retVal;
 }]);

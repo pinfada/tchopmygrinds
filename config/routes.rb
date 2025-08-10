@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
+  
+  # Handle Chrome DevTools requests (ignore silently)
+  get '/.well-known/*path', to: proc { |env| [204, {}, ['']] }
+  
   root "pages#home"
   get 'users/index'
   devise_for :users, controllers: { 
