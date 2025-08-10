@@ -1,18 +1,111 @@
-<h2>Sign up</h2>
-
-<%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= f.error_notification %>
-
-  <div class="form-inputs">
-    <%= f.input :name, required: true, autofocus: true %>
-    <%= f.input :email, required: true, autofocus: true %>
-    <%= f.input :password, required: true, hint: ("#{@minimum_password_length} characters minimum" if @minimum_password_length) %>
-    <%= f.input :password_confirmation, required: true %>
+<!-- Inscription TchopMyGrinds avec Tailwind CSS -->
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <!-- Logo et titre -->
+    <div class="text-center">
+      <div class="text-4xl mb-4">🍌</div>
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">
+        Rejoindre TchopMyGrinds
+      </h2>
+      <p class="text-gray-600">
+        Créez votre compte pour découvrir les meilleurs produits locaux près de chez vous
+      </p>
+    </div>
   </div>
 
-  <div class="form-actions">
-    <%= f.button :submit, "Sign up" %>
-  </div>
-<% end %>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="card">
+      <div class="card-body px-6 py-8 space-y-6">
+        
+        <%= simple_form_for(resource, as: resource_name, url: registration_path(resource_name), 
+                            html: { class: "space-y-6" }) do |f| %>
+          
+          <!-- Notification d'erreurs -->
+          <% if resource.errors.any? %>
+            <div class="alert alert-danger">
+              <div class="flex items-start space-x-3">
+                <i class="fas fa-exclamation-triangle text-red-500 mt-0.5"></i>
+                <div class="flex-1">
+                  <h4 class="font-medium mb-2">Erreurs détectées :</h4>
+                  <ul class="list-disc list-inside space-y-1 text-sm">
+                    <% resource.errors.full_messages.each do |message| %>
+                      <li><%= message %></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          <% end %>
 
-<%= render "devise/shared/links" %>
+          <!-- Champs du formulaire -->
+          <div class="space-y-4">
+            <div>
+              <%= f.label :name, class: "form-label" %>
+              <%= f.input_field :name, 
+                  required: true, 
+                  autofocus: true, 
+                  placeholder: "Votre nom complet",
+                  class: "form-input" %>
+            </div>
+
+            <div>
+              <%= f.label :email, class: "form-label" %>
+              <%= f.input_field :email, 
+                  required: true, 
+                  placeholder: "votre.email@exemple.com",
+                  class: "form-input" %>
+            </div>
+
+            <div>
+              <%= f.label :password, "Mot de passe", class: "form-label" %>
+              <%= f.input_field :password, 
+                  required: true, 
+                  placeholder: "Choisissez un mot de passe sécurisé",
+                  class: "form-input" %>
+              <% if @minimum_password_length %>
+                <p class="form-help">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  Minimum <%= @minimum_password_length %> caractères
+                </p>
+              <% end %>
+            </div>
+
+            <div>
+              <%= f.label :password_confirmation, "Confirmer le mot de passe", class: "form-label" %>
+              <%= f.input_field :password_confirmation, 
+                  required: true, 
+                  placeholder: "Retapez votre mot de passe",
+                  class: "form-input" %>
+            </div>
+          </div>
+
+          <!-- Bouton de soumission -->
+          <div class="pt-4">
+            <%= f.button :submit, "Créer mon compte", 
+                class: "btn-primary w-full btn-lg" %>
+          </div>
+        <% end %>
+
+        <!-- Liens supplémentaires -->
+        <div class="mt-6 pt-6 border-t border-gray-200">
+          <div class="text-center text-sm">
+            <span class="text-gray-600">Déjà inscrit ?</span>
+            <%= link_to "Se connecter", 
+                new_user_session_path, 
+                class: "font-medium text-primary-600 hover:text-primary-500 ml-1" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations supplémentaires -->
+    <div class="mt-6 text-center text-xs text-gray-500">
+      <p>
+        En créant un compte, vous acceptez nos 
+        <a href="#" class="text-primary-600 hover:text-primary-500">conditions d'utilisation</a> 
+        et notre 
+        <a href="#" class="text-primary-600 hover:text-primary-500">politique de confidentialité</a>.
+      </p>
+    </div>
+  </div>
+</div>

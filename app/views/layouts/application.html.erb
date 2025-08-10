@@ -2,16 +2,27 @@
 <html lang="en" ng-app="marketApp">
   <head>
     <title><%= full_title(yield(:title)) %></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description"
-          content="Tchopmygrinds is first and foremost a new way of approaching the exchange of products in the city. 
-                   With our services, consuming quality products near you becomes easy.">
-    <%= stylesheet_link_tag    "https://cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.css" %>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="TchopMyGrinds - Marketplace moderne pour bananes plantain et produits locaux au Cameroun. Trouvez des vendeurs près de chez vous avec géolocalisation.">
+    <meta name="keywords" content="banane plantain, marketplace, cameroun, e-commerce, géolocalisation, produits locaux">
     
-    <%= stylesheet_link_tag    'application', media: 'all', "data-turbolinks-track" => "reload"  %>
-    <%= javascript_include_tag 'application', "data-turbolinks-track" => "reload" %>
-    <!-- Tailwind: chargé via pipeline d'assets (voir app/assets/stylesheets/tailwind.css) -->
-    <%= stylesheet_link_tag 'builds/tailwind', media: 'all' %>
+    <!-- Tailwind CSS - Styles principaux -->
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    
+    <!-- Google Fonts pour Tailwind -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Libraries externes -->
+    <%= stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/trix/0.9.2/trix.css" %>
+    
+    <!-- Scripts -->
+    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.js" %>
     <%= javascript_include_tag "https://cdn.jsdelivr.net/angular.chartjs/latest/angular-chart.min.js" %>
     <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/trix/1.3.1/trix.js" %>
@@ -19,22 +30,43 @@
     <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/angular-moment/1.3.0/angular-moment.js" %>
     <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/angular-moment/1.3.0/angular-moment.min.js" %>
     <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/angular-filter/0.5.17/angular-filter.min.js" %>
-    <%= csrf_meta_tag %>
+    
+    <%= csrf_meta_tags %>
     <%= render 'layouts/shim' %>
+    
+    <!-- Alpine.js pour interactions simples -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   </head>
-  <body>
-    <div header>
-      <!-- 
-	    <% flash.each do |key, value| %> 
-	    	<%= content_tag(:div, value, class: "alert alert-#{key}") %> 
-	    <% end %>
-      -->
-      <div class = "container-fluid">
-        <%= yield %>
+  <body class="bg-gray-50 font-body antialiased">
+    <!-- Flash messages avec Tailwind -->
+    <% flash.each do |key, value| %>
+      <div class="fixed top-4 right-4 z-50 max-w-md animate-slide-up" x-data="{ show: true }" x-show="show" x-transition>
+        <div class="alert <%= 'alert-success' if key == 'notice' %>
+                          <%= 'alert-danger' if key == 'alert' %>
+                          <%= 'alert-warning' if key == 'warning' %>
+                          <%= 'alert-info' if key == 'info' %>">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <%= value %>
+            </div>
+            <button @click="show = false" class="ml-4 text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
       </div>
-      <!-- 
-      <%= debug(params) if Rails.env.development? %>   
-      -->
-    </div>
+    <% end %>
+    
+    <!-- Contenu principal -->
+    <main class="w-full">
+      <%= yield %>
+    </main>
+    
+    <% if Rails.env.development? %>
+      <!-- Debug info en développement -->
+      <div class="fixed bottom-4 left-4 bg-gray-800 text-white text-xs p-2 rounded opacity-75 z-40">
+        <%= debug(params) if params.present? %>
+      </div>
+    <% end %>
   </body>
 </html>

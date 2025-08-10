@@ -28,6 +28,7 @@ end
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
 gem 'bootstrap-sass'
+gem 'tailwindcss-rails', '~> 2.0'
 gem 'gibbon'
 gem 'bower-rails'
 gem 'leaflet-rails', '~> 1.0', '>= 1.0.2'

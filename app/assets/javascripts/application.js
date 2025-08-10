@@ -29,7 +29,7 @@
 //= require modern-maps
 //= require angularjs/rails/resource
 //= require angular-devise
-//= require js-routes
+//= require routes_helper
 //= require ngcart
 //= require ngGeolocation
 //= require angular-trix

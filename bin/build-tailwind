@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Build script for Tailwind CSS in TchopMyGrinds
+# Usage: ./bin/build-tailwind [--watch]
+
+set -e
+
+# Create builds directory if it doesn't exist
+mkdir -p app/assets/builds
+
+# Build Tailwind CSS
+if [ "$1" = "--watch" ]; then
+  echo "🎨 Building Tailwind CSS (watch mode)..."
+  npx tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --watch
+else
+  echo "🎨 Building Tailwind CSS..."
+  npx tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --minify
+  echo "✅ Tailwind CSS built successfully!"
+fi
