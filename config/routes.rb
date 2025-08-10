@@ -56,10 +56,17 @@ Rails.application.routes.draw do
       collection do
         get :listproduct
         get :listcommerce
+        get :search_nearby  # Nouvelle route pour recherche avancée
       end
     end
   
     resources :addresses
     resources :orders
     resources :orderdetails
+    
+    resources :product_interests, only: [:create, :index, :destroy] do
+      collection do
+        get :for_merchants
+      end
+    end
 end

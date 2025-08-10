@@ -1,0 +1,76 @@
+<div class="modal-header">
+	<!--<h3 class="modal-title" id="modal-title">PRODUCTS</h3>-->
+	<!-- <div class="pull-right"> -->
+	<div>
+		<ngcart-summary ng-if="nbproduit > 0"></ngcart-summary>
+	</div>
+</div>
+<div class="modal-body" id="modal-body">
+	<div class="container-fluid">
+		<div class="row" ng-switch="nbproduit">
+			<div ng-switch-when="0">
+				<div>
+				  <strong>Désolé!</strong> Ce commerce n'a pas de produit en stock
+				</div>
+			</div>
+			<div ng-switch-default>
+				<div>
+					<uib-tabset active="active">
+						<uib-tab index="0" heading="Products">
+							<div ng-repeat="produit in produits">
+							<!--
+							<div class="col-md-3 col-sm-4 col-xs-6">
+								<div class="dummy"></div>
+								<a href="#x" class="thumbnail purple">{{produit.name}}</a>
+							</div>
+							-->
+
+								<div class="col-md-3">
+									<figure class="card card-product">
+										<img class="img-wrap" src="/assets/ava1-534c112384adde1fe5cc77bdca4c449729433ab81b55ef9c283cccdba10ce6a9.png" />
+										<figcaption class="info-wrap">
+												<h4 class="title">{{produit.name}}</h4>
+												<p class="desc">Some small description goes here</p>
+												<div class="rating-wrap">
+													<div class="label-rating">132 reviews</div>
+													<div class="label-rating">154 orders </div>
+												</div> <!-- rating-wrap.// -->
+												<div class="price-wrap h5">
+													<span class="price-new">Price : <strong> {{ produit.unitprice | currency }} </strong></span> 
+													<!--<del class="price-old">$1980</del>-->
+												</div> <!-- price-wrap.// -->
+										</figcaption>
+										<div class="bottom-wrap">
+											<!--
+											<button type="button" ng-click="" class="btn btn-sm btn-primary pull-right">Order Now</button>
+											-->
+								            <ngcart-addtocart id="{{ produit.id }}" name="{{ produit.name }}" price="{{ produit.unitprice }}" quantity="1" quantity-max="{{ produit.unitsinstock }}">Add to Cart
+								            </ngcart-addtocart>
+										</div> <!-- bottom-wrap.// -->
+									</figure>
+								</div> <!-- col // -->
+							</div>
+						</uib-tab>
+					</uib-tabset>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+<hr>
+
+<ngcart-cart ng-if="nbproduit > 0"></ngcart-cart>
+
+<ngcart-checkout ng-if="nbproduit > 0" service="log">Checkout</ngcart-checkout>
+
+<!--
+<a href="#/products" class="browse-link">Keep Browsing</a>
+-->
+</div>
+
+<!--
+<div class="modal-footer">
+	<button type="button" class="btn btn-warning" ng-click="cancel()">Cancel</button>
+	<button type="submit" class="btn primary-btn" ng-click="submit(data)">Submit</button>
+</div>
+-->

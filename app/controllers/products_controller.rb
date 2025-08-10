@@ -96,27 +96,135 @@ class ProductsController < ApplicationController
     #@commerces = produit.commerces.near([47.4742699, -0.5490779], 50, units: :km)
   end
 
-  # GET /commerces/listcommerce
-  # Recuperation de la liste des commerces en fonction :
-  # - Des coordonnées de l'utilisateur
-  # - Du produit
+  # GET /products/listcommerce
+  # AMÉLIORATION : Recherche géolocalisée optimisée de produits
+  # Récupère les commerces vendant un produit spécifique dans un rayon donné
   def listcommerce
-    recuproduct = []
     search_name = params[:name_query]
-    lat_name = params[:lat_query]
-    lng_name = params[:lng_query]
-    if search_name.present? && lat_name.present? && lng_name.present?
-      @product = Product.find_by(name: search_name)
-      commerces = @product.commerces
-      recupcommerce = commerces.includes(:categorizations).near([lat_name, lng_name], 10, units: :km, order: "")
-      recupcommerce.each do |commerce|
-      	produit = commerce.products.where(name: search_name)
-      	distance = commerce.distance_to([lat_name, lng_name])
-      	recuproduct.push({name: commerce.name, distance: distance, prix: produit[0].unitprice, stock: produit[0].unitsinstock})
-      end
-      respond_with recuproduct
+    lat_name = params[:lat_query]&.to_f
+    lng_name = params[:lng_query]&.to_f
+    radius = params[:radius]&.to_i || 25 # Rayon par défaut : 25km
+    
+    if search_name.blank? || lat_name.nil? || lng_name.nil?
+      render json: { error: "Paramètres manquants: name_query, lat_query, lng_query" }, status: :bad_request
+      return
     end
-    #@commerces = produit.commerces.near([47.4742699, -0.5490779], 50, units: :km)
+    
+    begin
+      # Recherche flexible : nom exact puis recherche partielle
+      products = Product.where("LOWER(nom) LIKE LOWER(?)", "%#{search_name.strip}%")
+                       .where("unitsinstock > 0")
+      
+      if products.empty?
+        render json: [], status: :ok
+        return
+      end
+      
+      results = []
+      
+      products.each do |product|
+        # Récupérer les commerces vendant ce produit dans le rayon spécifié
+        commerces_with_product = product.commerces
+                                       .includes(:user, :categorizations)
+                                       .near([lat_name, lng_name], radius, units: :km)
+        
+        commerces_with_product.each do |commerce|
+          # Vérifier que le commerce a bien ce produit en stock
+          categorization = commerce.categorizations.find_by(product: product)
+          next unless categorization
+          
+          distance = commerce.distance_to([lat_name, lng_name])
+          
+          results << {
+            # Informations commerce
+            commerceId: commerce.id,
+            name: commerce.nom,
+            ville: commerce.ville,
+            latitude: commerce.latitude,
+            longitude: commerce.longitude,
+            distance: distance.round(2),
+            commerceType: commerce.user&.statut_type || 'sedentary',
+            
+            # Informations produit
+            productId: product.id,
+            productName: product.nom,
+            prix: product.unitprice,
+            stock: product.unitsinstock,
+            
+            # Meta informations
+            searchQuery: search_name,
+            userLatitude: lat_name,
+            userLongitude: lng_name
+          }
+        end
+      end
+      
+      # Trier par distance croissante
+      results.sort_by! { |r| r[:distance] }
+      
+      render json: results, status: :ok
+      
+    rescue StandardError => e
+      Rails.logger.error "Erreur dans listcommerce: #{e.message}"
+      render json: { error: "Erreur interne du serveur" }, status: :internal_server_error
+    end
+  end
+
+  # GET /products/search_nearby
+  # NOUVELLE MÉTHODE : Recherche avancée de produits avec suggestions
+  def search_nearby
+    query = params[:q]
+    lat = params[:lat]&.to_f  
+    lng = params[:lng]&.to_f
+    radius = params[:radius]&.to_i || 25
+    limit = params[:limit]&.to_i || 50
+    
+    if query.blank?
+      # Retourner les produits populaires si pas de requête
+      popular_products = Product.joins(:orderdetails)
+                               .group(:nom)
+                               .order('COUNT(orderdetails.id) DESC')
+                               .limit(10)
+                               .pluck(:nom)
+      
+      render json: { suggestions: popular_products }, status: :ok
+      return
+    end
+    
+    # Recherche textuelle flexible
+    products = Product.where("LOWER(nom) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?)", 
+                            "%#{query}%", "%#{query}%")
+                     .where("unitsinstock > 0")
+                     .limit(limit)
+    
+    if lat && lng
+      # Recherche géolocalisée
+      results = []
+      
+      products.each do |product|
+        product.commerces.near([lat, lng], radius, units: :km).each do |commerce|
+          results << {
+            productId: product.id,
+            productName: product.nom,
+            productDescription: product.description,
+            prix: product.unitprice,
+            stock: product.unitsinstock,
+            
+            commerceId: commerce.id,
+            commerceName: commerce.nom,
+            ville: commerce.ville,
+            distance: commerce.distance_to([lat, lng]).round(2),
+            commerceType: commerce.user&.statut_type
+          }
+        end
+      end
+      
+      results.sort_by! { |r| r[:distance] }
+      render json: results, status: :ok
+    else
+      # Recherche simple sans géolocalisation
+      render json: products.as_json(include: { commerces: { only: [:id, :nom, :ville] } }), status: :ok
+    end
   end
 
   private

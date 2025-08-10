@@ -1,18 +1,25 @@
-<div class="row site" ng-controller="HeaderController">
-    <div class="col-md-1 general_menu inner">
+<div class="row site with-sidebar" ng-controller="HeaderController">
+    <!-- Bouton de toggle pour mobile -->
+    <button class="sidebar-toggle bg-white border border-gray-200 rounded-md w-10 h-10 flex items-center justify-center shadow" ng-click="SidebarOpen = !SidebarOpen" aria-label="Ouvrir le menu">
+      <i class="fa fa-bars"></i>
+    </button>
+
+    <!-- Barre latérale verticale -->
+    <nav class="tm-sidebar bg-white" ng-class="{'is-open': SidebarOpen}" role="navigation" aria-label="Navigation principale">
       <a href="#" class="avatar" ng-show="isAuthenticated">
-          <%= image_tag "no_ava.png" %>
+        <%= image_tag "no_ava.png" %>
       </a>
-      <ul>
-        <!--<li ng-show="isAuthenticated"><a href="#" ng-click="logout()" class="gradientmenu" ng-class="{'active': activemenu === true}"><i class="fa fa-user-times"></i></a></li>--> 
-        <li ng-hide="isAuthenticated"><a href="#" ng-click="OpenRegistration(); activemenu = !activemenu" class="gradientmenu" ng-class="{'active': activemenu === true}"><i class="fa fa-user"></i></a></li>
-        <li><a href="/" ng-click="MapOpen = !MapOpen" class="gradientmenu" ng-class="{'active': MapOpen === true}"><i class="fa fa-home"></i></a></li>
-        <li ng-if="nb_produit > 0" ng-show="isBuyer"><a href="/" ng-click="SeeSearch = !SeeSearch" class="gradientmenu" ng-class="{'active': SeeSearch === true}"><i class="fa fa-sliders"></i></a></li>
-
-        <li ng-show="isSeller && nb_commerce > 0"><a href="/" ng-click="OngletCommerce = !OngletCommerce" class="gradientmenu" ng-class="{'active': OngletCommerce === true}"><i class="fa fa-tasks"></i></a></li>
-
+      <ul class="mt-3">
+        <!--<li ng-show="isAuthenticated"><a href="#" ng-click="logout()" class="gradientmenu" ng-class="{'active': activemenu === true}"><i class="fa fa-user-times"></i></a></li>-->
+        <li ng-hide="isAuthenticated"><a href="#" ng-click="openRegistration($event)" class="gradientmenu" ng-class="{'active': activemenu === true}" title="Se connecter / S'inscrire"><i class="fa fa-user"></i></a></li>
+        <li><a href="/" ng-click="toggleMapOpen($event)" class="gradientmenu" ng-class="{'active': MapOpen === true}" title="Carte"><i class="fa fa-home"></i></a></li>
+        <li ng-if="nb_produit > 0" ng-show="isBuyer"><a href="/" ng-click="toggleSeeSearch($event)" class="gradientmenu" ng-class="{'active': SeeSearch === true}" title="Recherche"><i class="fa fa-sliders"></i></a></li>
+        <li ng-show="isSeller && nb_commerce > 0"><a href="/" ng-click="toggleOngletCommerce($event)" class="gradientmenu" ng-class="{'active': OngletCommerce === true}" title="Tableau vendeur"><i class="fa fa-tasks"></i></a></li>
       </ul>
-    </div>
+    </nav>
+
+    <!-- Backdrop mobile -->
+    <div class="sidebar-backdrop" ng-if="SidebarOpen" ng-click="SidebarOpen=false"></div>
     <!--/Entête--> 
 
     <!--Profile-->
@@ -30,6 +37,11 @@
                             <li ng-if="nb_commerce > 0">Nombre de commerces <a href="#"> {{nb_commerce}} commerces</a></li>
                             <li ng-if="nb_produit > 0">Nombre de produits en stock <a href="#">{{nb_produit}} produits</a></li>
                             <li ng-if="nb_commerce == 0"><i>Pas de commerce pour cet utilisateur</i></li>
+                            <li ng-if="nb_commerce > 0">
+                                <a href="/merchant/interests" class="btn btn-info btn-xs" style="margin-top: 5px;">
+                                    <i class="fa fa-bell"></i> Demandes clients
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div ng-show="isBuyer">
@@ -192,19 +204,19 @@
         <!--/search-->
         <!--Features-->
         <div class="row features">
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12">
                 <h4><i class="fa fa-map-marker" aria-hidden="true"></i>Find out where your traders are</h4>
                 Geolocate real-time fruit and vegetable sellers near you
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12">
                 <h4><i class="fa fa-handshake-o" aria-hidden="true"></i>Best way of Life</h4>
                 No more running around to eat healthy. Save time and improve your quality of life.
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12">
                 <h4><i class="fa fa-user-o" aria-hidden="true"></i>Sharing and Favorites</h4>
                 Opportunity to share with your entourage and put in your favorites the best offers of traders.
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-12">
                 <h4><i class="fa fa-money" aria-hidden="true"></i>Find out where your friends</h4>
                 Because trust is the foundation of all relationships, we will never use your personal data without your consent. In addition, you can interact with the Blockchain to secure your transactions and guarantee your payments and guarantee your payments
             </div>

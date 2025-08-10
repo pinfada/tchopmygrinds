@@ -6,25 +6,18 @@ marketApp.controller("modalBoutiqueSedentaire", [
     '$route', 
     'usercoord', 
     'user', 
-    'mapquestkey',
     'GetUserCommerces',
-    'myBoutiques',
-    function ($q, $scope, $uibModalInstance, $log, $route, usercoord, user, mapquestkey, GetUserCommerces, myBoutiques){
+    function ($q, $scope, $uibModalInstance, $log, $route, usercoord, user, GetUserCommerces){
 
     var deferred = $q.defer();
 
     //console.log("modalBoutiqueSedentaire --> usercoord : ", usercoord)
-    //console.log("modalBoutiqueSedentaire --> mapquestkey : ", mapquestkey)
 
     $scope.commerceaffiche = [5, 15, 30, 50]
 
     $scope.affichage = function(item) {
-        if (item) {
-            //console.log("affichage item: ", item)
-            myBoutiques.getBoutiques([usercoord.lat, usercoord.lng], item, mapquestkey).then(function (boutique) {
-                $scope.boutiques = boutique.searchResults
-            })
-        }
+        // MapQuest supprimé: pas de suggestions automatiques
+        $scope.boutiques = [];
     };
 
     $scope.data = {}

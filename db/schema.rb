@@ -10,13 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_18_234522) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 2024_12_10_120000) do
 
   create_table "addresses", force: :cascade do |t|
-    t.bigint "user_id"
+    t.integer "user_id"
     t.text "address1"
     t.text "address2"
     t.text "city"
@@ -30,7 +27,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
     t.index ["user_id"], name: "index_addresses_on_user_id"
   end
 
-  create_table "categorizations", id: :serial, force: :cascade do |t|
+  create_table "categorizations", force: :cascade do |t|
     t.integer "product_id"
     t.integer "commerce_id"
     t.integer "position"
@@ -39,7 +36,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
     t.index ["product_id", "commerce_id"], name: "index_categorizations_on_product_id_and_commerce_id"
   end
 
-  create_table "commerces", id: :serial, force: :cascade do |t|
+  create_table "commerces", force: :cascade do |t|
     t.string "name"
     t.string "adress1"
     t.string "adress2"
@@ -51,7 +48,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "city"
-    t.bigint "user_id"
+    t.integer "user_id"
     t.index ["user_id"], name: "index_commerces_on_user_id"
   end
 
@@ -68,7 +65,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "orderdetails", id: :serial, force: :cascade do |t|
+  create_table "orderdetails", force: :cascade do |t|
     t.decimal "unitprice", precision: 8, scale: 2
     t.integer "quantity", default: 1
     t.decimal "discount", precision: 8, default: "0"
@@ -80,7 +77,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
     t.index ["product_id"], name: "index_orderdetails_on_product_id"
   end
 
-  create_table "orders", id: :serial, force: :cascade do |t|
+  create_table "orders", force: :cascade do |t|
     t.date "orderdate"
     t.date "requiredate"
     t.datetime "shippedate"
@@ -91,7 +88,27 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
-  create_table "products", id: :serial, force: :cascade do |t|
+  create_table "product_interests", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "product_name", null: false
+    t.decimal "user_latitude", precision: 10, scale: 6, null: false
+    t.decimal "user_longitude", precision: 10, scale: 6, null: false
+    t.integer "search_radius", default: 25
+    t.text "message"
+    t.boolean "fulfilled", default: false
+    t.datetime "fulfilled_at"
+    t.boolean "email_sent", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_product_interests_on_created_at"
+    t.index ["fulfilled", "product_name", "created_at"], name: "idx_interests_fulfilled_name_date"
+    t.index ["fulfilled"], name: "index_product_interests_on_fulfilled"
+    t.index ["product_name"], name: "index_product_interests_on_product_name"
+    t.index ["user_id"], name: "index_product_interests_on_user_id"
+    t.index ["user_latitude", "user_longitude"], name: "index_product_interests_on_user_latitude_and_user_longitude"
+  end
+
+  create_table "products", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -105,7 +122,7 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
     t.index ["commerce_id"], name: "index_products_on_commerce_id"
   end
 
-  create_table "users", id: :serial, force: :cascade do |t|
+  create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -132,5 +149,6 @@ ActiveRecord::Schema.define(version: 2020_04_18_234522) do
   add_foreign_key "orderdetails", "orders"
   add_foreign_key "orderdetails", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "product_interests", "users"
   add_foreign_key "products", "commerces"
 end

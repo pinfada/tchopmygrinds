@@ -1,0 +1,126 @@
+<!--
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">Product section</h3>
+</div>
+-->
+<form ng-submit="submit()" novalidate>
+  <div class="modal-body" id="modal-body">
+    <uib-tabset active="active">
+      <uib-tab index="0" heading="REGISTER PRODUCTS">
+        <br/>
+        <table class="table" ng-if="nbproduit > 0">
+            <thead>
+                <tr>
+                    <th scope="col">Product</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Quantity per unit</th>
+                    <th scope="col">Stock</th>
+                    <th scope="col">Obsolète</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="x in produits track by $index">
+                    <td>{{ x.name }}</td>
+                    <td>{{ x.unitprice | currency }}</td>
+                    <td>{{ x.quantityperunit }}</td>
+                    <td>{{ x.unitsinstock }}</td>
+                    <td>{{ x.discontinued }}</td>
+                    <td><a ng-click="remove($index)" class="btn btn-small btn-danger">Delete</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <br/>
+        <ng-form name="nestedForm" ng-show="visible" ng-trim="false">
+            <div class="form-inline">
+                <div class="form-group">
+                  <label class="control-label sr-only" id="InputDiscontinued">discontinued</label>
+                  <input type="checkbox" class="form-control" placeholder="Discontinued" required ng-model="fruit.discontinued" name="produitdiscontinued" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label sr-only" id="InputName">Name</label>
+                    <input type="text" class="form-control" placeholder="Product" ng-required ng-model="fruit.name" name="produitname" uib-typeahead="option.produit for option in fruits | filter:$viewValue | limitTo:8">
+                </div>
+                <div class="form-group">
+                    <label class="control-label sr-only" id="InputPrice">Price</label>
+                    <input type="number" class="form-control" placeholder="Price" ng-required ng-keyup="EnableDisable(fruit.prix)" ng-model="fruit.prix" name="produitprix" />
+                </div>
+                <div class="form-group">
+                    <label class="control-label sr-only" id="InputQuantityPerUnit">Quantity</label>
+                    <input type="text" class="form-control" placeholder="Quantity per Unit" ng-required ng-model="fruit.quantite" name="produitquantite" numeric-only/>
+                </div>
+                <div class="form-group">
+                    <label class="control-label sr-only" id="InputUnitInStock">Stock</label>
+                    <input type="number" class="form-control" placeholder="Unit in Stock" ng-required ng-model="fruit.stock" name="produitstock" />
+                </div>
+                <div class="form-group">
+                    <!--<input type="button" ng-click="newProduit(fruit)" class="btn btn-default btn-sm" value="Save" /> -->
+                    <button type="button" ng-click="newProduit(fruit)" ng-disabled="IsDisabled" class="btn btn-default btn-sm">
+                      <span class="glyphicon glyphicon-ok"></span>
+                    </button> 
+                </div>
+            </div>
+        </ng-form>
+        <br/>
+        <div ng-show="SeeGraph">
+          <!--
+          <h3>Graphe Statistiques</h3>
+          -->
+          <canvas id="line" width="500px" height="300px" class="chart chart-line" chart-data="data" chart-labels="labels" chart-series="series" chart-options="options" chart-dataset-override="datasetOverride" chart-click="onClick"></canvas>
+        </div>
+        <br/>
+      </uib-tab>
+      <uib-tab index="1" heading="Orders" ng-if="nb_order > 0">
+        <div>
+            <ul class="list-group">
+              <li ng-repeat="(key, value) in orders | countBy: 'name'" class="list-group-item d-flex justify-content-between align-items-center">
+                {{ key }}
+                <span class="badge badge-primary badge-pill">{{ value }}</span>
+              </li>
+            </ul>
+            <br>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">N° Order</th>
+                        <th scope="col">Article</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Status</th>
+                        <th colspan="3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="x in orders">
+                        <td>{{ x.order }}</td>
+                        <td>{{ x.name }}</td>
+                        <td>{{ x.price | currency }}</td>
+                        <td>{{ x.quantite}}</td>
+                        <td>{{ x.status}}</td>
+                        <td>
+                            <div class="btn-group" uib-dropdown>
+                              <button id="split-button" type="button" class="btn btn-light btn-sm">Action</button>
+                              <button type="button" class="btn btn-light btn-sm" uib-dropdown-toggle>
+                                <span class="caret"></span>
+                                <span class="sr-only">Split button!</span>
+                              </button>
+                              <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                                <li role="menuitem"><a href="#">Show details</a></li>
+                                <li role="menuitem"><a href="#">Update order</a></li>
+                                <li class="divider"></li>
+                                <li role="menuitem"><a href="#">Destroy</a></li>
+                              </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </uib-tab>
+    </uib-tabset>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn" ng-click="visible = true" ng-hide="SeeGraph"><i class="glyphicon glyphicon-plus"></i>Add product</button>
+    <button type="button" class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    <button type="submit" class="btn btn-success">Submit</button>
+  </div>
+</form>

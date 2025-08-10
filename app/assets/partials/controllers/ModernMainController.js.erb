@@ -1,0 +1,519 @@
+(function() {
+    'use strict';
+    
+    var module = angular.module('marketApp');
+    
+    module.controller('ModernMainController', [
+        '$q', 
+        '$scope',
+        '$compile',
+        '$window',
+        '$uibModal',
+        '$log',
+        '$http',
+        '$timeout',
+        'leafletData',
+        '$geolocation',
+        'Auth',
+        'ngCart',
+        function($q, $scope, $compile, $window, $uibModal, $log, $http, $timeout, leafletData, $geolocation, Auth, ngCart) {
+
+            // ===================================
+            // MODERN UI STATE MANAGEMENT
+            // ===================================
+            
+            // Search state
+            $scope.searchQuery = '';
+            $scope.searchRadius = 25;
+            $scope.searchResults = [];
+            $scope.noResults = false;
+            $scope.isSearching = false;
+            $scope.hasSearched = false;
+            $scope.viewMode = 'list';
+            
+            // UI state
+            $scope.showSuggestions = false;
+            $scope.suggestions = [];
+            $scope.selectedSuggestionIndex = -1;
+            $scope.cartItemsCount = 0;
+            
+            // Interest manifestation
+            $scope.showInterestForm = false;
+            $scope.interestMessage = '';
+            $scope.isSubmittingInterest = false;
+            
+            // User position
+            $scope.userPosition = null;
+            $scope.userAddress = '';
+            
+            // Popular products for banana plantain marketplace
+            $scope.popularProducts = [
+                'banane plantain',
+                'banane douce', 
+                'igname',
+                'manioc',
+                'patate douce',
+                'tomate',
+                'oignon',
+                'piment',
+                'ail',
+                'gingembre'
+            ];
+            
+            // Alternative products suggestions
+            $scope.alternativeProducts = [];
+            
+            // Modern map instance
+            var modernMap = null;
+
+            // ===================================
+            // INITIALIZATION
+            // ===================================
+            
+            $scope.init = function() {
+                console.log('🚀 Initializing Modern TchopMyGrinds Interface');
+                
+                // Initialize modern map
+                initModernMap();
+                
+                // Setup cart monitoring
+                setupCartMonitoring();
+                
+                // Setup search suggestions
+                setupSearchSuggestions();
+                
+                // Auto-detect user location if permitted
+                $scope.getCurrentLocation();
+                
+                console.log('✅ Modern interface initialized');
+            };
+            
+            function initModernMap() {
+                $timeout(function() {
+                    if (window.TchopMaps && document.getElementById('modernMap')) {
+                        modernMap = window.TchopMaps.init('modernMap', {
+                            center: [3.8480, 11.5021], // Yaoundé, Cameroon
+                            zoom: 13
+                        });
+                        
+                        // Listen for merchant selection events
+                        document.addEventListener('merchantSelected', function(event) {
+                            $scope.$apply(function() {
+                                $scope.selectMerchant(event.detail);
+                            });
+                        });
+                        
+                        console.log('🗺️ Modern map initialized');
+                    }
+                }, 500);
+            }
+            
+            function setupCartMonitoring() {
+                // Monitor cart changes
+                $scope.$watch(function() {
+                    return ngCart.getTotalItems();
+                }, function(newCount) {
+                    $scope.cartItemsCount = newCount;
+                });
+            }
+            
+            function setupSearchSuggestions() {
+                // Watch for search query changes to show suggestions
+                $scope.$watch('searchQuery', function(newValue, oldValue) {
+                    if (newValue && newValue.length > 1) {
+                        generateSuggestions(newValue);
+                    } else {
+                        $scope.suggestions = [];
+                        $scope.showSuggestions = false;
+                    }
+                });
+            }
+
+            // ===================================
+            // SEARCH FUNCTIONALITY
+            // ===================================
+            
+            $scope.searchProductNearby = function() {
+                if (!$scope.searchQuery || $scope.isSearching) {
+                    return;
+                }
+                
+                console.log('🔍 Searching for:', $scope.searchQuery, 'within', $scope.searchRadius, 'km');
+                
+                $scope.isSearching = true;
+                $scope.hasSearched = true;
+                $scope.showSuggestions = false;
+                $scope.noResults = false;
+                $scope.searchResults = [];
+                
+                // Get user position first
+                if (!$scope.userPosition) {
+                    $scope.getCurrentLocation().then(function() {
+                        performSearch();
+                    }).catch(function() {
+                        // Search without precise location
+                        performSearch();
+                    });
+                } else {
+                    performSearch();
+                }
+            };
+            
+            function performSearch() {
+                var searchParams = {
+                    product_name: $scope.searchQuery,
+                    latitude: $scope.userPosition ? $scope.userPosition[0] : 3.8480,
+                    longitude: $scope.userPosition ? $scope.userPosition[1] : 11.5021,
+                    radius: $scope.searchRadius
+                };
+                
+                console.log('📡 API Search params:', searchParams);
+                
+                $http.get('/products/search_nearby.json', {
+                    params: searchParams
+                }).then(function(response) {
+                    console.log('✅ Search results:', response.data);
+                    
+                    $scope.searchResults = response.data.results || [];
+                    $scope.noResults = $scope.searchResults.length === 0;
+                    
+                    // Generate alternatives if no results
+                    if ($scope.noResults) {
+                        generateAlternatives($scope.searchQuery);
+                    }
+                    
+                    // Update map with results
+                    if (modernMap && $scope.searchResults.length > 0) {
+                        window.TchopMaps.showSearchResults(
+                            $scope.searchResults, 
+                            $scope.userPosition || [3.8480, 11.5021],
+                            $scope.searchRadius
+                        );
+                    }
+                    
+                    $scope.isSearching = false;
+                    
+                }).catch(function(error) {
+                    console.error('❌ Search error:', error);
+                    $scope.noResults = true;
+                    $scope.isSearching = false;
+                    
+                    // Show mock results for demonstration
+                    showMockResults();
+                });
+            }
+            
+            function showMockResults() {
+                // Mock data for demonstration
+                $scope.searchResults = [
+                    {
+                        id: 1,
+                        commerceName: 'Marché Central Mvog-Mbi',
+                        commerceType: 'sedentary',
+                        ville: 'Yaoundé',
+                        distance: 1.2,
+                        prix: 500,
+                        stock: 15,
+                        latitude: 3.8580,
+                        longitude: 11.5121,
+                        otherProducts: ['igname', 'manioc', 'patate douce']
+                    },
+                    {
+                        id: 2,
+                        commerceName: 'Vendeur Ambulant - Paul',
+                        commerceType: 'itinerant',
+                        ville: 'Yaoundé',
+                        distance: 0.8,
+                        prix: 450,
+                        stock: 8,
+                        latitude: 3.8380,
+                        longitude: 11.5221,
+                        otherProducts: ['banane douce', 'ananas']
+                    }
+                ];
+                $scope.noResults = false;
+                
+                if (modernMap) {
+                    window.TchopMaps.showSearchResults(
+                        $scope.searchResults, 
+                        $scope.userPosition || [3.8480, 11.5021],
+                        $scope.searchRadius
+                    );
+                }
+            }
+            
+            function generateSuggestions(query) {
+                var filtered = $scope.popularProducts.filter(function(product) {
+                    return product.toLowerCase().includes(query.toLowerCase());
+                });
+                
+                // Add exact query if not in suggestions
+                if (filtered.indexOf(query) === -1) {
+                    filtered.unshift(query);
+                }
+                
+                $scope.suggestions = filtered.slice(0, 5);
+                $scope.showSuggestions = $scope.suggestions.length > 0;
+            }
+            
+            function generateAlternatives(searchTerm) {
+                // Generate alternatives based on search term
+                var alternatives = [];
+                
+                if (searchTerm.toLowerCase().includes('banane')) {
+                    alternatives = ['igname', 'manioc', 'patate douce', 'plantain'];
+                } else if (searchTerm.toLowerCase().includes('tomate')) {
+                    alternatives = ['piment', 'oignon', 'ail'];
+                } else {
+                    alternatives = ['banane plantain', 'igname', 'manioc'];
+                }
+                
+                $scope.alternativeProducts = alternatives.slice(0, 4);
+            }
+
+            // ===================================
+            // SUGGESTION HANDLING
+            // ===================================
+            
+            $scope.selectSuggestion = function(suggestion) {
+                $scope.searchQuery = suggestion;
+                $scope.suggestions = [];
+                $scope.showSuggestions = false;
+                $scope.searchProductNearby();
+            };
+            
+            // Keyboard navigation for suggestions
+            angular.element(document).on('keydown', function(e) {
+                if ($scope.showSuggestions && $scope.suggestions.length > 0) {
+                    if (e.keyCode === 40) { // Arrow down
+                        e.preventDefault();
+                        $scope.$apply(function() {
+                            $scope.selectedSuggestionIndex = 
+                                ($scope.selectedSuggestionIndex + 1) % $scope.suggestions.length;
+                        });
+                    } else if (e.keyCode === 38) { // Arrow up
+                        e.preventDefault();
+                        $scope.$apply(function() {
+                            $scope.selectedSuggestionIndex = 
+                                $scope.selectedSuggestionIndex <= 0 ? 
+                                $scope.suggestions.length - 1 : $scope.selectedSuggestionIndex - 1;
+                        });
+                    } else if (e.keyCode === 13 && $scope.selectedSuggestionIndex >= 0) { // Enter
+                        e.preventDefault();
+                        $scope.$apply(function() {
+                            $scope.selectSuggestion($scope.suggestions[$scope.selectedSuggestionIndex]);
+                        });
+                    }
+                }
+            });
+
+            // ===================================
+            // GEOLOCATION
+            // ===================================
+            
+            $scope.getCurrentLocation = function() {
+                var deferred = $q.defer();
+                
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            console.log('📍 User position:', position.coords);
+                            
+                            $scope.$apply(function() {
+                                $scope.userPosition = [
+                                    position.coords.latitude,
+                                    position.coords.longitude
+                                ];
+                                
+                                if (modernMap) {
+                                    window.TchopMaps.setUserLocation(
+                                        $scope.userPosition,
+                                        position.coords.accuracy
+                                    );
+                                }
+                                
+                                // Reverse geocoding to get address
+                                reverseGeocode($scope.userPosition);
+                            });
+                            
+                            deferred.resolve($scope.userPosition);
+                        },
+                        function(error) {
+                            console.error('❌ Geolocation error:', error);
+                            
+                            // Default to Yaoundé
+                            $scope.$apply(function() {
+                                $scope.userPosition = [3.8480, 11.5021];
+                                $scope.userAddress = 'Yaoundé, Cameroun';
+                            });
+                            
+                            deferred.reject(error);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 300000
+                        }
+                    );
+                } else {
+                    console.warn('⚠️ Geolocation not supported');
+                    deferred.reject('Geolocation not supported');
+                }
+                
+                return deferred.promise;
+            };
+            
+            function reverseGeocode(coords) {
+                // Simple reverse geocoding - in production, use proper service
+                $scope.userAddress = 'Yaoundé, Cameroun';
+            }
+
+            // ===================================
+            // MERCHANT INTERACTIONS
+            // ===================================
+            
+            $scope.selectMerchant = function(merchant) {
+                console.log('🏪 Merchant selected:', merchant);
+                // Could open merchant detail modal or navigate
+            };
+            
+            $scope.addToCartFromSearch = function(result) {
+                console.log('🛒 Adding to cart:', result);
+                
+                // Add to ngCart
+                ngCart.addItem(result.id, result.commerceName + ' - ' + result.searchQuery, result.prix, 1);
+                
+                // Show success notification
+                showNotification('Produit ajouté au panier! 🛒', 'success');
+            };
+            
+            $scope.notifyWhenAvailable = function(result) {
+                console.log('🔔 Notify when available:', result);
+                showNotification('Vous serez alerté quand le produit sera disponible! 📲', 'info');
+            };
+            
+            $scope.viewMerchantDetails = function(merchant) {
+                console.log('👁️ View merchant details:', merchant);
+                // Open merchant detail modal
+            };
+
+            // ===================================
+            // INTEREST MANIFESTATION
+            // ===================================
+            
+            $scope.showInterestModal = function() {
+                $scope.showInterestForm = true;
+                $scope.interestMessage = '';
+            };
+            
+            $scope.hideInterestModal = function() {
+                $scope.showInterestForm = false;
+                $scope.interestMessage = '';
+                $scope.isSubmittingInterest = false;
+            };
+            
+            $scope.submitInterest = function() {
+                if ($scope.isSubmittingInterest) return;
+                
+                $scope.isSubmittingInterest = true;
+                
+                var interestData = {
+                    product_name: $scope.searchQuery,
+                    user_latitude: $scope.userPosition ? $scope.userPosition[0] : 3.8480,
+                    user_longitude: $scope.userPosition ? $scope.userPosition[1] : 11.5021,
+                    search_radius: $scope.searchRadius,
+                    message: $scope.interestMessage
+                };
+                
+                console.log('💌 Submitting interest:', interestData);
+                
+                $http.post('/product_interests.json', {product_interest: interestData})
+                    .then(function(response) {
+                        console.log('✅ Interest submitted:', response.data);
+                        
+                        showNotification('Votre intérêt a été enregistré! Nous vous alerterons dès qu\'un vendeur sera disponible. 📧', 'success');
+                        $scope.hideInterestModal();
+                        
+                    }).catch(function(error) {
+                        console.error('❌ Interest submission error:', error);
+                        showNotification('Erreur lors de l\'enregistrement. Veuillez réessayer. ❌', 'error');
+                        $scope.isSubmittingInterest = false;
+                    });
+            };
+
+            // ===================================
+            // UI HELPERS
+            // ===================================
+            
+            $scope.setViewMode = function(mode) {
+                $scope.viewMode = mode;
+                
+                if (mode === 'map' && modernMap) {
+                    // Refresh map
+                    $timeout(function() {
+                        if (modernMap.getMap) {
+                            modernMap.getMap().invalidateSize();
+                        }
+                    }, 100);
+                }
+            };
+            
+            $scope.setSearchRadius = function(radius) {
+                $scope.searchRadius = radius;
+            };
+            
+            $scope.quickSearch = function() {
+                $scope.searchQuery = 'banane plantain';
+                $scope.searchProductNearby();
+            };
+            
+            $scope.toggleProfile = function() {
+                console.log('👤 Toggle profile');
+                // Implement profile toggle
+            };
+            
+            $scope.openCart = function() {
+                console.log('🛒 Open cart');
+                // Implement cart modal
+            };
+
+            // ===================================
+            // NOTIFICATION SYSTEM
+            // ===================================
+            
+            function showNotification(message, type, duration) {
+                if (window.TchopMaps && window.TchopMaps.showNotification) {
+                    window.TchopMaps.showNotification(message, type, duration);
+                } else {
+                    // Fallback notification
+                    console.log('📢', type.toUpperCase() + ':', message);
+                    
+                    // Simple browser notification
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('TchopMyGrinds', {
+                            body: message,
+                            icon: '/favicon.ico'
+                        });
+                    }
+                }
+            }
+
+            // ===================================
+            // CLEANUP
+            // ===================================
+            
+            $scope.$on('$destroy', function() {
+                // Clean up event listeners
+                angular.element(document).off('keydown');
+                document.removeEventListener('merchantSelected');
+                console.log('🧹 Modern controller cleaned up');
+            });
+
+            // ===================================
+            // INITIALIZE ON LOAD
+            // ===================================
+            
+            $scope.init();
+        }
+    ]);
+})();

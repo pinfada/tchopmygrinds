@@ -26,6 +26,7 @@
 //= require angular-leaflet
 //= require leaflet.js.erb
 //= require leaflet.awesome-markers
+//= require modern-maps
 //= require angularjs/rails/resource
 //= require angular-devise
 //= require js-routes

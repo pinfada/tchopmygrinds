@@ -100,6 +100,11 @@
         	    templateUrl: "<%= asset_path('Templates/checkout.html') %>"
         	})
 
+        	.when('/merchant/interests', {
+        	    controller: 'MerchantInterestsController',
+        	    templateUrl: "<%= asset_path('Templates/merchant_interests.html') %>"
+        	})
+
         	.otherwise('/');
 		
 	}]);

@@ -70,7 +70,7 @@ group :development do
   gem 'better_errors'
   gem 'rails_layout'
   gem "letter_opener"
-  #gem 'sqlite3'
+  gem 'sqlite3', '~> 1.4'
 end
 
 #group :production do

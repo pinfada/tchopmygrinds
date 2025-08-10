@@ -1,0 +1,329 @@
+/**
+ * Modern Map Styles for TchopMyGrinds
+ * Optimized for banana plantain marketplace
+ * Mobile-first responsive design
+ */
+
+// Variables
+$primary-color: #28a745;
+$secondary-color: #007AFF;
+$accent-color: #FFB61C;
+$danger-color: #E94B3B;
+$white: #ffffff;
+$light-gray: #f8f9fa;
+$dark-gray: #6c757d;
+$shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+$border-radius: 8px;
+
+// Map Container
+.map-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: $shadow;
+}
+
+// Custom Map Markers
+.custom-marker {
+  background: none;
+  border: none;
+}
+
+.merchant-marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: $white;
+  border-radius: 50%;
+  box-shadow: $shadow;
+  border: 3px solid $primary-color;
+  
+  &.mobile {
+    border-color: $accent-color;
+    animation: pulse 2s infinite;
+  }
+  
+  .emoji {
+    font-size: 20px;
+    line-height: 1;
+  }
+  
+  .merchant-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: $danger-color;
+    color: $white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+}
+
+// User Location Marker
+.user-location-marker {
+  background: none;
+  border: none;
+}
+
+.user-marker {
+  position: relative;
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  
+  .pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background: $secondary-color;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: pulse 1.5s infinite;
+  }
+}
+
+// Animations
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+// Map Popups
+.leaflet-popup-content-wrapper {
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  border: none;
+}
+
+.merchant-popup {
+  .leaflet-popup-content {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.merchant-popup-content {
+  padding: 16px;
+  
+  h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  .merchant-type {
+    display: inline-block;
+    background: $primary-color;
+    color: $white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+  }
+  
+  .distance {
+    color: $dark-gray;
+    font-size: 14px;
+    margin: 4px 0;
+  }
+  
+  .address {
+    color: $dark-gray;
+    font-size: 14px;
+    margin: 4px 0 12px 0;
+  }
+  
+  .merchant-actions {
+    display: flex;
+    gap: 8px;
+    
+    .btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &.btn-primary {
+        background: $primary-color;
+        color: $white;
+        
+        &:hover {
+          background: darken($primary-color, 10%);
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+}
+
+// Search Circle
+.search-circle {
+  stroke-dasharray: 5, 5;
+  animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+// Accuracy Circle
+.accuracy-circle {
+  opacity: 0.6;
+}
+
+// Map Controls
+.leaflet-control-container {
+  .leaflet-control {
+    border: none;
+    border-radius: $border-radius;
+    box-shadow: $shadow;
+    
+    a {
+      background: $white;
+      color: #2c3e50;
+      border-radius: $border-radius;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: $light-gray;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Notifications
+.map-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  z-index: 10000;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+  
+  &.info {
+    background: $secondary-color;
+    color: $white;
+  }
+  
+  &.success {
+    background: $primary-color;
+    color: $white;
+  }
+  
+  &.error {
+    background: $danger-color;
+    color: $white;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Mobile Optimizations
+@media (max-width: 768px) {
+  .map-container {
+    border-radius: 0;
+  }
+  
+  .merchant-marker {
+    width: 36px;
+    height: 36px;
+    
+    .emoji {
+      font-size: 18px;
+    }
+    
+    .merchant-badge {
+      width: 16px;
+      height: 16px;
+      font-size: 9px;
+    }
+  }
+  
+  .leaflet-popup-content-wrapper {
+    .merchant-popup-content {
+      padding: 12px;
+      
+      h4 {
+        font-size: 15px;
+      }
+    }
+  }
+  
+  .map-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    padding: 10px 14px;
+  }
+  
+  // Improve touch targets
+  .leaflet-control a {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+// Dark mode support (future enhancement)
+@media (prefers-color-scheme: dark) {
+  .merchant-marker {
+    background: #2c3e50;
+    color: $white;
+  }
+  
+  .leaflet-popup-content-wrapper {
+    background: #2c3e50;
+    color: $white;
+  }
+  
+  .leaflet-control a {
+    background: #2c3e50;
+    color: $white;
+  }
+}

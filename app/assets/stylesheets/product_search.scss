@@ -1,0 +1,168 @@
+// Styles pour la recherche de produits améliorée
+
+.search-container {
+  .input-group {
+    .form-control {
+      border-radius: 25px 0 0 25px;
+      border: 2px solid #2c5aa0;
+      
+      &:focus {
+        border-color: #1e3d6f;
+        box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+      }
+    }
+    
+    .input-group-btn .btn {
+      border-radius: 0 25px 25px 0;
+      border: 2px solid #2c5aa0;
+      border-left: none;
+      background-color: #2c5aa0;
+      color: white;
+      
+      &:hover {
+        background-color: #1e3d6f;
+        border-color: #1e3d6f;
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+  
+  .dropdown-menu {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+}
+
+.search-results {
+  .result-item {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transform: translateY(-2px);
+    }
+    
+    .badge {
+      &.badge-success {
+        background-color: #28a745;
+      }
+      
+      &.badge-danger {
+        background-color: #dc3545;
+      }
+    }
+    
+    .btn {
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.search-results, .search-container {
+  animation: fadeInUp 0.5s ease;
+}
+
+// Messages de succès flottants
+.success-message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  max-width: 300px;
+  animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+// Suggestions de produits
+.product-suggestions {
+  .btn {
+    margin: 2px 4px;
+    border-radius: 15px;
+    font-size: 12px;
+    padding: 4px 12px;
+    
+    &:hover {
+      background-color: #2c5aa0;
+      color: white;
+      border-color: #2c5aa0;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .search-container {
+    .col-md-8, .col-md-4 {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .input-group .form-control {
+      font-size: 16px; // Éviter le zoom sur iOS
+    }
+  }
+  
+  .search-results {
+    .result-item {
+      .col-md-8, .col-md-4 {
+        width: 100%;
+        text-align: left !important;
+        margin-bottom: 10px;
+      }
+    }
+  }
+}
+
+// Mode sombre (optionnel)
+@media (prefers-color-scheme: dark) {
+  .search-container {
+    background: #2d3748 !important;
+    color: white;
+  }
+  
+  .search-results {
+    background: #2d3748 !important;
+    color: white;
+    
+    .result-item {
+      background: #4a5568 !important;
+      border-color: #718096 !important;
+      color: white;
+      
+      .text-muted {
+        color: #a0aec0 !important;
+      }
+    }
+  }
+}

@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_many :orderdetails, through: :oders
   has_many :commerces
   has_many :addresses
+  has_many :product_interests, dependent: :destroy
 	before_save { self.email = email.downcase }
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i 
 	validates :email, presence: true, 

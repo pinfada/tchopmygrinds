@@ -9,8 +9,7 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
- *= require font-awesome
- *= require leaflet
- *= require angular-leaflet
- *= require_tree .
+ *= require modern-ui
+ *= require modern-maps
+ *= require modern-main
  */

@@ -28,6 +28,7 @@ marketApp.controller('HeaderController', [
     //$window.location.reload();
     $scope.nb_order = 99;
     $scope.activemenu = false;
+    $scope.SidebarOpen = false;
     $scope.SeeSearch = false;
     $scope.MapOpen = false;
     $scope.OngletCommerce = false
@@ -300,8 +301,9 @@ marketApp.controller('HeaderController', [
             ariaLabelledBy: 'modal-title-top',
             ariaDescribedBy: 'modal-body-top',
             controller: 'modalRegistration',
-            backdrop: true,
-            windowClass: 'modal',
+            backdrop: 'static',
+            keyboard: true,
+            windowClass: 'modal tm-modal',
             size: 'md',
             resolve: {
                 coordinates: function () {
@@ -419,6 +421,38 @@ marketApp.controller('HeaderController', [
       ).create();
       $route.reload();
       $scope.credentials = { email: ''};
+    };
+
+    // Navigation: règles ng-click centralisées pour éviter rechargements et états incohérents
+    $scope.closePanels = function() {
+      $scope.activemenu = false;
+      $scope.SeeSearch = false;
+      $scope.MapOpen = false;
+      $scope.OngletCommerce = false;
+    };
+
+    $scope.toggleMapOpen = function($event) {
+      if ($event) { $event.preventDefault(); }
+      $scope.closePanels();
+      $scope.MapOpen = true;
+    };
+
+    $scope.toggleSeeSearch = function($event) {
+      if ($event) { $event.preventDefault(); }
+      $scope.closePanels();
+      $scope.SeeSearch = true;
+    };
+
+    $scope.toggleOngletCommerce = function($event) {
+      if ($event) { $event.preventDefault(); }
+      $scope.closePanels();
+      $scope.OngletCommerce = true;
+    };
+
+    $scope.openRegistration = function($event) {
+      if ($event) { $event.preventDefault(); }
+      $scope.activemenu = true;
+      $scope.OpenRegistration();
     };
 
 }]);

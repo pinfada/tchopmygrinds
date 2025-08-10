@@ -30,11 +30,349 @@ module.controller('MainController', [
     'GetUserCommerces',
     'GetUserAddresses',
     'GetAllUser',
-    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, $geolocation, myPosition, myCoordinates, myMarkers, boutiques, myBoutiques, myCommercenear, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser, UpdateOrderDetails) {
+    function($q, $scope, $compile, $window,  $uibModal, $log, $http, nemSimpleLogger, leafletData, coordinates, $geolocation, myPosition, myCoordinates, myMarkers, boutiques, myBoutiques, myCommercenear, SearchCommerce, GetAllCommerce, $route, $routeParams, Auth, ngCart, GetUserCommerces, GetUserAddresses, GetAllUser) {
 
         ngCart.setTaxRate(7.5);
         ngCart.setShipping(2.99);
         var deferred = $q.defer();
+
+        // ===================================
+        // NOUVELLES FONCTIONNALITÉS RECHERCHE PRODUITS
+        // ===================================
+        
+        // Variables pour la recherche de produits
+        $scope.searchQuery = '';
+        $scope.searchRadius = 25; // Rayon par défaut en km
+        $scope.searchResults = [];
+        $scope.noResults = false;
+        $scope.isSearching = false;
+        $scope.viewMode = 'list'; // 'list' ou 'map'
+        $scope.userPosition = null;
+        
+        // Toasts simples en mémoire
+        $scope.successToasts = [];
+        $scope.errorToasts = [];
+        $scope.infoToasts = [];
+
+        $scope.pushToast = function(type, message, ttlMs) {
+            var bucket = type === 'success' ? $scope.successToasts : type === 'error' ? $scope.errorToasts : $scope.infoToasts;
+            bucket.push(message);
+            setTimeout(function(){
+                $scope.$applyAsync(function(){
+                    bucket.shift();
+                });
+            }, ttlMs || 3000);
+        };
+
+        // Produits populaires pour suggestions
+        $scope.popularProducts = [
+            'banane plantain', 'tomate', 'pain', 'mangue', 
+            'riz', 'poisson', 'igname', 'avocat', 'ananas'
+        ];
+
+        // Définir le rayon de recherche
+        $scope.setSearchRadius = function(radius) {
+            $scope.searchRadius = radius;
+            // Relancer la recherche si une requête est active
+            if ($scope.searchQuery) {
+                $scope.searchProductNearby();
+            }
+        };
+
+        // Fonction principale de recherche de produits géolocalisés
+        $scope.searchProductNearby = function() {
+            if (!$scope.searchQuery) return;
+            
+            $scope.isSearching = true;
+            $scope.noResults = false;
+            $scope.searchResults = [];
+            
+            // Obtenir la position de l'utilisateur
+            coordinates.getCoordinates().then(function(position) {
+                $scope.userPosition = position;
+                
+                // Appeler l'API de recherche de produits
+                var searchParams = {
+                    name_query: $scope.searchQuery,
+                    lat_query: position.lat,
+                    lng_query: position.lng,
+                    radius: $scope.searchRadius
+                };
+                
+                $http({
+                    method: 'GET',
+                    url: '/products/listcommerce',
+                    params: searchParams
+                }).then(function(response) {
+                    $scope.isSearching = false;
+                    
+                    if (response.data && response.data.length > 0) {
+                        // Traiter les résultats
+                        $scope.searchResults = response.data.map(function(item) {
+                            return {
+                                commerceName: item.name,
+                                commerceType: item.commerceType || 'sedentary', // À déterminer selon les données
+                                ville: item.ville || 'Non spécifiée',
+                                distance: item.distance,
+                                prix: item.prix,
+                                stock: item.stock,
+                                latitude: item.latitude,
+                                longitude: item.longitude,
+                                productName: $scope.searchQuery,
+                                commerceId: item.commerceId,
+                                productId: item.productId
+                            };
+                        });
+                        
+                        $scope.viewMode = 'list'; // Afficher la liste par défaut
+                        $scope.updateMapWithResults();
+                        
+                    } else {
+                        $scope.noResults = true;
+                    }
+                    
+                }).catch(function(error) {
+                    $scope.isSearching = false;
+                    console.error('Erreur recherche produits:', error);
+                    $scope.pushToast('error', "Erreur lors de la recherche des produits");
+                    // Fallback : rechercher dans tous les produits
+                    $scope.searchAllProducts();
+                });
+                
+            }).catch(function(error) {
+                $scope.isSearching = false;
+                console.error('Erreur géolocalisation:', error);
+                alert('Impossible de vous géolocaliser. Veuillez autoriser la géolocalisation.');
+            });
+        };
+
+        // Recherche alternative dans tous les produits si l'API spécialisée échoue
+        $scope.searchAllProducts = function() {
+            $http.get('/products').then(function(response) {
+                var allProducts = response.data;
+                var matchingProducts = allProducts.filter(function(product) {
+                    return product.nom && 
+                           product.nom.toLowerCase().includes($scope.searchQuery.toLowerCase()) &&
+                           product.unitsinstock > 0;
+                });
+                
+                if (matchingProducts.length > 0) {
+                    // Récupérer les commerces pour chaque produit
+                    $scope.getCommercesForProducts(matchingProducts);
+                } else {
+                    $scope.noResults = true;
+                }
+            });
+        };
+
+        // Récupérer les commerces associés aux produits trouvés
+        $scope.getCommercesForProducts = function(products) {
+            var promises = [];
+            
+            products.forEach(function(product) {
+                var promise = $http.get('/commerces').then(function(response) {
+                    return {
+                        product: product,
+                        commerces: response.data
+                    };
+                });
+                promises.push(promise);
+            });
+            
+            $q.all(promises).then(function(results) {
+                var searchResults = [];
+                
+                results.forEach(function(result) {
+                    result.commerces.forEach(function(commerce) {
+                        if (commerce.latitude && commerce.longitude && $scope.userPosition) {
+                            var distance = $scope.calculateDistance(
+                                $scope.userPosition.lat, $scope.userPosition.lng,
+                                commerce.latitude, commerce.longitude
+                            );
+                            
+                            if (distance <= $scope.searchRadius) {
+                                searchResults.push({
+                                    commerceName: commerce.nom,
+                                    commerceType: commerce.user?.statut_type || 'sedentary',
+                                    ville: commerce.ville,
+                                    distance: distance,
+                                    prix: result.product.unitprice,
+                                    stock: result.product.unitsinstock,
+                                    latitude: commerce.latitude,
+                                    longitude: commerce.longitude,
+                                    productName: result.product.nom,
+                                    commerceId: commerce.id,
+                                    productId: result.product.id
+                                });
+                            }
+                        }
+                    });
+                });
+                
+                if (searchResults.length > 0) {
+                    $scope.searchResults = searchResults.sort(function(a, b) {
+                        return a.distance - b.distance;
+                    });
+                    $scope.updateMapWithResults();
+                } else {
+                    $scope.noResults = true;
+                }
+            });
+        };
+
+        // Calculer la distance entre deux points (formule haversine)
+        $scope.calculateDistance = function(lat1, lng1, lat2, lng2) {
+            var R = 6371; // Rayon de la Terre en km
+            var dLat = (lat2 - lat1) * Math.PI / 180;
+            var dLng = (lng2 - lng1) * Math.PI / 180;
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        };
+
+        // Mettre à jour la carte avec les résultats de recherche
+        $scope.updateMapWithResults = function() {
+            // Cette fonction sera implémentée pour afficher les marqueurs des résultats
+            console.log('Mise à jour carte avec', $scope.searchResults.length, 'résultats');
+        };
+
+        // Ajouter un produit au panier depuis les résultats de recherche
+        $scope.addToCartFromSearch = function(result) {
+            if (result.stock > 0) {
+                ngCart.addItem(
+                    result.productId,
+                    result.productName,
+                    result.prix,
+                    1,
+                    {
+                        commerceName: result.commerceName,
+                        distance: result.distance
+                    }
+                );
+                
+                // Feedback visuel
+                $scope.pushToast('success', 'Produit ajouté au panier !');
+            }
+        };
+
+        // Système de manifestation d'intérêt
+        $scope.showInterestModal = function() {
+            if (!Auth.isAuthenticated()) {
+                $scope.pushToast('info', 'Veuillez vous connecter pour manifester votre intérêt.');
+                return;
+            }
+            
+            $uibModal.open({
+                template: `
+                    <div class="modal-header">
+                        <h4 class="modal-title">Manifester mon intérêt</h4>
+                        <button type="button" class="close" aria-label="Fermer" ng-click="$dismiss()">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Vous souhaitez être notifié quand "<strong>{{searchQuery}}</strong>" sera disponible dans votre zone ?</p>
+                        <p><small class="text-muted">Nous vous enverrons un email dès qu'un vendeur proposera ce produit dans un rayon de {{searchRadius}}km.</small></p>
+                        <div class="form-group">
+                            <label>Message pour les vendeurs (optionnel) :</label>
+                            <textarea ng-model="interestMessage" class="form-control" rows="3" 
+                                      placeholder="Ex: Je cherche des bananes plantains bien mûres..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-secondary" ng-click="$dismiss()">Annuler</button>
+                        <button class="btn btn-primary" ng-click="submitInterest()">
+                            <i class="fa fa-bell"></i> Manifester mon intérêt
+                        </button>
+                    </div>
+                `,
+                controller: ['$scope', '$uibModalInstance', function($modalScope, $modalInstance) {
+                    $modalScope.searchQuery = $scope.searchQuery;
+                    $modalScope.searchRadius = $scope.searchRadius;
+                    $modalScope.interestMessage = '';
+                    
+                    $modalScope.submitInterest = function() {
+                        $scope.saveProductInterest($modalScope.interestMessage);
+                        $modalInstance.close();
+                    };
+                }],
+                size: 'md',
+                backdrop: 'static',
+                keyboard: true,
+                windowClass: 'modal tm-modal'
+            });
+        };
+
+        // Sauvegarder la manifestation d'intérêt
+        $scope.saveProductInterest = function(message) {
+            if (!$scope.userPosition) {
+                $scope.pushToast('error', 'Position utilisateur non disponible.');
+                return;
+            }
+            
+            var interestData = {
+                product_interest: {
+                    product_name: $scope.searchQuery,
+                    user_latitude: $scope.userPosition.lat,
+                    user_longitude: $scope.userPosition.lng,
+                    search_radius: $scope.searchRadius,
+                    message: message
+                }
+            };
+            
+            $http.post('/product_interests', interestData)
+                .then(function(response) {
+                    if (response.data.success) {
+                        $scope.showSuccessMessage(response.data.message);
+                    } else {
+                        $scope.pushToast('error', 'Erreur: ' + response.data.errors.join(', '));
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Erreur sauvegarde intérêt:', error);
+                    $scope.pushToast('error', 'Erreur lors de l\'enregistrement.');
+                });
+        };
+
+        // Alerter quand le produit sera disponible
+        $scope.notifyWhenAvailable = function(result) {
+            if (!Auth.isAuthenticated()) {
+                $scope.pushToast('info', 'Veuillez vous connecter pour activer les alertes.');
+                return;
+            }
+            
+            // Enregistrer l'alerte
+            Auth.currentUser().then(function(user) {
+                var alertData = {
+                    user_id: user.id,
+                    commerce_id: result.commerceId,
+                    product_id: result.productId,
+                    product_name: result.productName,
+                    commerce_name: result.commerceName
+                };
+                
+                var alerts = JSON.parse(localStorage.getItem('stockAlerts') || '[]');
+                alerts.push(alertData);
+                localStorage.setItem('stockAlerts', JSON.stringify(alerts));
+                
+                $scope.showSuccessMessage('Vous serez alerté quand ce produit sera à nouveau disponible chez ' + result.commerceName);
+            });
+        };
+
+        // Afficher un message de succès
+        $scope.showSuccessMessage = function(message) {
+            // Simple implementation avec une div temporaire
+            var alertDiv = angular.element('<div class="alert alert-success" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">' + message + '</div>');
+            angular.element('body').append(alertDiv);
+            
+            setTimeout(function() {
+                alertDiv.fadeOut(500, function() {
+                    alertDiv.remove();
+                });
+            }, 3000);
+        };
     
         //map = L.mapquest.map('map', {
         //    center: [47.4550213, -0.5370654],
@@ -85,72 +423,20 @@ module.controller('MainController', [
 
         coordinates.getCoordinates().then(function (resultcoord) {
             var map = null;
-            var mapquest_key = 'qH6FPb3ABRz7fD8LSYwfTGGhw4QASLSn';
+            // MapQuest supprimé: on utilise Leaflet + OpenStreetMap
+            var mapquest_key = null;
     
             //nemSimpleLogger.doLog = true; //default is true 
             //nemSimpleLogger.currentLevel = nemSimpleLogger.LEVELS.debug;//defaults to error only 
     
-            L.mapquest.key = mapquest_key; //Cle API mapquest
-            L.mapquest.open = true; // Permet d'utiliser les fonctionnalités de openstreet
-            // The ID of a map style. The supported style IDs are 'map', 'hybrid', 'satellite', 'light', 'dark'.
-            var tileLayer = L.mapquest.tileLayer('map');
-            map = L.mapquest.map('map', {
+            map = L.map('map', {
                 center: [resultcoord.lat, resultcoord.lng],
-                layers: [tileLayer],
                 zoom: 14
             });
-           
-            // Controle de la map (localisation, zoom etc...)
-            map.addControl(L.mapquest.control());
-            
-            let directionsControl = L.mapquest.directionsControl({
-                directionsLayer: {
-                    startMarker: {
-                      title: 'Drag to change location',
-                      draggable: true,
-                      icon: 'marker-start',
-                      iconOptions: {
-                        size: 'sm'
-                      }
-                    },
-                    endMarker: {
-                      draggable: true,
-                      title: 'Drag to change location',
-                      icon: 'marker-end',
-                      iconOptions: {
-                        size: 'sm'
-                      }
-                    },
-                    viaMarker: {
-                      title: 'Drag to change route'
-                    },
-                    routeRibbon: {
-                      showTraffic: true
-                    },
-                    alternateRouteRibbon: {
-                      showTraffic: false
-                    },
-                    paddingTopLeft: [450, 20],
-                    paddingBottomRight: [180, 20],
-                  },
-                endInput: {
-                    compactResults: true,
-                    disabled: true,
-                    location: {},
-                    placeholderText: 'Destination',
-                    geolocation: {
-                      enabled: true
-                    },
-                    clearTitle: 'Remove this destination'
-                  }
+            var tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
-
-            directionsControl.setFirstDestination({
-                latLng: {
-                    lat: resultcoord.lat,
-                    lng: resultcoord.lng
-                }
-            });
 
             // Affichage des commerces à proximité si l'utilisateur s'est authentifié
             if (Auth.isAuthenticated() )
@@ -186,9 +472,6 @@ module.controller('MainController', [
                                             },
                                             user: function () {
                                                 return user; 
-                                            },
-                                            mapquestkey: function () {
-                                                return mapquest_key; 
                                             }
                                         }
                                     })
@@ -305,12 +588,10 @@ module.controller('MainController', [
                                     };
                                     
                                     // Customisation des Icons utiliser pour la map
-                                    customIcon = L.mapquest.icons.marker({
-                                        primaryColor: '#22407F',
-                                        secondaryColor: '#3B5998',
-                                        shadow: true,
-                                        size: 'md'
-                            //          symbol: 'A'
+                                    // Icône personnalisée Leaflet (MapQuest supprimé)
+                                    customIcon = L.icon({
+                                        iconUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ2VarF6jyBEEqUI5d0ZK1NMm69I1rngTAM1KEQHvH_5CW73v-g',
+                                        iconSize: [35, 35]
                                     });
 
                                     // Customisation de l'Icon pour les commerces déjà presents en base
