@@ -1,0 +1,14 @@
+{
+  "name": "tchopmygrinds",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/tailwind.css -o ./app/assets/builds/tailwind.css --minify",
+    "watch:css": "tailwindcss -i ./app/assets/stylesheets/tailwind.css -o ./app/assets/builds/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.10",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41"
+  }
+}
+
