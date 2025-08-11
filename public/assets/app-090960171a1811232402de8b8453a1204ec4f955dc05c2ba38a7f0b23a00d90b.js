@@ -5,6 +5,7 @@
 		'templates', 
 		'ui.bootstrap', 
 		'rails', 
+		'angular-advanced-searchbox',
 		'nemLogging',
 		'ui-leaflet',
 		'Devise',
@@ -38,12 +39,12 @@
 		// Fonction helper temporaire pour obtenir les URLs de templates
 		function getTemplateUrl(templateName) {
 			var templates = {
-				main: "<%= asset_path('Templates/main.html') %>",
-				header: "<%= asset_path('Templates/header.html') %>",
-				fail: "<%= asset_path('Templates/fail.html') %>",
-				cart: "<%= asset_path('Templates/cart.html') %>",
-				checkout: "<%= asset_path('Templates/checkout.html') %>",
-				merchantInterests: "<%= asset_path('Templates/merchant_interests.html') %>"
+				main: "/assets/Templates/main-583cc0fa89d4746a5b4d99329999f1f3a4b7a38d8812a4cabe9d20cacf403089.html",
+				header: "/assets/Templates/header-2976fac72c9bcd102166f9ddb4516ee542e64c6fce413b824255865cc5a181dc.html",
+				fail: "/assets/Templates/fail-bfddade570795ec527e413f56261920bf04541a444b4a66c7c773736e56b9e2c.html",
+				cart: "/assets/Templates/cart-1cc9077404a87de3f90ce54253dfa0b480a97a5611a7c527067708fc25899a73.html",
+				checkout: "/assets/Templates/checkout-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.html",
+				merchantInterests: "/assets/Templates/merchant_interests-465753b821331ed4f5bc4ff2d4b88d794a62a00c6b2757fc0d3cd7abdce79ec7.html"
 			};
 			return templates[templateName] || '';
 		}

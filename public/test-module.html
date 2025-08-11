@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test du module marketApp</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+    <script src="/assets/application.js"></script>
+</head>
+<body ng-app="marketApp">
+    <div ng-controller="TestController">
+        <h1>{{message}}</h1>
+        <p>Module marketApp: {{moduleStatus}}</p>
+        <p>ConfigService: {{configServiceStatus}}</p>
+        <p>ErrorHandlerService: {{errorServiceStatus}}</p>
+    </div>
+
+    <script>
+        angular.module('marketApp').controller('TestController', ['$scope', 'ConfigService', 'ErrorHandlerService', 
+        function($scope, ConfigService, ErrorHandlerService) {
+            $scope.message = 'Test du module marketApp';
+            $scope.moduleStatus = '✅ Module chargé avec succès !';
+            
+            try {
+                var testImage = ConfigService.getImageUrl('logo');
+                $scope.configServiceStatus = testImage ? '✅ ConfigService fonctionne' : '⚠️ ConfigService sans données';
+            } catch(e) {
+                $scope.configServiceStatus = '❌ Erreur ConfigService: ' + e.message;
+            }
+            
+            try {
+                var testError = ErrorHandlerService.getErrorType({status: 404});
+                $scope.errorServiceStatus = testError ? '✅ ErrorHandlerService fonctionne' : '⚠️ ErrorHandlerService incomplet';
+            } catch(e) {
+                $scope.errorServiceStatus = '❌ Erreur ErrorHandlerService: ' + e.message;
+            }
+        }]);
+    </script>
+</body>
+</html>

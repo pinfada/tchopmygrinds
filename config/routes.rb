@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     match '/agrimer', to: 'pages#agrimer', via: 'get'
     match '/fail', to: 'pages#fail', via: 'get'
     match '/serveraddress', to: 'pages#serveraddress', via: 'get'
+    match '/test-tailwind', to: 'pages#test_tailwind', via: 'get'
   
     resources :newsletters
   

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html ng-app="testApp">
+<head>
+    <title>Test AngularJS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+</head>
+<body>
+    <div ng-controller="TestController">
+        <h1>{{message}}</h1>
+        <p>ConfigService status: {{configServiceStatus}}</p>
+    </div>
+
+    <script>
+        // Test simple pour vérifier si AngularJS fonctionne
+        var testApp = angular.module('testApp', []);
+        
+        testApp.controller('TestController', function($scope) {
+            $scope.message = 'AngularJS fonctionne !';
+            $scope.configServiceStatus = 'Non testé';
+            
+            // Tester si on peut créer un service simple
+            try {
+                testApp.service('TestService', function() {
+                    this.test = 'Service fonctionne';
+                });
+                $scope.configServiceStatus = 'Les services fonctionnent';
+            } catch(e) {
+                $scope.configServiceStatus = 'Erreur services: ' + e.message;
+            }
+        });
+    </script>
+</body>
+</html>

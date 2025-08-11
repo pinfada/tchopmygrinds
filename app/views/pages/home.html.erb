@@ -1,1 +1,27 @@
-<div ng-include='"Templates/main-tailwind.html"'></div>
+<!-- Container principal avec classes Tailwind appliquées -->
+<div id="angular-app-container" class="w-full h-screen bg-gray-50 font-body antialiased">
+  <div ng-include='"<%= asset_path('Templates/main-tailwind.html') %>"' class="w-full h-full"></div>
+</div>
+
+<!-- Script pour forcer l'application des styles Tailwind -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Force l'application des classes CSS sur le contenu dynamique
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      mutation.addedNodes.forEach(function(node) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          // Force le rendu des styles Tailwind
+          node.style.display = node.style.display;
+        }
+      });
+    });
+  });
+  
+  // Observer les changements dans le container Angular
+  const container = document.getElementById('angular-app-container');
+  if (container) {
+    observer.observe(container, { childList: true, subtree: true });
+  }
+});
+</script>

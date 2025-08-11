@@ -1,10 +1,29 @@
 module.exports = {
   content: [
-    './app/views/**/*.erb',
-    './app/assets/javascripts/**/*.html',
-    './app/assets/javascripts/**/*.erb',
-    './app/assets/partials/**/*.js',
-    './app/assets/partials/**/*.erb'
+    './app/views/**/*.{erb,html}',
+    './app/assets/javascripts/**/*.{html,erb}',
+    './app/assets/javascripts/Templates/**/*.{html,erb}',
+    './app/assets/partials/**/*.{js,erb}',
+    './app/assets/stylesheets/**/*.{css,scss}',
+    './app/helpers/**/*.rb'
+  ],
+  safelist: [
+    // Garantir que ces classes sont toujours incluses
+    'font-display',
+    'bg-white/95',
+    'backdrop-blur-sm',
+    'safe-top',
+    'safe-bottom',
+    'btn-icon',
+    'translate-x-0',
+    '-translate-x-full',
+    // Classes dynamiques AngularJS
+    {
+      pattern: /^(bg|text|border|hover|focus)-(primary|banana|plantain)-(50|100|200|300|400|500|600|700|800|900)$/
+    },
+    {
+      pattern: /^(w|h|p|m|space)-(0|1|2|3|4|5|6|8|10|12|16|20|24|32|40|48|56|64|72|80|96)$/
+    }
   ],
   theme: {
     extend: {

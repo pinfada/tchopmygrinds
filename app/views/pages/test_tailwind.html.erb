@@ -1,0 +1,94 @@
+<div class="min-h-screen bg-gray-100 py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Header de test -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Test Tailwind CSS</h1>
+      <p class="text-lg text-gray-600">Cette page teste si Tailwind CSS fonctionne correctement</p>
+    </div>
+
+    <!-- Grille de cartes test -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- Card 1 -->
+      <div class="card card-hover">
+        <div class="card-body">
+          <h3 class="text-xl font-semibold text-primary-800 mb-2">Couleurs Primary</h3>
+          <p class="text-gray-600 mb-4">Test des couleurs personnalisées primary</p>
+          <button class="btn-primary">Bouton Primary</button>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card card-hover">
+        <div class="card-body">
+          <h3 class="text-xl font-semibold text-banana-800 mb-2">Couleurs Banana</h3>
+          <p class="text-gray-600 mb-4">Test des couleurs personnalisées banana</p>
+          <button class="btn-accent">Bouton Accent</button>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="card card-hover">
+        <div class="card-body">
+          <h3 class="text-xl font-semibold text-plantain-800 mb-2">Couleurs Plantain</h3>
+          <p class="text-gray-600 mb-4">Test des couleurs personnalisées plantain</p>
+          <button class="btn-secondary">Bouton Secondary</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Test formulaire -->
+    <div class="card mb-8">
+      <div class="card-header">
+        <h2 class="text-2xl font-semibold text-gray-900">Test Formulaire</h2>
+      </div>
+      <div class="card-body">
+        <form class="space-y-4">
+          <div>
+            <label class="form-label">Nom</label>
+            <input type="text" class="form-input" placeholder="Entrez votre nom">
+          </div>
+          <div>
+            <label class="form-label">Email</label>
+            <input type="email" class="search-input" placeholder="votre.email@example.com">
+          </div>
+          <div>
+            <label class="form-label">Message</label>
+            <textarea class="form-textarea" rows="4" placeholder="Votre message"></textarea>
+          </div>
+          <div class="flex gap-3">
+            <button type="submit" class="btn-primary">Envoyer</button>
+            <button type="button" class="btn-secondary">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Test badges et alerts -->
+    <div class="space-y-6">
+      <div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Test Badges</h3>
+        <div class="flex gap-3">
+          <span class="badge badge-success">Succès</span>
+          <span class="badge badge-warning">Attention</span>
+          <span class="badge badge-danger">Erreur</span>
+          <span class="badge badge-info">Info</span>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">Test Alerts</h3>
+        <div class="space-y-3">
+          <div class="alert alert-success">
+            Ceci est une alerte de succès avec Tailwind !
+          </div>
+          <div class="alert alert-warning">
+            Ceci est une alerte d'avertissement avec Tailwind !
+          </div>
+          <div class="alert alert-danger">
+            Ceci est une alerte d'erreur avec Tailwind !
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

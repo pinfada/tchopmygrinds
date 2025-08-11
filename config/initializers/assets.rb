@@ -19,7 +19,12 @@ Rails.application.config.assets.precompile += %w( builds/tailwind.css )
 # folder are already added.
 Rails.application.config.assets.precompile += %w( 
   app.js.erb
+  interceptors/*.js
+  services/*.js
+  controllers/*.js
+  directives/*.js
   Templates/*.html
   Templates/*.html.erb
   *.png *.gif *.jpg *.jpeg *.svg
+  builds/tailwind.css
 )

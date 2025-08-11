@@ -1,32 +1,45 @@
 class ProductsController < ApplicationController
-  # before_action :authenticate_user!
+  include ApiResponse
+  
   authorize_resource
-  #before_action :searchnear
   before_action :set_product, only: [:show, :edit, :update, :destroy]
   before_action :set_commerce, only: [:create, :new]
+  before_action :set_pagination_params, only: [:index, :search_nearby]
 
   respond_to :json
   # GET /products
   # GET /products.json
   def index
-    #@products = Product.all.order("created_at ASC")
-    #products = Product.all.group(:name)
-    #@products = products.sum(:unitsinstock)
-    commerceid = params[:commerce_id]
-    if commerceid.present? 
-      @commerce = Commerce.find(commerceid)
-      @products = @commerce.products
-    else
-      @products = Product.all.order("created_at ASC")
+    begin
+      commerceid = params[:commerce_id]
+      
+      products_query = if commerceid.present? 
+        @commerce = Commerce.find(commerceid)
+        @commerce.products
+      else
+        Product.all
+      end
+      
+      @products = products_query
+        .includes(:commerces)
+        .where("unitsinstock > 0")
+        .page(@page)
+        .per(@per_page)
+        .order(:nom)
+      
+      render_paginated(@products, method(:serialize_product))
+    rescue ActiveRecord::RecordNotFound
+      render_not_found("Commerce")
+    rescue StandardError => e
+      Rails.logger.error "Error in products#index: #{e.message}"
+      render_error("Internal server error")
     end
-    
-    respond_with(@products)
   end
 
   # GET /products/1
   # GET /products/1.json
   def show
-    respond_with(@product)
+    render_success(serialize_product(@product))
   end
 
   # GET /products/new
@@ -228,18 +241,38 @@ class ProductsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_product
       @product = Product.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      render_not_found("Product") and return
     end
 
     def set_commerce
-     @commerce = Commerce.find(params[:commerce_id])
+      @commerce = Commerce.find(params[:commerce_id])
+    rescue ActiveRecord::RecordNotFound
+      render_not_found("Commerce") and return
+    end
+    
+    def set_pagination_params
+      @page = params[:page]&.to_i || 1
+      @per_page = [params[:per_page]&.to_i || 20, 100].min # Max 100 items per page
+    end
+    
+    def serialize_product(product)
+      {
+        id: product.id,
+        nom: product.nom,
+        description: product.description,
+        prix_unitaire: product.unitprice,
+        stock: product.unitsinstock,
+        quantite_par_unite: product.quantityperunit,
+        commerces_count: product.commerces.count,
+        created_at: product.created_at
+      }
     end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
     def product_params
-      params.require(:product).permit(:name, :quantityperunit, :unitprice, :unitsinstock, :unitsonorder, :commerce_id)
+      params.require(:product).permit(:nom, :quantityperunit, :unitprice, :unitsinstock, :unitsonorder, :commerce_id)
     end
 
 end

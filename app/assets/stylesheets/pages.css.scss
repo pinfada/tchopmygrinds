@@ -1,6 +1,8 @@
-@import "bootstrap-sprockets";
+/* Bootstrap désactivé pour éviter les conflits avec Tailwind CSS */
+/* @import "bootstrap-sprockets"; */
+/* @import "bootstrap"; */
 
-@import "bootstrap";
+/* Styles Bootstrap essentiels récrits en Tailwind - à migrer progressivement */
 
 @import "leaflet.awesome-markers";
 

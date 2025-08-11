@@ -33,6 +33,12 @@
 //= require ngcart
 //= require ngGeolocation
 //= require angular-trix
-//= require app
+//= require app.js.erb
+//= require services/config_service
+//= require services/error_handler
+//= require interceptors/csrf_interceptor
+//= require controllers/base_controller
+//= require directives/app_image
+//= require directives/simple_searchbox
 //= require_tree ../partials
 //= require_tree .

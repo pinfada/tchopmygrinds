@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="marketApp">
+<head>
+    <title>Test Simple Searchbox</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+    <script src="/assets/application.js"></script>
+    <link rel="stylesheet" href="/assets/application.css">
+</head>
+<body>
+    <div ng-controller="SearchTestController" style="padding: 20px; max-width: 500px;">
+        <h1>Test de la nouvelle directive de recherche</h1>
+        
+        <div style="margin: 20px 0;">
+            <h3>Simple Searchbox:</h3>
+            <simple-searchbox ng-model="searchParams"
+                             parameters="availableSearchParams"
+                             placeholder="Recherchez un produit...">
+            </simple-searchbox>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <h3>Paramètres sélectionnés:</h3>
+            <div ng-show="searchParams.length">
+                <div ng-repeat="param in searchParams" style="background: #f0f0f0; padding: 5px; margin: 5px 0; border-radius: 3px;">
+                    <strong>{{param.name}}</strong>: {{param.value}} 
+                    <small>({{param.type}})</small>
+                </div>
+            </div>
+            <div ng-show="!searchParams.length" style="color: #666;">
+                Aucun paramètre sélectionné
+            </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button class="btn btn-primary" ng-click="resetSearch()">Réinitialiser</button>
+            <button class="btn btn-info" ng-click="showDebug = !showDebug">Debug</button>
+        </div>
+        
+        <div ng-show="showDebug" style="background: #f8f9fa; padding: 10px; border-radius: 3px; font-family: monospace;">
+            <strong>Debug:</strong><br>
+            searchParams: {{searchParams | json}}<br>
+            availableSearchParams: {{availableSearchParams | json}}
+        </div>
+    </div>
+
+    <script>
+        angular.module('marketApp').controller('SearchTestController', ['$scope', 
+        function($scope) {
+            $scope.searchParams = [];
+            $scope.showDebug = false;
+            
+            // Paramètres de test
+            $scope.availableSearchParams = [
+                { name: 'Banane plantain', type: 'product', value: 'banane' },
+                { name: 'Tomate', type: 'product', value: 'tomate' },
+                { name: 'Oignon', type: 'product', value: 'oignon' },
+                { name: 'Carotte', type: 'product', value: 'carotte' },
+                { name: 'Pomme de terre', type: 'product', value: 'pomme_terre' },
+                { name: 'Haricot vert', type: 'product', value: 'haricot' },
+                { name: 'Prix maximum', type: 'filter', value: 'max_price' },
+                { name: 'Distance', type: 'filter', value: 'distance' }
+            ];
+            
+            $scope.resetSearch = function() {
+                $scope.searchParams = [];
+            };
+        }]);
+    </script>
+</body>
+</html>
