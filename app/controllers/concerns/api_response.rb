@@ -51,7 +51,7 @@ module ApiResponse
   end
 
   def render_paginated(collection, serializer = nil, meta = {})
-    # Kaminari pagination info
+    # Kaminari pagination info (legacy)
     pagination_meta = if collection.respond_to?(:current_page)
       {
         pagination: {
@@ -60,7 +60,8 @@ module ApiResponse
           total_pages: collection.total_pages,
           total_count: collection.total_count,
           next_page: collection.next_page,
-          prev_page: collection.prev_page
+          prev_page: collection.prev_page,
+          pagination_type: 'offset_based'
         }
       }
     else
@@ -74,5 +75,36 @@ module ApiResponse
     end
 
     render_success(data, nil, :ok, pagination_meta.merge(meta))
+  end
+  
+  # Rendu paginé avec curseurs (optimisé pour de grandes collections)
+  def render_cursor_paginated(result, message = nil)
+    render_success(result[:data], message, :ok, result.except(:data))
+  end
+  
+  # Helper pour paginer avec curseur une relation
+  def paginate_with_cursor(relation, **options)
+    CursorPaginationService.paginate(relation, **options)
+  end
+  
+  # Helper pour paginer avec curseur et géolocalisation
+  def paginate_geospatial(relation, lat:, lng:, radius:, **options)
+    CursorPaginationService.paginate_geospatial(
+      relation, 
+      lat: lat, 
+      lng: lng, 
+      radius: radius, 
+      **options
+    )
+  end
+  
+  # Helper pour paginer avec curseur et recherche textuelle
+  def paginate_search(relation, query:, search_fields: [], **options)
+    CursorPaginationService.paginate_search(
+      relation, 
+      query: query, 
+      search_fields: search_fields, 
+      **options
+    )
   end
 end

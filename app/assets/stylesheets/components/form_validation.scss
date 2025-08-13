@@ -1,0 +1,206 @@
+// Styles pour la validation des formulaires
+
+// États de validation des champs
+.form-control, .form-input {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  
+  &.is-valid {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    
+    &:focus {
+      border-color: #28a745;
+      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+  }
+  
+  &.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    
+    &:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+  }
+}
+
+// Messages d'erreur des champs
+.field-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+  animation: slideDown 0.3s ease-out;
+  
+  &:before {
+    content: "⚠ ";
+    font-size: 0.8rem;
+  }
+}
+
+// Animation d'apparition des erreurs
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Styles pour les alertes de validation
+.alert-validation {
+  border-radius: 8px;
+  border: 1px solid;
+  padding: 12px 16px;
+  margin-bottom: 1rem;
+  
+  &.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  
+  &.alert-success {
+    background-color: #d1eddb;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
+  
+  &.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+  }
+  
+  ul {
+    margin-bottom: 0;
+    padding-left: 1.2rem;
+  }
+  
+  li {
+    margin-bottom: 0.25rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Indicateurs de validation dans les groupes de champs
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+  
+  .validation-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 3;
+    
+    &.valid {
+      color: #28a745;
+    }
+    
+    &.invalid {
+      color: #dc3545;
+    }
+  }
+  
+  // Styles pour les labels
+  label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+    
+    &.required:after {
+      content: " *";
+      color: #dc3545;
+    }
+  }
+}
+
+// Styles pour les formulaires avec validation en temps réel
+.validated-form {
+  .form-group {
+    &.has-success {
+      .form-control {
+        border-color: #28a745;
+      }
+      
+      label {
+        color: #28a745;
+      }
+    }
+    
+    &.has-error {
+      .form-control {
+        border-color: #dc3545;
+      }
+      
+      label {
+        color: #dc3545;
+      }
+    }
+  }
+}
+
+// Responsive design pour les messages d'erreur
+@media (max-width: 768px) {
+  .field-error {
+    font-size: 0.8rem;
+  }
+  
+  .alert-validation {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+}
+
+// États de chargement pour la validation asynchrone
+.validating {
+  position: relative;
+  
+  &:after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: translateY(-50%) rotate(0deg); }
+  100% { transform: translateY(-50%) rotate(360deg); }
+}
+
+// Styles spécifiques pour Tailwind CSS
+@layer components {
+  .form-error {
+    @apply text-red-600 text-sm mt-1 block;
+  }
+  
+  .form-success {
+    @apply text-green-600 text-sm mt-1 block;
+  }
+  
+  .input-error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+  }
+  
+  .input-success {
+    @apply border-green-500 focus:border-green-500 focus:ring-green-500;
+  }
+}

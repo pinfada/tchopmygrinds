@@ -1,5 +1,6 @@
 class ProductsController < ApplicationController
   include ApiResponse
+  include EnhancedErrorHandling
   
   authorize_resource
   before_action :set_product, only: [:show, :edit, :update, :destroy]
@@ -10,36 +11,69 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.json
   def index
-    begin
+    with_logging do
       commerceid = params[:commerce_id]
       
       products_query = if commerceid.present? 
         @commerce = Commerce.find(commerceid)
+        log_business_event('PRODUCTS_FILTERED_BY_COMMERCE', { commerce_id: commerceid })
         @commerce.products
       else
         Product.all
       end
       
-      @products = products_query
+      # Utiliser la pagination avec curseur pour de meilleures performances
+      base_relation = products_query
         .includes(:commerces)
         .where("unitsinstock > 0")
-        .page(@page)
-        .per(@per_page)
-        .order(:nom)
       
-      render_paginated(@products, method(:serialize_product))
-    rescue ActiveRecord::RecordNotFound
-      render_not_found("Commerce")
-    rescue StandardError => e
-      Rails.logger.error "Error in products#index: #{e.message}"
-      render_error("Internal server error")
+      # Déterminer le type de pagination selon les paramètres
+      if use_cursor_pagination?
+        cursor_options = {
+          page_size: @per_page,
+          after: params[:after],
+          before: params[:before],
+          cursor_field: params[:sort_by]&.to_sym || :created_at,
+          direction: params[:sort_direction]&.to_sym || :desc
+        }
+        
+        result = paginate_with_cursor(base_relation, **cursor_options)
+        
+        # Sérialiser les données
+        result[:data] = result[:data].map { |product| serialize_product(product) }
+        
+        log_business_event('PRODUCTS_LISTED_CURSOR', { 
+          total_fetched: result[:data].size,
+          page_size: @per_page,
+          cursor_field: cursor_options[:cursor_field]
+        })
+        
+        render_cursor_paginated(result)
+      else
+        # Pagination classique pour compatibilité
+        @products = base_relation
+          .page(@page)
+          .per(@per_page)
+          .order(:nom)
+        
+        log_business_event('PRODUCTS_LISTED', { 
+          total_count: @products.total_count, 
+          page: @page, 
+          per_page: @per_page 
+        })
+        
+        render_paginated(@products, method(:serialize_product))
+      end
     end
   end
 
   # GET /products/1
   # GET /products/1.json
   def show
-    render_success(serialize_product(@product))
+    with_logging do
+      log_business_event('PRODUCT_VIEWED', { product_id: @product.id, product_name: @product.nom })
+      render_success(serialize_product(@product))
+    end
   end
 
   # GET /products/new
@@ -184,59 +218,122 @@ class ProductsController < ApplicationController
   end
 
   # GET /products/search_nearby
-  # NOUVELLE MÉTHODE : Recherche avancée de produits avec suggestions
+  # NOUVELLE MÉTHODE : Recherche avancée de produits avec suggestions et pagination optimisée
   def search_nearby
-    query = params[:q]
-    lat = params[:lat]&.to_f  
-    lng = params[:lng]&.to_f
-    radius = params[:radius]&.to_i || 25
-    limit = params[:limit]&.to_i || 50
-    
-    if query.blank?
-      # Retourner les produits populaires si pas de requête
-      popular_products = Product.joins(:orderdetails)
-                               .group(:nom)
-                               .order('COUNT(orderdetails.id) DESC')
-                               .limit(10)
-                               .pluck(:nom)
+    with_logging do
+      query = params[:q]
+      lat = params[:lat]&.to_f  
+      lng = params[:lng]&.to_f
+      radius = params[:radius]&.to_i || 25
       
-      render json: { suggestions: popular_products }, status: :ok
-      return
-    end
-    
-    # Recherche textuelle flexible
-    products = Product.where("LOWER(nom) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?)", 
-                            "%#{query}%", "%#{query}%")
-                     .where("unitsinstock > 0")
-                     .limit(limit)
-    
-    if lat && lng
-      # Recherche géolocalisée
-      results = []
+      if query.blank?
+        # Retourner les produits populaires si pas de requête
+        popular_products = Product.joins(:orderdetails)
+                                 .group(:nom)
+                                 .order('COUNT(orderdetails.id) DESC')
+                                 .limit(10)
+                                 .pluck(:nom)
+        
+        log_business_event('POPULAR_PRODUCTS_REQUESTED', { count: popular_products.size })
+        render_success({ suggestions: popular_products })
+        return
+      end
       
-      products.each do |product|
-        product.commerces.near([lat, lng], radius, units: :km).each do |commerce|
-          results << {
+      # Recherche textuelle flexible
+      base_relation = Product.where("LOWER(nom) LIKE LOWER(?) OR LOWER(description) LIKE LOWER(?)", 
+                              "%#{query}%", "%#{query}%")
+                       .where("unitsinstock > 0")
+      
+      if lat && lng
+        # Utiliser la pagination géospatiale optimisée
+        cursor_options = {
+          page_size: params[:page_size]&.to_i || 20,
+          after: params[:after],
+          before: params[:before]
+        }
+        
+        result = paginate_geospatial(
+          base_relation.joins(:commerces),
+          lat: lat,
+          lng: lng, 
+          radius: radius,
+          **cursor_options
+        )
+        
+        # Enrichir les données avec les informations de commerce
+        enriched_data = result[:data].map do |product|
+          # Trouver le commerce le plus proche pour ce produit
+          closest_commerce = product.commerces
+                                   .near([lat, lng], radius, units: :km)
+                                   .first
+          
+          {
             productId: product.id,
             productName: product.nom,
             productDescription: product.description,
             prix: product.unitprice,
             stock: product.unitsinstock,
+            quantite_par_unite: product.quantityperunit,
             
-            commerceId: commerce.id,
-            commerceName: commerce.nom,
-            ville: commerce.ville,
-            distance: commerce.distance_to([lat, lng]).round(2),
-            commerceType: commerce.user&.statut_type
+            commerceId: closest_commerce&.id,
+            commerceName: closest_commerce&.nom,
+            ville: closest_commerce&.ville,
+            distance: closest_commerce&.distance_to([lat, lng])&.round(2),
+            commerceType: closest_commerce&.user&.statut_type,
+            
+            searchQuery: query
           }
         end
+        
+        result[:data] = enriched_data
+        
+        log_business_event('PRODUCTS_SEARCH_GEOSPATIAL', { 
+          query: query, 
+          lat: lat, 
+          lng: lng, 
+          radius: radius,
+          results_count: enriched_data.size
+        })
+        
+        render_cursor_paginated(result)
+      else
+        # Recherche simple sans géolocalisation avec pagination curseur
+        cursor_options = {
+          page_size: params[:page_size]&.to_i || 20,
+          after: params[:after],
+          before: params[:before],
+          cursor_field: :created_at,
+          direction: :desc
+        }
+        
+        result = paginate_search(
+          base_relation,
+          query: query,
+          search_fields: ['nom', 'description'],
+          **cursor_options
+        )
+        
+        # Sérialiser avec informations basiques des commerces
+        result[:data] = result[:data].map do |product|
+          {
+            productId: product.id,
+            productName: product.nom,
+            productDescription: product.description,
+            prix: product.unitprice,
+            stock: product.unitsinstock,
+            quantite_par_unite: product.quantityperunit,
+            commerces: product.commerces.select(:id, :nom, :ville).limit(3).as_json(only: [:id, :nom, :ville]),
+            searchQuery: query
+          }
+        end
+        
+        log_business_event('PRODUCTS_SEARCH_TEXT', { 
+          query: query, 
+          results_count: result[:data].size 
+        })
+        
+        render_cursor_paginated(result)
       end
-      
-      results.sort_by! { |r| r[:distance] }
-      render json: results, status: :ok
-    else
-      # Recherche simple sans géolocalisation
-      render json: products.as_json(include: { commerces: { only: [:id, :nom, :ville] } }), status: :ok
     end
   end
 
@@ -256,6 +353,15 @@ class ProductsController < ApplicationController
     def set_pagination_params
       @page = params[:page]&.to_i || 1
       @per_page = [params[:per_page]&.to_i || 20, 100].min # Max 100 items per page
+    end
+    
+    # Détermine si on doit utiliser la pagination avec curseur
+    def use_cursor_pagination?
+      # Utiliser cursor si explicitement demandé ou pour de gros volumes
+      params[:cursor].present? || 
+      params[:after].present? || 
+      params[:before].present? ||
+      (@per_page > 50) # Pour de grandes pages, utiliser curseur
     end
     
     def serialize_product(product)

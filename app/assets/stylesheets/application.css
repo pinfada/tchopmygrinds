@@ -4,6 +4,8 @@
  *
  *= require_self
  *= require components/simple_searchbox
+ *= require components/form_validation
+ *= require components/notifications
  */
 
 /* Styles spécifiques à l'application qui ne sont pas dans Tailwind */

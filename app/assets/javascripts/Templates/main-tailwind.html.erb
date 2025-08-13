@@ -425,7 +425,7 @@
                       </h3>
                       <div class="flex items-center text-gray-600 text-sm mb-2">
                         <span class="mr-1">📍</span>
-                        <span>{{result.ville}} • </span>
+                        <span>{{result.ville}} &bull; </span>
                         <span class="font-medium text-primary-600 ml-1">{{result.distance | number:1}} km</span>
                       </div>
                       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium" 
@@ -442,10 +442,10 @@
                     </div>
                     <div class="flex items-center justify-end">
                       <span ng-if="result.stock > 0" class="badge badge-success">
-                        ✅ {{result.stock}} dispo
+                        &#x2713; {{result.stock}} dispo
                       </span>
                       <span ng-if="result.stock === 0" class="badge badge-danger">
-                        ❌ Rupture
+                        &#x2717; Rupture
                       </span>
                     </div>
                   </div>

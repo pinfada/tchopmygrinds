@@ -1,5 +1,6 @@
 class CommercesController < ApplicationController
   include ApiResponse
+  include EnhancedErrorHandling
   
   authorize_resource
   before_action :set_commerce, only: [:show, :edit, :update, :destroy]
@@ -91,50 +92,57 @@ class CommercesController < ApplicationController
   end
 
   # GET /commerces/listcommerce
-  # Récupération de la liste des commerces dans un rayon donné
+  # Récupération de la liste des commerces dans un rayon donné (avec cache)
   # Paramètres: lat_query, lng_query, radius (optionnel, défaut: 50km)
   def listcommerce
-    lat_name = params[:lat_query]&.to_f
-    lng_name = params[:lng_query]&.to_f
-    radius = params[:radius]&.to_i || 50
-    
-    if lat_name.blank? || lng_name.blank?
-      return render_error("Paramètres manquants: lat_query et lng_query requis")
-    end
-    
-    begin
-      commerces_query = Commerce
-        .includes(:user, :categorizations, :products)
-        .near([lat_name, lng_name], radius, units: :km)
+    with_logging do
+      lat_name = params[:lat_query]&.to_f
+      lng_name = params[:lng_query]&.to_f
+      radius = params[:radius]&.to_i || 50
       
-      @commerces = commerces_query
-        .page(@page)
-        .per(@per_page)
-      
-      # Sérialisation avec données de géolocalisation
-      serialized_data = @commerces.map do |commerce|
-        {
-          id: commerce.id,
-          nom: commerce.nom,
-          adresse1: commerce.adresse1,
-          ville: commerce.ville,
-          latitude: commerce.latitude,
-          longitude: commerce.longitude,
-          distance: commerce.distance_to([lat_name, lng_name]).round(2),
-          products_count: commerce.products.count,
-          user_type: commerce.user&.statut_type,
-          categories: commerce.categorizations.pluck(:name)
-        }
+      if lat_name.blank? || lng_name.blank?
+        return render_error("Paramètres manquants: lat_query et lng_query requis")
       end
       
-      render_paginated(
-        @commerces,
-        -> (commerce) { serialized_data.find { |s| s[:id] == commerce.id } },
-        { search_coordinates: { lat: lat_name, lng: lng_name, radius: radius } }
+      # Filtres optionnels
+      filters = {
+        commerce_type: params[:commerce_type],
+        categories: params[:categories],
+        has_products: params[:has_products].present?
+      }.compact
+      
+      # Utiliser le cache géolocalisé
+      cache_result = GeoCacheService.instance.cached_commerces_near(
+        lat_name, lng_name, radius, filters
       )
-    rescue StandardError => e
-      Rails.logger.error "Error in listcommerce: #{e.message}"
-      render_error("Erreur lors de la recherche géolocalisée")
+      
+      # Appliquer la pagination sur les résultats cachés
+      total_results = cache_result[:results]
+      paginated_results = Kaminari.paginate_array(total_results, total_count: total_results.length)
+                                 .page(@page)
+                                 .per(@per_page)
+      
+      log_business_event('COMMERCES_GEOLOCATED', {
+        coordinates: { lat: lat_name, lng: lng_name },
+        radius_km: radius,
+        filters_applied: filters,
+        results_count: total_results.length,
+        from_cache: cache_result[:cached_at].present?
+      })
+      
+      render_success(paginated_results, nil, :ok, {
+        pagination: {
+          current_page: paginated_results.current_page,
+          per_page: paginated_results.limit_value,
+          total_pages: paginated_results.total_pages,
+          total_count: total_results.length
+        },
+        search_coordinates: { lat: lat_name, lng: lng_name, radius: radius },
+        cache_info: {
+          cached_at: cache_result[:cached_at],
+          ttl: cache_result[:ttl]
+        }
+      })
     end
   end
 

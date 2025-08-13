@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html ng-app="marketApp">
+<head>
+    <title>Test des Améliorations - TchopMyGrinds</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+    <script src="/assets/application.js"></script>
+    <link rel="stylesheet" href="/assets/application.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <notification-container position="top-right"></notification-container>
+    
+    <div ng-controller="TestController" class="container mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="mb-4">🚀 Test des Améliorations TchopMyGrinds</h1>
+                
+                <!-- Section Notifications -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fa fa-bell"></i> Système de Notifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-success w-100" ng-click="showSuccessNotification()">
+                                    <i class="fa fa-check"></i> Succès
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-danger w-100" ng-click="showErrorNotification()">
+                                    <i class="fa fa-exclamation"></i> Erreur
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-warning w-100" ng-click="showWarningNotification()">
+                                    <i class="fa fa-warning"></i> Avertissement
+                                </button>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <button class="btn btn-info w-100" ng-click="showInfoNotification()">
+                                    <i class="fa fa-info"></i> Info
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-primary w-100" ng-click="showConfirmDialog()">
+                                    <i class="fa fa-question"></i> Dialogue de Confirmation
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-secondary w-100" ng-click="showProgressNotification()">
+                                    <i class="fa fa-spinner"></i> Progression
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Validation -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fa fa-check-square"></i> Système de Validation</h5>
+                    </div>
+                    <div class="card-body">
+                        <form name="testForm" class="validated-form" novalidate>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="required">Nom du produit</label>
+                                        <input type="text" 
+                                               class="form-control"
+                                               ng-model="testProduct.nom"
+                                               field-validator="validationRules.nom"
+                                               validation-name="nom"
+                                               placeholder="Ex: Banane plantain">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="required">Prix unitaire</label>
+                                        <input type="number" 
+                                               class="form-control"
+                                               ng-model="testProduct.unitprice"
+                                               field-validator="validationRules.unitprice"
+                                               validation-name="unitprice"
+                                               placeholder="Ex: 2500">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="required">Stock disponible</label>
+                                        <input type="number" 
+                                               class="form-control"
+                                               ng-model="testProduct.unitsinstock"
+                                               field-validator="validationRules.unitsinstock"
+                                               validation-name="unitsinstock"
+                                               placeholder="Ex: 50">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label>Quantité par unité</label>
+                                        <input type="text" 
+                                               class="form-control"
+                                               ng-model="testProduct.quantityperunit"
+                                               field-validator="validationRules.quantityperunit"
+                                               validation-name="quantityperunit"
+                                               placeholder="Ex: 1 kg">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button type="button" class="btn btn-primary" ng-click="validateProduct()">
+                                <i class="fa fa-check"></i> Valider le Produit
+                            </button>
+                            
+                            <div ng-if="validationResult" class="mt-3">
+                                <div class="alert" ng-class="validationResult.valid ? 'alert-success' : 'alert-danger'">
+                                    <strong>{{validationResult.valid ? 'Validation réussie !' : 'Erreurs de validation :'}}</strong>
+                                    <ul ng-if="!validationResult.valid" class="mt-2 mb-0">
+                                        <li ng-repeat="error in validationResult.errors">{{error.message}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Section Recherche -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fa fa-search"></i> Recherche Améliorée</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <simple-searchbox ng-model="searchParams"
+                                                 parameters="availableProducts"
+                                                 placeholder="Rechercher un produit...">
+                                </simple-searchbox>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-primary w-100" ng-click="performSearch()">
+                                    <i class="fa fa-search"></i> Rechercher
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div ng-if="searchParams.length" class="mt-3">
+                            <h6>Paramètres sélectionnés :</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span ng-repeat="param in searchParams" class="badge bg-primary">
+                                    {{param.name}}: {{param.value}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Test API -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fa fa-server"></i> Test API avec Cache</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label>Latitude</label>
+                                    <input type="number" 
+                                           class="form-control"
+                                           ng-model="geoParams.lat"
+                                           placeholder="Ex: 3.848">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label>Longitude</label>
+                                    <input type="number" 
+                                           class="form-control"
+                                           ng-model="geoParams.lng"
+                                           placeholder="Ex: 11.502">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group mb-3">
+                                    <label>Rayon (km)</label>
+                                    <input type="number" 
+                                           class="form-control"
+                                           ng-model="geoParams.radius"
+                                           placeholder="Ex: 25">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-success w-100" ng-click="testGeoAPI()" ng-disabled="isLoading">
+                                    <i class="fa" ng-class="isLoading ? 'fa-spinner fa-spin' : 'fa-map-marker'"></i>
+                                    {{isLoading ? 'Recherche...' : 'Test Géolocalisation'}}
+                                </button>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-info w-100" ng-click="getCurrentPosition()">
+                                    <i class="fa fa-crosshairs"></i> Ma Position
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div ng-if="geoResults" class="mt-3">
+                            <div class="alert alert-info">
+                                <strong>Résultats :</strong> {{geoResults.total_count}} commerces trouvés
+                                <span ng-if="geoResults.from_cache">(données du cache)</span>
+                                <br>
+                                <small>Recherche effectuée en {{geoResults.duration || '?'}}ms</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Statistiques -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fa fa-chart-bar"></i> Statistiques en Temps Réel</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <h4 class="text-primary">{{stats.notifications}}</h4>
+                                    <small>Notifications envoyées</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <h4 class="text-success">{{stats.validations}}</h4>
+                                    <small>Validations effectuées</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <h4 class="text-info">{{stats.searches}}</h4>
+                                    <small>Recherches lancées</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3">
+                                    <h4 class="text-warning">{{stats.apiCalls}}</h4>
+                                    <small>Appels API</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        angular.module('marketApp').controller('TestController', [
+            '$scope', 'NotificationService', 'ValidationService', 'FormValidationService', '$http', '$timeout',
+            function($scope, NotificationService, ValidationService, FormValidationService, $http, $timeout) {
+                
+                // Initialisation
+                $scope.testProduct = {};
+                $scope.searchParams = [];
+                $scope.geoParams = { lat: 3.848, lng: 11.502, radius: 25 };
+                $scope.validationResult = null;
+                $scope.geoResults = null;
+                $scope.isLoading = false;
+                
+                // Statistiques
+                $scope.stats = {
+                    notifications: 0,
+                    validations: 0,
+                    searches: 0,
+                    apiCalls: 0
+                };
+                
+                // Règles de validation
+                $scope.validationRules = ValidationService.schemas.product;
+                
+                // Produits disponibles pour la recherche
+                $scope.availableProducts = [
+                    { name: 'Banane plantain', type: 'product', value: 'banane' },
+                    { name: 'Tomate', type: 'product', value: 'tomate' },
+                    { name: 'Oignon', type: 'product', value: 'oignon' },
+                    { name: 'Carotte', type: 'product', value: 'carotte' },
+                    { name: 'Pomme de terre', type: 'product', value: 'pomme_terre' },
+                    { name: 'Haricot vert', type: 'product', value: 'haricot' }
+                ];
+                
+                // Tests de notifications
+                $scope.showSuccessNotification = function() {
+                    NotificationService.success('Opération réussie avec succès !');
+                    $scope.stats.notifications++;
+                };
+                
+                $scope.showErrorNotification = function() {
+                    NotificationService.error('Une erreur est survenue lors du traitement.');
+                    $scope.stats.notifications++;
+                };
+                
+                $scope.showWarningNotification = function() {
+                    NotificationService.warning('Attention : cette action est irréversible.');
+                    $scope.stats.notifications++;
+                };
+                
+                $scope.showInfoNotification = function() {
+                    NotificationService.info('Information : le système sera maintenu ce soir.');
+                    $scope.stats.notifications++;
+                };
+                
+                $scope.showConfirmDialog = function() {
+                    NotificationService.confirm(
+                        'Êtes-vous sûr de vouloir supprimer cet élément ?',
+                        function() {
+                            NotificationService.success('Élément supprimé !');
+                        },
+                        function() {
+                            NotificationService.info('Suppression annulée.');
+                        }
+                    );
+                    $scope.stats.notifications++;
+                };
+                
+                $scope.showProgressNotification = function() {
+                    var progress = 0;
+                    var progressInterval = setInterval(function() {
+                        progress += 20;
+                        NotificationService.progress('Traitement en cours...', progress);
+                        
+                        if (progress >= 100) {
+                            clearInterval(progressInterval);
+                            $timeout(function() {
+                                NotificationService.success('Traitement terminé !');
+                            }, 500);
+                        }
+                    }, 500);
+                    $scope.stats.notifications++;
+                };
+                
+                // Test de validation
+                $scope.validateProduct = function() {
+                    $scope.validationResult = ValidationService.validateProduct($scope.testProduct);
+                    $scope.stats.validations++;
+                    
+                    if ($scope.validationResult.valid) {
+                        NotificationService.success('Produit validé avec succès !');
+                    } else {
+                        NotificationService.validationError($scope.validationResult.errors);
+                    }
+                };
+                
+                // Test de recherche
+                $scope.performSearch = function() {
+                    if ($scope.searchParams.length === 0) {
+                        NotificationService.warning('Veuillez sélectionner au moins un produit à rechercher.');
+                        return;
+                    }
+                    
+                    NotificationService.info('Recherche lancée pour ' + $scope.searchParams.length + ' produit(s).');
+                    $scope.stats.searches++;
+                };
+                
+                // Test API géolocalisation
+                $scope.testGeoAPI = function() {
+                    if (!$scope.geoParams.lat || !$scope.geoParams.lng) {
+                        NotificationService.error('Veuillez saisir des coordonnées valides.');
+                        return;
+                    }
+                    
+                    $scope.isLoading = true;
+                    $scope.stats.apiCalls++;
+                    
+                    var startTime = Date.now();
+                    
+                    // Simuler un appel API
+                    $timeout(function() {
+                        var duration = Date.now() - startTime;
+                        
+                        $scope.geoResults = {
+                            total_count: Math.floor(Math.random() * 20) + 1,
+                            from_cache: Math.random() > 0.5,
+                            duration: duration
+                        };
+                        
+                        $scope.isLoading = false;
+                        
+                        NotificationService.success('Recherche géolocalisée terminée !');
+                    }, 1000 + Math.random() * 2000);
+                };
+                
+                // Obtenir la position actuelle
+                $scope.getCurrentPosition = function() {
+                    if (!navigator.geolocation) {
+                        NotificationService.error('La géolocalisation n\'est pas supportée par ce navigateur.');
+                        return;
+                    }
+                    
+                    NotificationService.info('Obtention de votre position...');
+                    
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            $scope.$apply(function() {
+                                $scope.geoParams.lat = position.coords.latitude;
+                                $scope.geoParams.lng = position.coords.longitude;
+                                NotificationService.success('Position obtenue avec succès !');
+                            });
+                        },
+                        function(error) {
+                            $scope.$apply(function() {
+                                NotificationService.geolocationError(error);
+                            });
+                        }
+                    );
+                };
+            }
+        ]);
+    </script>
+</body>
+</html>

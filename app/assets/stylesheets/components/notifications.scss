@@ -1,0 +1,366 @@
+// Styles pour le système de notifications
+
+// Conteneur principal des notifications
+.notification-container {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 420px;
+  width: 100%;
+  
+  // Positions du conteneur
+  &.position-top-right {
+    top: 20px;
+    right: 20px;
+  }
+  
+  &.position-top-left {
+    top: 20px;
+    left: 20px;
+  }
+  
+  &.position-bottom-right {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  &.position-bottom-left {
+    bottom: 20px;
+    left: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    left: 10px;
+    right: 10px;
+    max-width: none;
+    
+    &.position-top-left,
+    &.position-top-right {
+      top: 10px;
+    }
+    
+    &.position-bottom-left,
+    &.position-bottom-right {
+      bottom: 10px;
+    }
+  }
+}
+
+// Élément de notification individuel
+.notification-item {
+  pointer-events: auto;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  position: relative;
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+  
+  // Animations
+  &.notification-entering {
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  &.notification-hiding {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  
+  // Types de notifications
+  &.alert-success {
+    background-color: #d1f2eb;
+    border-left: 4px solid #28a745;
+    
+    .notification-icon {
+      color: #28a745;
+    }
+  }
+  
+  &.alert-danger {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    
+    .notification-icon {
+      color: #dc3545;
+    }
+  }
+  
+  &.alert-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    
+    .notification-icon {
+      color: #856404;
+    }
+  }
+  
+  &.alert-info {
+    background-color: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+    
+    .notification-icon {
+      color: #17a2b8;
+    }
+  }
+}
+
+// Contenu de la notification
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  background-color: white;
+  position: relative;
+}
+
+// Icône de la notification
+.notification-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+// Corps du message
+.notification-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-message {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  margin-bottom: 8px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Barre de progression
+.notification-progress {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+  
+  .progress-bar {
+    height: 100%;
+    background-color: #007bff;
+    transition: width 0.3s ease;
+    border-radius: 2px;
+  }
+}
+
+// Actions de la notification
+.notification-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  
+  .btn {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &.btn-primary {
+      background-color: #007bff;
+      color: white;
+      
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+    
+    &.btn-secondary {
+      background-color: #6c757d;
+      color: white;
+      
+      &:hover {
+        background-color: #545b62;
+      }
+    }
+  }
+}
+
+// Bouton de fermeture
+.notification-close {
+  margin-left: 8px;
+  
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s ease;
+    
+    &:hover {
+      color: #666;
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  }
+}
+
+// Timer visuel
+.notification-timer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: rgba(0, 0, 0, 0.2);
+  animation: timerCountdown linear;
+  transform-origin: left;
+  
+  &.timer-success {
+    background-color: #28a745;
+  }
+  
+  &.timer-error {
+    background-color: #dc3545;
+  }
+  
+  &.timer-warning {
+    background-color: #ffc107;
+  }
+  
+  &.timer-info {
+    background-color: #17a2b8;
+  }
+}
+
+// Animations
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes timerCountdown {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+// Toasts (notifications légères)
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 14px;
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+  
+  &.toast-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+  
+  .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .toast-message {
+    font-weight: 500;
+  }
+  
+  // Types de toasts
+  &.toast-success {
+    background-color: rgba(40, 167, 69, 0.9);
+  }
+  
+  &.toast-error {
+    background-color: rgba(220, 53, 69, 0.9);
+  }
+  
+  &.toast-warning {
+    background-color: rgba(255, 193, 7, 0.9);
+    color: #333;
+  }
+  
+  &.toast-info {
+    background-color: rgba(23, 162, 184, 0.9);
+  }
+}
+
+// Responsive
+@media (max-width: 480px) {
+  .notification-item {
+    margin-bottom: 8px;
+  }
+  
+  .notification-content {
+    padding: 12px;
+  }
+  
+  .notification-message {
+    font-size: 13px;
+  }
+  
+  .notification-actions {
+    margin-top: 8px;
+    
+    .btn {
+      font-size: 11px;
+      padding: 3px 8px;
+    }
+  }
+  
+  .toast-notification {
+    left: 10px;
+    right: 10px;
+    transform: translateX(0) translateY(100px);
+    
+    &.toast-visible {
+      transform: translateX(0) translateY(0);
+    }
+  }
+}
+
+// Intégration avec Tailwind CSS
+@layer components {
+  .notification-success {
+    @apply bg-green-50 border-l-4 border-green-400 text-green-700;
+  }
+  
+  .notification-error {
+    @apply bg-red-50 border-l-4 border-red-400 text-red-700;
+  }
+  
+  .notification-warning {
+    @apply bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700;
+  }
+  
+  .notification-info {
+    @apply bg-blue-50 border-l-4 border-blue-400 text-blue-700;
+  }
+}
