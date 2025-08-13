@@ -5,8 +5,13 @@
 		'templates', 
 		'ui.bootstrap', 
 		'rails', 
+		'nemLogging',
 		'ui-leaflet',
-		'angularTrix'
+		'Devise',
+		'ngCart',
+		'angularTrix',
+		'ngGeolocation',
+		'angular.filter'
 	];
 	var marketApp = angular.module('marketApp', modules);
 
@@ -31,12 +36,12 @@
 		// Fonction helper temporaire pour obtenir les URLs de templates
 		function getTemplateUrl(templateName) {
 			var templates = {
-				main: "<%= asset_path('Templates/main.html') %>",
-				header: "<%= asset_path('Templates/header.html') %>",
-				fail: "<%= asset_path('Templates/fail.html') %>",
-				cart: "<%= asset_path('Templates/cart.html') %>",
-				checkout: "<%= asset_path('Templates/checkout.html') %>",
-				merchantInterests: "<%= asset_path('Templates/merchant_interests.html') %>"
+				main: "/assets/Templates/main-6c120c7d674b7e66d3f03b454bccb6fb142ec4d7fbda48ac5b9bb26e64aff9c8.html",
+				header: "/assets/Templates/header-3742d18d17237cfa1d6f4145b86392be35c88e1f01a6e1a1c343f080cfa4786e.html",
+				fail: "/assets/Templates/fail-bfddade570795ec527e413f56261920bf04541a444b4a66c7c773736e56b9e2c.html",
+				cart: "/assets/Templates/cart-76c7ebff0572d88c686da2af13740528b8c188016b0398756a231a0dfec69d15.html",
+				checkout: "/assets/Templates/checkout-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855.html",
+				merchantInterests: "/assets/Templates/merchant_interests-2a6d991b7ca5a21846c9c41e4689efc2beb62d09eb5899c26ff930f53b72937e.html"
 			};
 			return templates[templateName] || '';
 		}

@@ -2,18 +2,18 @@ source 'https://rubygems.org'
 
 #ruby "2.7.4"
 gem 'rails', '~> 6.0'
-gem 'puma'
+gem 'puma', '~> 6.4'
 gem 'rack'
 gem 'rack-cors'
 
 # Rails defaults
 gem 'sass-rails', '~> 5.0'
-gem 'uglifier', '>= 1.3.0'
+gem 'terser'
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails'
 gem 'turbolinks', '~> 5'
 gem 'jbuilder', '~> 2.5'
-gem 'pg'
+gem 'pg', '~> 1.5'
 group :development, :test do
   gem 'byebug', platform: :mri
 end
@@ -30,7 +30,7 @@ gem 'bootsnap', require: false
 gem 'bootstrap-sass'
 gem 'tailwindcss-rails', '~> 2.0'
 gem 'gibbon'
-gem 'bower-rails'
+# gem 'bower-rails' # REMOVED: Bower obsolète depuis 2017
 gem 'leaflet-rails', '~> 1.0', '>= 1.0.2'
 gem 'angularjs-rails', '~> 1.6', '>= 1.6.1'
 gem 'angularjs-rails-resource', '~> 2.2', '>= 2.2.2'
@@ -48,24 +48,25 @@ gem "responders"
 gem 'sprockets'
 #gem 'sprockets', '~> 3.5', '>= 3.5.2'
 #gem 'sprockets-rails', :require => 'sprockets/railtie'
-gem 'geocoder', '~> 1.4', '>= 1.4.1'
+gem 'geocoder', '~> 1.8'
 gem 'faker'
-gem 'devise'
-gem 'cancancan', '~> 2.0'
+gem 'devise', '~> 4.9'
+gem 'cancancan', '~> 3.5'
 gem 'rails_admin'
 gem 'activerecord-reset-pk-sequence'
-gem 'database_cleaner', '~> 1.4.0'
+gem 'database_cleaner-active_record'
 gem 'sendgrid'
 gem 'sendgrid-ruby'
 gem "figaro"
 gem 'letter_opener_web'
 
-source "https://rails-assets.org" do
-  gem "rails-assets-angular-devise"
-  gem "rails-assets-moment"
-  gem 'rails-assets-ngGeolocation'
-  gem 'rails-assets-ng-cart'
-end
+# source "https://rails-assets.org" do
+#   gem "rails-assets-angular-devise"
+#   gem "rails-assets-moment"
+#   gem 'rails-assets-ngGeolocation'
+#   gem 'rails-assets-ng-cart'
+# end
+# REMOVED: rails-assets.org non fiable, remplacé par npm packages
 
 group :development do
   gem 'better_errors'

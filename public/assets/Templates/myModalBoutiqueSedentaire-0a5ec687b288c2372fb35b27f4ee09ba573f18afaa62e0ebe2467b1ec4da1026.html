@@ -1,0 +1,24 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Boutiques</h3>
+    <button type="button" class="close" aria-label="Fermer" ng-click="$dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+	<div class="input-group mb-0">
+	  <div class="input-group-prepend">
+	    <label class="input-group-text" for="inputGroupSelect01">Select number of shops to display</label>
+	  </div>
+	  <select ng-model="selectedItem" ng-options="item for item in commerceaffiche" ng-change="affichage(selectedItem)"></select>
+	</div>
+</div>
+<div class="modal-body" id="modal-body">
+	<p>Elément sélectionné : {{selectedItem}}</p>
+	<label for="boutiqueSelect"> Select your store on the list below</label><br>
+	<select name="boutiqueSelect" id="multipleSelect" ng-model="data.boutiqueSelect" multiple="">
+	  <option value="">---Please select---</option> <!-- not selected / blank option -->
+	  <option ng-repeat="x in boutiques" value="{{x}}">{{x.name}}</option>
+	</select><br>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" ng-click="cancel()">Annuler</button>
+    <button type="submit" class="btn btn-primary" ng-click="submit(data)">Valider</button>
+</div>

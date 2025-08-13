@@ -1,0 +1,295 @@
+<!-- Modern TchopMyGrinds Interface - Mobile First Design -->
+<div class="app-layout">
+  <!-- Modern Header -->
+  <header class="app-header">
+    <div class="modern-header">
+      <a href="#" class="logo">
+        <span class="logo-icon">🍌</span>
+        <span>TchopMyGrinds</span>
+      </a>
+      
+      <div class="header-actions">
+        <!-- User Profile -->
+        <button class="btn btn-icon btn-secondary" ng-click="toggleProfile()">
+          <span>👤</span>
+        </button>
+        
+        <!-- Cart -->
+        <button class="btn btn-icon btn-primary" ng-click="openCart()">
+          <span>🛒</span>
+          <span class="badge" ng-if="cartItemsCount > 0">{{cartItemsCount}}</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Hero Search Section -->
+    <div class="hero-search">
+      <div class="search-container">
+        <h1 class="hero-title">
+          Trouvez la meilleure <strong>banane plantain</strong> près de vous
+        </h1>
+        <p class="hero-subtitle">
+          Découvrez les vendeurs locaux et commandez vos produits frais en quelques clics
+        </p>
+        
+        <!-- Modern Search Form -->
+        <form class="search-form" ng-submit="searchProductNearby()">
+          <div class="search-input-group">
+            <input type="text" 
+                   ng-model="searchQuery" 
+                   class="search-input" 
+                   placeholder="Que cherchez-vous ? (banane plantain, tomate, pain...)"
+                   autocomplete="off">
+            
+            <!-- Search Suggestions -->
+            <div class="search-suggestions" ng-if="showSuggestions && suggestions.length">
+              <div class="suggestion-item" 
+                   ng-repeat="suggestion in suggestions track by $index"
+                   ng-class="{'active': selectedSuggestionIndex === $index}"
+                   ng-click="selectSuggestion(suggestion)">
+                <span class="suggestion-icon">🔍</span>
+                {{suggestion}}
+              </div>
+            </div>
+          </div>
+          
+          <!-- Radius Selector -->
+          <div class="radius-selector">
+            <select ng-model="searchRadius" class="radius-select">
+              <option value="5">5 km</option>
+              <option value="15">15 km</option>
+              <option value="25">25 km</option>
+              <option value="50">50 km</option>
+            </select>
+          </div>
+          
+          <!-- Search Button -->
+          <button type="submit" 
+                  class="btn btn-primary btn-lg"
+                  ng-disabled="!searchQuery || isSearching">
+            <span ng-if="!isSearching">🔍</span>
+            <span ng-if="isSearching" class="spinner">&#x27F3;</span>
+            <span ng-if="!isSearching">Chercher</span>
+            <span ng-if="isSearching">Recherche...</span>
+          </button>
+          
+          <!-- Location Button -->
+          <button type="button" 
+                  class="btn btn-secondary btn-icon"
+                  ng-click="getCurrentLocation()"
+                  title="Ma position">
+            📍
+          </button>
+        </form>
+        
+        <!-- Popular Suggestions -->
+        <div class="popular-suggestions" ng-if="!searchQuery && !searchResults.length">
+          <p class="suggestions-label">Suggestions populaires :</p>
+          <div class="suggestion-chips">
+            <button class="chip" 
+                    ng-repeat="suggestion in popularProducts" 
+                    ng-click="searchQuery = suggestion; searchProductNearby()">
+              {{suggestion}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results-section" ng-if="hasSearched">
+      <!-- No Results -->
+      <div class="no-results-card" ng-if="noResults">
+        <div class="no-results-icon">😔</div>
+        <h3>Aucun vendeur trouvé</h3>
+        <p>Nous n'avons trouvé aucun vendeur de "<strong>{{searchQuery}}</strong>" dans un rayon de {{searchRadius}}km.</p>
+        
+        <!-- Interest Manifestation -->
+        <div class="interest-section">
+          <button class="btn btn-primary btn-lg" ng-click="showInterestModal()">
+            <span>🔔</span>
+            Manifester mon intérêt
+          </button>
+          <p class="interest-help">
+            Nous vous alerterons dès qu'un vendeur sera disponible dans votre zone
+          </p>
+        </div>
+        
+        <!-- Alternative Suggestions -->
+        <div class="alternatives" ng-if="alternativeProducts.length">
+          <p class="alternatives-label">Produits similaires disponibles :</p>
+          <div class="alternative-chips">
+            <button class="chip chip-outline" 
+                    ng-repeat="alt in alternativeProducts" 
+                    ng-click="searchQuery = alt; searchProductNearby()">
+              {{alt}}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Results Found -->
+      <div class="results-container" ng-if="searchResults.length">
+        <!-- Results Header -->
+        <div class="results-header">
+          <h2>
+            <span class="results-count">{{searchResults.length}}</span>
+            vendeur{{searchResults.length > 1 ? 's' : ''}} trouvé{{searchResults.length > 1 ? 's' : ''}}
+          </h2>
+          <p class="results-subtitle">
+            Pour "<strong>{{searchQuery}}</strong>" dans un rayon de {{searchRadius}}km
+          </p>
+          
+          <!-- View Toggle -->
+          <div class="view-toggle">
+            <button class="toggle-btn" 
+                    ng-class="{'active': viewMode === 'list'}" 
+                    ng-click="setViewMode('list')">
+              <span>📋</span> Liste
+            </button>
+            <button class="toggle-btn" 
+                    ng-class="{'active': viewMode === 'map'}" 
+                    ng-click="setViewMode('map')">
+              <span>🗺️</span> Carte
+            </button>
+          </div>
+        </div>
+        
+        <!-- List View -->
+        <div class="results-list" ng-if="viewMode === 'list'">
+          <div class="merchant-card" 
+               ng-repeat="result in searchResults | orderBy:'distance' track by result.id"
+               ng-click="selectMerchant(result)">
+            
+            <div class="merchant-header">
+              <div class="merchant-info">
+                <div class="merchant-icon">
+                  <span ng-if="result.commerceType === 'sedentary'">🏪</span>
+                  <span ng-if="result.commerceType === 'itinerant'">🚐</span>
+                </div>
+                <div class="merchant-details">
+                  <h3 class="merchant-name">{{result.commerceName}}</h3>
+                  <p class="merchant-location">
+                    &#x1F4CD; {{result.ville}} &bull; <strong>{{result.distance | number:1}} km</strong>
+                  </p>
+                  <div class="merchant-type">
+                    {{result.commerceType === 'itinerant' ? 'Ambulant' : 'Commerce fixe'}}
+                  </div>
+                </div>
+              </div>
+              
+              <div class="merchant-status">
+                <div class="price">{{result.prix | currency:'FCFA '}}</div>
+                <div class="stock" ng-class="{'in-stock': result.stock > 0, 'out-of-stock': result.stock === 0}">
+                  <span ng-if="result.stock > 0">&#x2713; {{result.stock}} disponible{{result.stock > 1 ? 's' : ''}}</span>
+                  <span ng-if="result.stock === 0">&#x2717; Rupture de stock</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="merchant-actions">
+              <button class="btn btn-primary" 
+                      ng-if="result.stock > 0"
+                      ng-click="addToCartFromSearch(result); $event.stopPropagation()">
+                🛒 Ajouter au panier
+              </button>
+              
+              <button class="btn btn-outline" 
+                      ng-if="result.stock === 0"
+                      ng-click="notifyWhenAvailable(result); $event.stopPropagation()">
+                🔔 M'alerter
+              </button>
+              
+              <button class="btn btn-secondary" 
+                      ng-click="viewMerchantDetails(result); $event.stopPropagation()">
+                👁️ Détails
+              </button>
+            </div>
+            
+            <!-- Quick Preview -->
+            <div class="merchant-preview" ng-if="result.otherProducts.length">
+              <p class="preview-label">Autres produits disponibles :</p>
+              <div class="preview-products">
+                <span class="product-tag" ng-repeat="product in result.otherProducts | limitTo:3">
+                  {{product}}
+                </span>
+                <span class="more-products" ng-if="result.otherProducts.length > 3">
+                  +{{result.otherProducts.length - 3}} autres
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Map View -->
+    <div class="map-section" ng-show="!hasSearched || viewMode === 'map'">
+      <div id="modernMap" class="map-container"></div>
+      
+      <!-- Map Overlay Info -->
+      <div class="map-overlay" ng-if="!hasSearched">
+        <div class="map-overlay-content">
+          <h3>🗺️ Explorez votre région</h3>
+          <p>Découvrez les vendeurs autour de vous</p>
+          <button class="btn btn-primary" ng-click="getCurrentLocation()">
+            📍 Ma position
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab" 
+            ng-click="quickSearch()"
+            ng-if="!hasSearched">
+      <span>🔍</span>
+    </button>
+  </main>
+</div>
+
+<!-- Interest Manifestation Modal -->
+<div class="modal" ng-class="{'active': showInterestForm}">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Manifester votre intérêt</h3>
+      <button class="modal-close" ng-click="hideInterestModal()">&#x2715;</button>
+    </div>
+    
+    <div class="modal-body">
+      <p>Nous vous alerterons dès qu'un vendeur de <strong>"{{searchQuery}}"</strong> sera disponible dans votre zone.</p>
+      
+      <div class="form-group">
+        <label>Message personnel (optionnel)</label>
+        <textarea ng-model="interestMessage" 
+                  class="form-control" 
+                  placeholder="Ex: Je recherche des bananes plantain très mûres pour faire du alloco..."
+                  rows="3"></textarea>
+      </div>
+      
+      <div class="interest-summary">
+        <div class="summary-item">
+          <strong>Produit :</strong> {{searchQuery}}
+        </div>
+        <div class="summary-item">
+          <strong>Zone de recherche :</strong> {{searchRadius}}km autour de votre position
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" ng-click="hideInterestModal()">
+        Annuler
+      </button>
+      <button class="btn btn-primary" 
+              ng-click="submitInterest()"
+              ng-disabled="isSubmittingInterest">
+        <span ng-if="!isSubmittingInterest">🔔 Confirmer mon intérêt</span>
+        <span ng-if="isSubmittingInterest">&#x23F3; Envoi en cours...</span>
+      </button>
+    </div>
+  </div>
+</div>

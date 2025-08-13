@@ -1,0 +1,201 @@
+<!-- Interface pour les marchands - Voir les demandes de produits -->
+<div class="container-fluid" style="padding: 20px;">
+    <div class="row">
+        <div class="col-md-12">
+            <h2><i class="fa fa-bell"></i> Demandes de produits dans votre zone</h2>
+            <p class="text-muted">
+                Découvrez quels produits vos clients potentiels recherchent près de vos commerces.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Contrôles et filtres -->
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-md-6">
+            <button class="btn btn-primary" ng-click="loadMerchantInterests()">
+                <i class="fa fa-refresh" ng-class="{'fa-spin': loadingInterests}"></i>
+                Actualiser
+            </button>
+            
+            <div class="btn-group" style="margin-left: 10px;">
+                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    Période: {{interestPeriod}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" ng-click="setInterestPeriod('7 derniers jours')">7 derniers jours</a></li>
+                    <li><a href="#" ng-click="setInterestPeriod('30 derniers jours')">30 derniers jours</a></li>
+                    <li><a href="#" ng-click="setInterestPeriod('3 derniers mois')">3 derniers mois</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="col-md-6 text-right">
+            <div class="alert alert-info" style="display: inline-block; margin: 0; padding: 8px 12px;">
+                <strong>{{merchantInterests.length}}</strong> demande(s) trouvée(s)
+            </div>
+        </div>
+    </div>
+    
+    <!-- Message si aucune demande -->
+    <div ng-if="!loadingInterests && merchantInterests.length === 0" class="alert alert-warning">
+        <h4><i class="fa fa-info-circle"></i> Aucune demande trouvée</h4>
+        <p>Il n'y a actuellement aucune demande de produit dans votre zone.</p>
+        <ul>
+            <li>Assurez-vous que vos commerces sont bien géolocalisés</li>
+            <li>Les demandes sont recherchées dans un rayon de 50km</li>
+            <li>Essayez de modifier la période de recherche</li>
+        </ul>
+    </div>
+    
+    <!-- Liste des demandes -->
+    <div ng-if="merchantInterests.length > 0" class="row">
+        <div ng-repeat="interest in merchantInterests | orderBy:['distance_from_commerce', '-created_at']" 
+             class="col-md-6 col-lg-4" style="margin-bottom: 20px;">
+            
+            <div class="panel panel-default" style="border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                <div class="panel-header" style="background: linear-gradient(45deg, #2c5aa0, #1e3d6f); color: white; padding: 15px; border-radius: 10px 10px 0 0;">
+                    <h4 style="margin: 0; font-size: 18px;">
+                        <i class="fa fa-search"></i> 
+                        {{interest.product_name}}
+                    </h4>
+                    <small>
+                        <i class="fa fa-clock-o"></i> 
+                        {{interest.created_at | date:'dd/MM/yyyy à HH:mm'}}
+                    </small>
+                </div>
+                
+                <div class="panel-body" style="padding: 15px;">
+                    <!-- Informations de distance et localisation -->
+                    <div style="margin-bottom: 10px;">
+                        <span class="label label-info" style="font-size: 11px;">
+                            <i class="fa fa-map-marker"></i> 
+                            {{interest.distance_from_commerce}} km de {{interest.commerce_name}}
+                        </span>
+                    </div>
+                    
+                    <!-- Rayon de recherche du client -->
+                    <p style="margin-bottom: 10px;">
+                        <strong>Rayon de recherche:</strong> {{interest.search_radius}} km
+                    </p>
+                    
+                    <!-- Message du client -->
+                    <div ng-if="interest.message" style="margin-bottom: 15px;">
+                        <strong>Message du client:</strong>
+                        <div class="well well-sm" style="margin-top: 5px; font-style: italic;">
+                            "{{interest.message}}"
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="text-center">
+                        <button class="btn btn-success btn-sm" 
+                                ng-click="respondToInterest(interest)"
+                                style="margin-right: 5px;">
+                            <i class="fa fa-plus"></i> Ajouter ce produit
+                        </button>
+                        
+                        <button class="btn btn-info btn-sm" 
+                                ng-click="contactClient(interest)">
+                            <i class="fa fa-envelope"></i> Contacter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chargement -->
+    <div ng-if="loadingInterests" class="text-center" style="padding: 50px;">
+        <i class="fa fa-spinner fa-spin fa-3x text-muted"></i>
+        <p class="text-muted" style="margin-top: 10px;">Chargement des demandes...</p>
+    </div>
+</div>
+
+<!-- Modal pour ajouter un produit en réponse à une demande -->
+<script type="text/ng-template" id="addProductModal.html">
+    <div class="modal-header">
+        <h4 class="modal-title">
+            <i class="fa fa-plus"></i> Ajouter "{{selectedInterest.product_name}}"
+        </h4>
+    </div>
+    <div class="modal-body">
+        <form name="productForm">
+            <div class="alert alert-info">
+                <strong>Demande de:</strong> {{selectedInterest.product_name}}<br>
+                <strong>Distance:</strong> {{selectedInterest.distance_from_commerce}} km de votre commerce
+            </div>
+            
+            <div class="form-group">
+                <label>Commerce *</label>
+                <select ng-model="newProduct.commerce_id" 
+                        class="form-control" required>
+                    <option value="">Sélectionnez un commerce</option>
+                    <option ng-repeat="commerce in userCommerces" 
+                            value="{{commerce.id}}">
+                        {{commerce.nom}} - {{commerce.ville}}
+                    </option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Nom du produit *</label>
+                <input type="text" 
+                       ng-model="newProduct.nom" 
+                       class="form-control" 
+                       required
+                       placeholder="Ex: Banane plantain mûre">
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea ng-model="newProduct.description" 
+                          class="form-control" 
+                          rows="3"
+                          placeholder="Décrivez votre produit..."></textarea>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Prix unitaire (FCFA) *</label>
+                        <input type="number" 
+                               ng-model="newProduct.unitprice" 
+                               class="form-control" 
+                               step="0.01"
+                               min="0"
+                               required
+                               placeholder="0.00">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Stock disponible *</label>
+                        <input type="number" 
+                               ng-model="newProduct.unitsinstock" 
+                               class="form-control" 
+                               min="0"
+                               required
+                               placeholder="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="notifyClient"> 
+                    Notifier automatiquement le client que ce produit est maintenant disponible
+                </label>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-default" ng-click="$dismiss()">Annuler</button>
+        <button class="btn btn-primary" 
+                ng-click="saveNewProduct()" 
+                ng-disabled="productForm.$invalid || savingProduct">
+            <i class="fa fa-save" ng-if="!savingProduct"></i>
+            <i class="fa fa-spinner fa-spin" ng-if="savingProduct"></i>
+            Ajouter le produit
+        </button>
+    </div>
+</script>

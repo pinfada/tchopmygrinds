@@ -19,7 +19,11 @@
     "concurrently": "^8.2.2"
   },
   "dependencies": {
-    "alpinejs": "^3.13.3"
+    "alpinejs": "^3.13.3",
+    "angular": "^1.8.3",
+    "angular-route": "^1.8.3",
+    "angular-cookies": "^1.8.3",
+    "leaflet": "^1.9.4"
   },
   "browserslist": [
     "defaults",

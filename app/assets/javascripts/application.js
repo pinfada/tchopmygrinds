@@ -11,13 +11,10 @@
 // GO AFTER THE REQUIRES BELOW.
 // require location -- 20190130
 //
-//= require moment
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
 //= require angular
-//= require angular-simple-logger
-//= require ui-leaflet
 //= require leaflet
 //= require angular-rails-templates
 //= require angular-route
@@ -28,12 +25,8 @@
 //= require leaflet.awesome-markers
 //= require modern-maps
 //= require angularjs/rails/resource
-//= require angular-devise
 //= require routes_helper
-//= require ngcart
-//= require ngGeolocation
 //= require angular-trix
-//= require angular-filter/dist/angular-filter
 //= require app.js.erb
 //= require directives/app_image
 //= require directives/simple_searchbox
@@ -46,4 +39,3 @@
 //= require interceptors/csrf_interceptor
 //= require controllers/base_controller
 //= require_tree ../partials
-//= require_tree .
