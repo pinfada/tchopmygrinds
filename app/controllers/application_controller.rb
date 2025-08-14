@@ -51,6 +51,17 @@ class ApplicationController < ActionController::Base
 		end
 	end
 	
+	# CORS preflight check
+	def cors_preflight_check
+		if request.method == 'OPTIONS'
+			headers['Access-Control-Allow-Origin'] = '*'
+			headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, PATCH, DELETE, OPTIONS'
+			headers['Access-Control-Allow-Headers'] = 'Origin, Content-Type, Accept, Authorization, Token, X-Requested-With'
+			headers['Access-Control-Max-Age'] = '1728000'
+			render plain: '', status: 200
+		end
+	end
+	
 	# Rendre les helpers d'auth disponibles dans toutes les vues
 	helper_method :current_user_json, :user_initials, :can_access_resource?
 end

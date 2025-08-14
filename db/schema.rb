@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_12_10_120000) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_14_230637) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -48,7 +48,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_10_120000) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "city"
     t.integer "user_id"
+    t.decimal "rating", precision: 3, scale: 2, default: "0.0"
+    t.integer "rating_count", default: 0
+    t.boolean "verified", default: false
+    t.string "category"
+    t.string "phone"
+    t.string "website"
+    t.text "opening_hours"
+    t.string "image_url"
+    t.index ["category"], name: "index_commerces_on_category"
+    t.index ["rating"], name: "index_commerces_on_rating"
     t.index ["user_id"], name: "index_commerces_on_user_id"
+    t.index ["verified"], name: "index_commerces_on_verified"
   end
 
   create_table "commerces_products", id: false, force: :cascade do |t|
@@ -84,6 +95,11 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_10_120000) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.integer "status"
+    t.decimal "total_amount", precision: 10, scale: 2
+    t.string "delivery_address"
+    t.string "phone"
+    t.text "notes"
+    t.index ["total_amount"], name: "index_orders_on_total_amount"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -118,6 +134,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_10_120000) do
     t.integer "reorderlevel", default: 0
     t.boolean "discontinued", default: false
     t.integer "commerce_id"
+    t.string "category"
+    t.text "description"
+    t.string "image_url"
+    t.boolean "available", default: true
+    t.index ["available"], name: "index_products_on_available"
+    t.index ["category"], name: "index_products_on_category"
     t.index ["commerce_id"], name: "index_products_on_commerce_id"
   end
 
@@ -139,7 +161,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_12_10_120000) do
     t.boolean "seller_role", default: false
     t.boolean "buyer_role", default: false
     t.integer "statut_type"
+    t.string "phone"
+    t.string "avatar_url"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["phone"], name: "index_users_on_phone"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 

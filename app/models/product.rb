@@ -7,9 +7,13 @@ class Product < ApplicationRecord
     validates :unitsinstock, presence: true
     validates :unitsonorder, presence: true
     
+    # Direct association for API compatibility
+    belongs_to :commerce, optional: true
+    
+    # Many-to-many association for legacy compatibility
     has_many :categorizations
     has_many :orderdetails, dependent: :destroy
-    has_many :commerces, -> { distinct }, through: :categorizations
+    has_many :commerces_through_categorizations, -> { distinct }, through: :categorizations, source: :commerce
     has_many :orders, -> { distinct }, through: :orderdetails
-    accepts_nested_attributes_for :commerces, :orders
+    accepts_nested_attributes_for :commerces_through_categorizations, :orders
 end

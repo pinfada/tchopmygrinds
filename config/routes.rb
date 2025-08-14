@@ -1,4 +1,52 @@
 Rails.application.routes.draw do
+  # API namespace pour React
+  namespace :api do
+    namespace :v1 do
+      # CORS preflight pour API seulement
+      match '*all', to: 'base#cors_preflight_check', via: [:options]
+      # Authentification
+      post 'auth/login', to: 'auth#login'
+      post 'auth/register', to: 'auth#register'
+      post 'auth/logout', to: 'auth#logout'
+      get 'auth/me', to: 'auth#me'
+      patch 'auth/profile', to: 'auth#update_profile'
+      
+      # Commerces
+      resources :commerces do
+        collection do
+          get :nearby
+          get :search
+        end
+      end
+      
+      # Produits
+      resources :products do
+        collection do
+          get :search
+          get :categories
+        end
+        member do
+          get :price_history
+        end
+      end
+      
+      # Commandes
+      resources :orders do
+        collection do
+          get :stats
+        end
+        member do
+          patch :cancel
+        end
+      end
+      
+      # Utilitaires
+      namespace :utils do
+        get 'geocode', to: 'utils#geocode'
+        get 'reverse-geocode', to: 'utils#reverse_geocode'
+      end
+    end
+  end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
   
   # Handle Chrome DevTools requests (ignore silently)
