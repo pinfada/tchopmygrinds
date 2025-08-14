@@ -6,8 +6,14 @@
   "scripts": {
     "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --minify",
     "watch:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/tailwind.css --watch",
-    "dev": "concurrently \"npm run watch:css\" \"rails server\"",
-    "build": "npm run build:css && rails assets:precompile"
+    "dev": "concurrently \"npm run watch:css\" \"rails server\" \"npm run dev:react\"",
+    "dev:react": "vite",
+    "build": "npm run build:css && npm run build:react && rails assets:precompile",
+    "build:react": "vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.10",
@@ -16,14 +22,31 @@
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.41",
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "vite": "^6.0.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "@types/react": "^18.3.17",
+    "@types/react-dom": "^18.3.5",
+    "@types/leaflet": "^1.9.14",
+    "eslint": "^9.17.0",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
+    "prettier": "^3.4.2"
   },
   "dependencies": {
     "alpinejs": "^3.13.3",
     "angular": "^1.8.3",
     "angular-route": "^1.8.3",
     "angular-cookies": "^1.8.3",
-    "leaflet": "^1.9.4"
+    "leaflet": "^1.9.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.1",
+    "@reduxjs/toolkit": "^2.4.0",
+    "react-redux": "^9.1.2",
+    "axios": "^1.7.9",
+    "react-leaflet": "^4.2.1"
   },
   "browserslist": [
     "defaults",
