@@ -67,7 +67,7 @@ export const watchLocation = createAsyncThunk(
             longitude: position.coords.longitude,
           }))
         },
-        (error) => {
+        () => {
           dispatch(setError('Erreur de surveillance de position'))
         },
         {
