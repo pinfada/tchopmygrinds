@@ -1,25 +1,28 @@
 source 'https://rubygems.org'
 
-#ruby "2.7.4"
-gem 'rails', '~> 6.0'
+ruby "3.2.3"
+gem 'rails', '~> 7.1.0'
 gem 'puma', '~> 6.4'
+gem 'image_processing', '~> 1.2'
 gem 'rack'
 gem 'rack-cors'
 
 # Rails defaults
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails', '~> 6.0'
 gem 'terser'
 gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails'
-gem 'turbolinks', '~> 5'
-gem 'jbuilder', '~> 2.5'
+# gem 'turbolinks', '~> 5' # Remplacé par Turbo Drive dans Rails 7
+gem 'turbo-rails'
+gem 'stimulus-rails'
+gem 'jbuilder', '~> 2.7'
 gem 'pg', '~> 1.5'
 group :development, :test do
   gem 'byebug', platform: :mri
 end
 group :development do
   gem 'web-console'
-  gem 'listen', '~> 3.0.5'
+  gem 'listen', '~> 3.8'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end
@@ -27,7 +30,7 @@ end
 # learn-rails
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', require: false
-gem 'bootstrap-sass'
+# gem 'bootstrap-sass' # Remplacé par Tailwind CSS
 gem 'tailwindcss-rails', '~> 2.0'
 gem 'gibbon'
 # gem 'bower-rails' # REMOVED: Bower obsolète depuis 2017
@@ -51,6 +54,8 @@ gem 'sprockets'
 gem 'geocoder', '~> 1.8'
 gem 'faker'
 gem 'devise', '~> 4.9'
+gem 'omniauth', '~> 2.1'
+gem 'omniauth-rails_csrf_protection', '~> 1.0'
 gem 'cancancan', '~> 3.5'
 gem 'rails_admin'
 gem 'activerecord-reset-pk-sequence'
@@ -59,6 +64,7 @@ gem 'sendgrid'
 gem 'sendgrid-ruby'
 gem "figaro"
 gem 'letter_opener_web'
+gem 'redis', '~> 5.0'
 
 # source "https://rails-assets.org" do
 #   gem "rails-assets-angular-devise"
@@ -82,6 +88,6 @@ end
 
 group :test do
   gem 'minitest-spec-rails'
-  gem 'minitest-rails-capybara'
+  # gem 'minitest-rails-capybara' # Obsolète pour Rails 7.1
 end
 gem 'sassc-rails'

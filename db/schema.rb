@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_12_10_120000) do
-
+ActiveRecord::Schema[7.1].define(version: 2024_12_10_120000) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -20,8 +19,8 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
     t.text "state"
     t.text "country"
     t.text "zipcode"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.float "latitude"
     t.float "longitude"
     t.index ["user_id"], name: "index_addresses_on_user_id"
@@ -31,8 +30,8 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
     t.integer "product_id"
     t.integer "commerce_id"
     t.integer "position"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["product_id", "commerce_id"], name: "index_categorizations_on_product_id_and_commerce_id"
   end
 
@@ -45,8 +44,8 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
     t.string "country"
     t.float "latitude"
     t.float "longitude"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "city"
     t.integer "user_id"
     t.index ["user_id"], name: "index_commerces_on_user_id"
@@ -61,8 +60,8 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
   create_table "newsletters", force: :cascade do |t|
     t.string "name"
     t.string "email"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "orderdetails", force: :cascade do |t|
@@ -71,8 +70,8 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
     t.decimal "discount", precision: 8, default: "0"
     t.integer "product_id"
     t.integer "order_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["order_id"], name: "index_orderdetails_on_order_id"
     t.index ["product_id"], name: "index_orderdetails_on_product_id"
   end
@@ -80,10 +79,10 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
   create_table "orders", force: :cascade do |t|
     t.date "orderdate"
     t.date "requiredate"
-    t.datetime "shippedate"
+    t.datetime "shippedate", precision: nil
     t.integer "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "status"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
@@ -96,10 +95,10 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
     t.integer "search_radius", default: 25
     t.text "message"
     t.boolean "fulfilled", default: false
-    t.datetime "fulfilled_at"
+    t.datetime "fulfilled_at", precision: nil
     t.boolean "email_sent", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_product_interests_on_created_at"
     t.index ["fulfilled", "product_name", "created_at"], name: "idx_interests_fulfilled_name_date"
     t.index ["fulfilled"], name: "index_product_interests_on_fulfilled"
@@ -110,8 +109,8 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
 
   create_table "products", force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "quantityperunit"
     t.decimal "unitprice", precision: 10, scale: 2
     t.integer "unitsinstock", default: 0
@@ -126,15 +125,15 @@ ActiveRecord::Schema.define(version: 2024_12_10_120000) do
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at", precision: nil
+    t.datetime "remember_created_at", precision: nil
     t.integer "sign_in_count", default: 0, null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
+    t.datetime "current_sign_in_at", precision: nil
+    t.datetime "last_sign_in_at", precision: nil
     t.string "current_sign_in_ip"
     t.string "last_sign_in_ip"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "name"
     t.boolean "admin", default: false
     t.boolean "seller_role", default: false

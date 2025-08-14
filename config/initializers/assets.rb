@@ -1,30 +1,12 @@
 # Be sure to restart your server when you modify this file.
 
 # Version of your assets, change this if you want to expire all your assets.
-Rails.application.config.assets.version = '1.0'
+Rails.application.config.assets.version = "1.0"
 
 # Add additional assets to the asset load path.
 # Rails.application.config.assets.paths << Emoji.images_path
-# Add Yarn node_modules folder to the asset load path.
-Rails.application.config.assets.paths << Rails.root.join('node_modules')
-
-# Build output for Tailwind CSS
-Rails.application.config.assets.paths << Rails.root.join('app/assets/builds')
-
-# Precompile Tailwind build
-Rails.application.config.assets.precompile += %w( builds/tailwind.css )
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
-Rails.application.config.assets.precompile += %w( 
-  app.js.erb
-  interceptors/*.js
-  services/*.js
-  controllers/*.js
-  directives/*.js
-  Templates/*.html
-  Templates/*.html.erb
-  *.png *.gif *.jpg *.jpeg *.svg
-  builds/tailwind.css
-)
+# Rails.application.config.assets.precompile += %w( admin.js admin.css )

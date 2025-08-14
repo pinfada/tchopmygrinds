@@ -1,7 +1,4 @@
-require_relative 'boot'
-
-# Ruby 3.2.3 compatibility fix for Rails 6.1
-require 'logger' unless defined?(Logger)
+require_relative "boot"
 
 require "rails"
 # Pick the frameworks you want:
@@ -11,9 +8,10 @@ require "active_record/railtie"
 require "active_storage/engine"
 require "action_controller/railtie"
 require "action_mailer/railtie"
+# require "action_mailbox/engine"
+# require "action_text/engine"
 require "action_view/railtie"
 # require "action_cable/engine"
-require "sprockets/railtie"
 require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems
@@ -23,14 +21,22 @@ Bundler.require(*Rails.groups)
 module StatExo1
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.0
-
-    # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration can go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded after loading
-    # the framework and any gems in your application.
+    config.load_defaults 7.1
     
-    # Add app/controllers/concerns to autoload paths
-    config.autoload_paths += %W(#{config.root}/app/controllers/concerns)
+    # Mise à jour du format de cache pour Rails 7.1
+    config.active_support.cache_format_version = 7.1
+
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w(assets tasks))
+
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    # config.time_zone = "Central Time (US & Canada)"
+    # config.eager_load_paths << Rails.root.join("extras")
   end
 end
