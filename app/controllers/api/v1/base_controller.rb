@@ -19,30 +19,20 @@ class Api::V1::BaseController < ApplicationController
   
   private
   
-  # Authentification JWT (à configurer avec devise-jwt)
+  # Authentification JWT avec devise-jwt
   def authenticate_user_from_token!
-    token = request.headers['Authorization']&.split(' ')&.last
-    
-    if token
-      begin
-        # TODO: Décoder JWT token et charger utilisateur
-        # decoded_token = JWT.decode(token, Rails.application.secret_key_base)
-        # @current_user = User.find(decoded_token[0]['user_id'])
-      rescue JWT::DecodeError
-        render_unauthorized
-      end
-    else
-      # Permettre l'accès anonyme pour certains endpoints
-      @current_user = nil
-    end
+    # devise-jwt gère automatiquement l'authentification via Warden
+    # On utilise les méthodes Devise standards
+    authenticate_user! if jwt_required_for_action?
+  rescue JWT::DecodeError, JWT::ExpiredSignature
+    render_unauthorized
   end
   
-  def current_user
-    @current_user
-  end
-  
-  def authenticate_user!
-    render_unauthorized unless current_user
+  # Vérifier si JWT est requis pour cette action
+  def jwt_required_for_action?
+    # Permettre accès public à certains endpoints
+    public_endpoints = %w[cors_preflight_check]
+    !public_endpoints.include?(action_name)
   end
   
   # Headers pour performance et cache

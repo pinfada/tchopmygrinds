@@ -20,13 +20,27 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Intercepteur pour gérer les erreurs d'authentification
+// Intercepteur pour gérer les JWT tokens et erreurs
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Extraire le token JWT du header Authorization de la réponse (devise-jwt)
+    const authHeader = response.headers.authorization || response.headers.Authorization
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '')
+      localStorage.setItem('auth_token', token)
+    }
+    return response
+  },
   (error) => {
     if (error.response?.status === 401) {
+      // Token expiré ou invalide
       localStorage.removeItem('auth_token')
-      window.location.href = '/auth'
+      localStorage.removeItem('current_user')
+      
+      // Rediriger vers login seulement si pas déjà sur la page auth
+      if (!window.location.pathname.includes('/auth')) {
+        window.location.href = '/auth'
+      }
     }
     return Promise.reject(error)
   }
@@ -34,9 +48,15 @@ api.interceptors.response.use(
 
 // API Authentication
 export const authAPI = {
-  login: async (credentials: { email: string; password: string }): Promise<{ user: User; token: string }> => {
+  login: async (credentials: { email: string; password: string }): Promise<{ user: User }> => {
     const response = await api.post('/auth/login', credentials)
-    return response.data
+    
+    // Stocker l'utilisateur en localStorage
+    if (response.data.data.user) {
+      localStorage.setItem('current_user', JSON.stringify(response.data.data.user))
+    }
+    
+    return response.data.data
   },
   
   register: async (userData: { 
@@ -44,23 +64,45 @@ export const authAPI = {
     password: string; 
     role: string; 
     name?: string 
-  }): Promise<{ user: User; token: string }> => {
-    const response = await api.post('/auth/register', userData)
-    return response.data
+  }): Promise<{ user: User }> => {
+    const response = await api.post('/auth/register', { user: userData })
+    
+    // Stocker l'utilisateur en localStorage
+    if (response.data.data.user) {
+      localStorage.setItem('current_user', JSON.stringify(response.data.data.user))
+    }
+    
+    return response.data.data
   },
   
   logout: async (): Promise<void> => {
-    await api.post('/auth/logout')
+    try {
+      await api.post('/auth/logout')
+    } finally {
+      // Nettoyer le stockage local même si la requête échoue
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('current_user')
+    }
   },
   
   getCurrentUser: async (): Promise<User> => {
     const response = await api.get('/auth/me')
-    return response.data.user
+    const user = response.data.data.user
+    
+    // Mettre à jour le localStorage
+    localStorage.setItem('current_user', JSON.stringify(user))
+    
+    return user
   },
   
   updateProfile: async (userData: Partial<User>): Promise<User> => {
-    const response = await api.patch('/auth/profile', userData)
-    return response.data.user
+    const response = await api.patch('/auth/profile', { user: userData })
+    const user = response.data.data.user
+    
+    // Mettre à jour le localStorage
+    localStorage.setItem('current_user', JSON.stringify(user))
+    
+    return user
   },
 }
 

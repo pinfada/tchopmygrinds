@@ -7,12 +7,11 @@ class Api::V1::AuthController < Api::V1::BaseController
     user = User.find_by(email: params[:email])
     
     if user&.valid_password?(params[:password])
-      # TODO: Générer JWT token
-      token = generate_jwt_token(user)
+      # Devise JWT génère automatiquement le token
+      sign_in(user, store: false) # Ne pas stocker en session
       
       render_success({
-        user: user_data(user),
-        token: token
+        user: user_data(user)
       }, message: 'Connexion réussie')
     else
       render_error('Email ou mot de passe incorrect', :unauthorized)
@@ -24,12 +23,11 @@ class Api::V1::AuthController < Api::V1::BaseController
     user = User.new(registration_params)
     
     if user.save
-      # TODO: Générer JWT token
-      token = generate_jwt_token(user)
+      # Devise JWT génère automatiquement le token
+      sign_in(user, store: false)
       
       render_success({
-        user: user_data(user),
-        token: token
+        user: user_data(user)
       }, message: 'Inscription réussie', status: :created)
     else
       render_error(user.errors.full_messages.join(', '))
@@ -38,7 +36,8 @@ class Api::V1::AuthController < Api::V1::BaseController
   
   # POST /api/v1/auth/logout
   def logout
-    # TODO: Invalider JWT token (blacklist)
+    # Devise JWT révoque automatiquement le token
+    sign_out(current_user) if current_user
     render_success(nil, message: 'Déconnexion réussie')
   end
   
@@ -67,7 +66,7 @@ class Api::V1::AuthController < Api::V1::BaseController
   private
   
   def registration_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :name, :role, :phone)
+    params.require(:user).permit(:email, :password, :password_confirmation, :name, :statut_type, :phone)
   end
   
   def profile_params
@@ -91,16 +90,5 @@ class Api::V1::AuthController < Api::V1::BaseController
     }
   end
   
-  # TODO: Implémenter avec devise-jwt
-  def generate_jwt_token(user)
-    # Temporaire: token simple pour développement
-    payload = {
-      user_id: user.id,
-      email: user.email,
-      exp: 24.hours.from_now.to_i
-    }
-    
-    # JWT.encode(payload, Rails.application.secret_key_base)
-    "temp_token_#{user.id}_#{Time.current.to_i}"
-  end
+  # JWT généré automatiquement par devise-jwt via les headers de réponse
 end

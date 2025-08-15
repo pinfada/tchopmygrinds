@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_14_230637) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_15_085953) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -66,6 +66,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_14_230637) do
     t.integer "commerce_id", null: false
     t.integer "product_id", null: false
     t.index ["commerce_id", "product_id"], name: "index_commerces_products_on_commerce_id_and_product_id"
+  end
+
+  create_table "jwt_denylists", force: :cascade do |t|
+    t.string "jti"
+    t.datetime "exp"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["jti"], name: "index_jwt_denylists_on_jti"
   end
 
   create_table "newsletters", force: :cascade do |t|
