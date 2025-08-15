@@ -93,7 +93,16 @@ const commerceSlice = createSlice({
       })
       .addCase(fetchNearbyCommerces.fulfilled, (state, action) => {
         state.loading = false
-        state.commerces = action.payload.commerces || []
+        // Gérer différents formats de réponse API
+        if (Array.isArray(action.payload)) {
+          state.commerces = action.payload
+        } else if (action.payload && Array.isArray(action.payload.commerces)) {
+          state.commerces = action.payload.commerces
+        } else if (action.payload && Array.isArray(action.payload.data)) {
+          state.commerces = action.payload.data
+        } else {
+          state.commerces = []
+        }
       })
       .addCase(fetchNearbyCommerces.rejected, (state, action) => {
         state.loading = false

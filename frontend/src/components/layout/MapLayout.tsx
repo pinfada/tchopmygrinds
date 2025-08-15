@@ -90,7 +90,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
       <Sidebar />
 
       {/* Main Content - Carte */}
-      <div className="flex-1 ml-64 relative">
+      <div className="flex-1 transition-all duration-300 relative" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
         {/* Header de la carte */}
         <div className="absolute top-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200">
           <div className="flex items-center justify-between px-6 py-4">

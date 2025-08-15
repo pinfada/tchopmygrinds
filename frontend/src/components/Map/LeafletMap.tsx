@@ -82,15 +82,23 @@ function MapEventHandlers({ commerces }: { commerces: Commerce[] }) {
 // Composant pour le marker utilisateur
 function UserMarker({ position }: { position: Coordinates }) {
   const { user } = useAppSelector((state) => state.auth)
+  const navigate = useNavigate()
+
+  const handleUserClick = () => {
+    navigate('/profile')
+  }
 
   return (
     <Marker 
       position={[position.latitude, position.longitude]} 
       icon={createCustomIcon('user', { isOnline: true })}
+      eventHandlers={{
+        click: handleUserClick,
+      }}
     >
       <Popup>
         <div dangerouslySetInnerHTML={{
-          __html: createUserPopup(user, () => {})
+          __html: createUserPopup(user, handleUserClick)
         }} />
       </Popup>
     </Marker>

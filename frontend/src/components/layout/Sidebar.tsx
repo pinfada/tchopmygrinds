@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { logout } from '../../store/slices/authSlice'
@@ -22,6 +22,19 @@ const Sidebar = () => {
 
   const handleCartToggle = () => {
     dispatch(toggleCart())
+  }
+
+  // Initialiser la variable CSS au montage
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      '--sidebar-width', 
+      isCollapsed ? '64px' : '256px'
+    )
+  }, [isCollapsed])
+
+  // Mettre à jour la variable CSS globale quand la sidebar change
+  const handleToggleSidebar = () => {
+    setIsCollapsed(!isCollapsed)
   }
 
   const menuItems = [
@@ -69,9 +82,14 @@ const Sidebar = () => {
   }
 
   return (
-    <div className={`bg-white shadow-xl border-r border-gray-200 h-screen fixed left-0 top-0 z-40 transition-all duration-300 ${
-      isCollapsed ? 'w-16' : 'w-64'
-    }`}>
+    <div 
+      className={`bg-white shadow-xl border-r border-gray-200 h-screen fixed left-0 top-0 z-40 transition-all duration-300 ${
+        isCollapsed ? 'w-16' : 'w-64'
+      }`}
+      style={{ 
+        '--sidebar-width': isCollapsed ? '64px' : '256px' 
+      } as React.CSSProperties & { '--sidebar-width': string }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
@@ -91,7 +109,7 @@ const Sidebar = () => {
         )}
         
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
+          onClick={handleToggleSidebar}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           aria-label={isCollapsed ? 'Élargir le menu' : 'Réduire le menu'}
         >
