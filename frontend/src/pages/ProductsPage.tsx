@@ -66,7 +66,7 @@ const ProductsPage = () => {
   }
 
   // Filtrer localement les produits
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = Array.isArray(products) ? products.filter(product => {
     if (selectedCategory && selectedCategory !== 'Tous' && product.category !== selectedCategory) {
       return false
     }
@@ -77,17 +77,14 @@ const ProductsPage = () => {
       return false
     }
     return true
-  })
+  }) : []
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="p-6 space-y-6">
+      {/* Description */}
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Produits frais locaux
-        </h1>
-        <p className="text-xl text-gray-600">
-          Découvrez les meilleurs produits de votre région
+        <p className="text-gray-600">
+          {filteredProducts.length} produit{filteredProducts.length !== 1 ? 's' : ''} disponible{filteredProducts.length !== 1 ? 's' : ''}
         </p>
       </div>
 

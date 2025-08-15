@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNearbyCommerces } from '../store/slices/commerceSlice'
-// import { getCurrentLocation } from '../store/slices/locationSlice'
 import LeafletMap from '../components/Map/LeafletMap'
 import GeolocationButton from '../components/Map/GeolocationButton'
 import type { Commerce } from '../types'
@@ -30,11 +29,6 @@ const HomePage = () => {
       }))
     }
   }, [currentLocation, dispatch, commercesLoading, commerces.length])
-
-  // Fonction de géolocalisation (utilisée dans le composant GeolocationButton)
-  // const handleLocationRequest = () => {
-  //   dispatch(getCurrentLocation())
-  // }
 
   const handleCommerceClick = (commerce: Commerce) => {
     // Navigation vers la page du commerce

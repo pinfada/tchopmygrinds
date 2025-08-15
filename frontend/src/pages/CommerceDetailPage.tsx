@@ -29,14 +29,14 @@ const CommerceDetailPage = () => {
     dispatch(addToCart({ product, quantity: 1 }))
   }
 
-  const availableProducts = products.filter(p => p.isAvailable && p.stock > 0)
+  const availableProducts = Array.isArray(products) ? products.filter(p => p.isAvailable && p.stock > 0) : []
   
-  const filteredProducts = availableProducts.filter(product => {
+  const filteredProducts = Array.isArray(availableProducts) ? availableProducts.filter(product => {
     if (selectedCategory && product.category !== selectedCategory) {
       return false
     }
     return true
-  })
+  }) : []
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
@@ -136,7 +136,7 @@ const CommerceDetailPage = () => {
                       ))}
                     </div>
                     <span className="text-sm font-medium text-gray-600">
-                      {Number(currentCommerce.rating).toFixed(1)}
+                      {Number(currentCommerce.rating || 0).toFixed(1)}
                     </span>
                   </div>
                 )}

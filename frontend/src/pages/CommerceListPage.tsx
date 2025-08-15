@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNearbyCommerces, searchCommerces } from '../store/slices/commerceSlice'
 import { getCurrentLocation } from '../store/slices/locationSlice'
-import LeafletMap from '../components/Map/LeafletMap'
-import GeolocationButton from '../components/Map/GeolocationButton'
 import type { Commerce } from '../types'
 
 const CommerceListPage = () => {
@@ -16,7 +14,6 @@ const CommerceListPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [minRating, setMinRating] = useState(0)
   const [verifiedOnly, setVerifiedOnly] = useState(false)
-  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
 
   const categories = [
     'Tous',
@@ -70,7 +67,7 @@ const CommerceListPage = () => {
   }
 
   // Filtrer localement les commerces selon les critères
-  const filteredCommerces = commerces.filter(commerce => {
+  const filteredCommerces = Array.isArray(commerces) ? commerces.filter(commerce => {
     if (selectedCategory && selectedCategory !== 'Tous' && commerce.category !== selectedCategory) {
       return false
     }
@@ -81,7 +78,7 @@ const CommerceListPage = () => {
       return false
     }
     return true
-  })
+  }) : []
 
   const handleCommerceClick = (commerce: Commerce) => {
     // Navigation vers la page du commerce
@@ -89,44 +86,20 @@ const CommerceListPage = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="p-6 space-y-6">
+      {/* Description */}
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Commerces locaux
-        </h1>
-        <p className="text-xl text-gray-600">
-          Découvrez les commerces près de vous dans un rayon de 50km
+        <p className="text-gray-600">
+          {filteredCommerces.length} commerce{filteredCommerces.length !== 1 ? 's' : ''} dans un rayon de 50km
         </p>
       </div>
 
-      {/* Géolocalisation */}
+      {/* Info géolocalisation */}
       {!currentLocation && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Activez la géolocalisation</h3>
-                <p className="text-gray-600">Pour voir les commerces les plus proches</p>
-              </div>
-            </div>
-            <GeolocationButton
-              onLocationFound={(coords) => {
-                dispatch(fetchNearbyCommerces({ 
-                  location: coords, 
-                  radius: 50 
-                }))
-              }}
-              className="btn-primary"
-            >
-              Activer
-            </GeolocationButton>
-          </div>
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+          <p className="text-amber-800 text-sm">
+            📍 Activez la géolocalisation depuis la carte pour voir les commerces près de vous
+          </p>
         </div>
       )}
 
@@ -201,32 +174,6 @@ const CommerceListPage = () => {
               </label>
             </div>
 
-            {/* Toggle vue */}
-            <div className="pt-8">
-              <label className="form-label mb-2">Mode d'affichage</label>
-              <div className="flex rounded-lg border border-gray-200 p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                    viewMode === 'grid' 
-                      ? 'bg-emerald-500 text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  📋 Liste
-                </button>
-                <button
-                  onClick={() => setViewMode('map')}
-                  className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
-                    viewMode === 'map' 
-                      ? 'bg-emerald-500 text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  🗺️ Carte
-                </button>
-              </div>
-            </div>
 
             {/* Réinitialiser */}
             <div className="pt-8">
@@ -282,25 +229,6 @@ const CommerceListPage = () => {
               </div>
             ))}
           </div>
-        ) : viewMode === 'map' && filteredCommerces.length > 0 ? (
-          <div className="space-y-4">
-            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <p className="text-gray-600">
-                {filteredCommerces.length} commerce{filteredCommerces.length > 1 ? 's' : ''} affiché{filteredCommerces.length > 1 ? 's' : ''} sur la carte
-              </p>
-            </div>
-            
-            <div className="rounded-xl overflow-hidden shadow-lg">
-              <LeafletMap
-                userLocation={currentLocation}
-                commerces={filteredCommerces}
-                onCommerceClick={handleCommerceClick}
-                height="600px"
-                zoom={currentLocation ? 12 : 6}
-                center={currentLocation ? [currentLocation.latitude, currentLocation.longitude] : [46.603354, 1.888334]} // Centre de la France
-              />
-            </div>
-          </div>
         ) : filteredCommerces.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCommerces.map((commerce) => (
@@ -346,7 +274,7 @@ const CommerceListPage = () => {
                       </span>
                       {commerce.distance && (
                         <span className="text-gray-500">
-                          {commerce.distance.toFixed(1)} km
+                          {Number(commerce.distance || 0).toFixed(1)} km
                         </span>
                       )}
                     </div>
@@ -365,7 +293,7 @@ const CommerceListPage = () => {
                         ))}
                       </div>
                       <span className="text-gray-500 text-sm ml-2">
-                        ({(commerce.rating || 0).toFixed(1)})
+                        ({Number(commerce.rating || 0).toFixed(1)})
                       </span>
                     </div>
                   </div>

@@ -1,81 +1,103 @@
 import { useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Commerce, Coordinates } from '../../types'
+import { useAppSelector } from '../../hooks/redux'
+import { createCustomIcon, createUserPopup, createCommercePopup, markerStyles, MarkerType } from './MapMarkers'
+import { locationTrackingService, AmbulantCommerce } from '../../services/locationTracking'
 
-// Fix for default markers in React Leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-})
-
-// Icônes personnalisées pour différents types de commerces
-const commerceIcons = {
-  itinerant: new L.Icon({
-    iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-    iconRetinaUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-    shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  }),
-  sedentary: new L.Icon({
-    iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-    iconRetinaUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-    shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  }),
-  user: new L.Icon({
-    iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
-    iconRetinaUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-    shadowUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-shadow.png',
-    iconSize: [30, 45],
-    iconAnchor: [15, 45],
-    popupAnchor: [1, -40],
-    shadowSize: [45, 45],
-  })
+interface LeafletMapProps {
+  userLocation: Coordinates | null
+  commerces: Commerce[]
+  onCommerceClick: (commerce: Commerce) => void
+  height: string
+  zoom: number
+  center: [number, number]
+  selectedCommerce?: Commerce | null
 }
 
-// Composant pour centrer la carte sur une position
-function ChangeView({ center, zoom }: { center: [number, number]; zoom: number }) {
-  const map = useMap()
-  
+// Composant pour injecter les styles
+function MapStyleInjector() {
   useEffect(() => {
-    map.setView(center, zoom)
-  }, [map, center, zoom])
-  
+    const styleId = 'leaflet-custom-styles'
+    if (!document.getElementById(styleId)) {
+      const styleElement = document.createElement('div')
+      styleElement.id = styleId
+      styleElement.innerHTML = markerStyles
+      document.head.appendChild(styleElement)
+    }
+  }, [])
+
   return null
 }
 
-// Composant pour le marker de l'utilisateur
-function UserLocationMarker({ position }: { position: Coordinates | null }) {
-  if (!position) return null
+// Composant pour les handlers globaux
+function MapEventHandlers({ commerces }: { commerces: Commerce[] }) {
+  const navigate = useNavigate()
   
+  useEffect(() => {
+    // Handler pour voir le profil utilisateur
+    (window as any).handleProfileClick = () => {
+      navigate('/profile')
+    }
+
+    // Handler pour voir les produits d'un commerce
+    (window as any).handleProductsClick = (commerceId: string) => {
+      navigate(`/products?commerce=${commerceId}`)
+    }
+
+    // Handler pour suivre un commerce ambulant
+    (window as any).handleTrackClick = (commerceId: string) => {
+      const commerce = commerces.find(c => c.id === commerceId)
+      if (commerce && commerce.type === 'itinerant') {
+        locationTrackingService.startTracking(commerceId, (updatedCommerce) => {
+          console.log('Position mise à jour:', updatedCommerce)
+          // Trigger re-render ou update state
+          window.dispatchEvent(new CustomEvent('commerce-location-update', {
+            detail: { commerceId, commerce: updatedCommerce }
+          }))
+        })
+      }
+    }
+
+    // Handler pour voir les détails d'un commerce
+    (window as any).handleCommerceDetail = (commerceId: string) => {
+      navigate(`/commerces/${commerceId}`)
+    }
+
+    return () => {
+      // Cleanup handlers
+      delete (window as any).handleProfileClick
+      delete (window as any).handleProductsClick
+      delete (window as any).handleTrackClick
+      delete (window as any).handleCommerceDetail
+    }
+  }, [navigate, commerces])
+
+  return null
+}
+
+// Composant pour le marker utilisateur
+function UserMarker({ position }: { position: Coordinates }) {
+  const { user } = useAppSelector((state) => state.auth)
+
   return (
     <Marker 
       position={[position.latitude, position.longitude]} 
-      icon={commerceIcons.user}
+      icon={createCustomIcon('user', { isOnline: true })}
     >
       <Popup>
-        <div className="text-center">
-          <h3 className="font-semibold text-blue-600">📍 Votre position</h3>
-          <p className="text-sm text-gray-600">
-            {position.latitude.toFixed(4)}, {position.longitude.toFixed(4)}
-          </p>
-        </div>
+        <div dangerouslySetInnerHTML={{
+          __html: createUserPopup(user, () => {})
+        }} />
       </Popup>
     </Marker>
   )
 }
 
-// Composant pour les markers des commerces
+// Composant pour les markers des commerces avec suivi des ambulants
 function CommerceMarkers({ 
   commerces, 
   onCommerceClick,
@@ -85,54 +107,88 @@ function CommerceMarkers({
   onCommerceClick: (commerce: Commerce) => void
   selectedCommerce?: Commerce | null
 }) {
+  const [trackedCommerces, setTrackedCommerces] = useState<Map<string, AmbulantCommerce>>(new Map())
+
+  // Écouter les mises à jour de position des commerces ambulants
+  useEffect(() => {
+    const handleLocationUpdate = (event: CustomEvent) => {
+      const { commerceId, commerce } = event.detail
+      setTrackedCommerces(prev => {
+        const updated = new Map(prev)
+        updated.set(commerceId, commerce)
+        return updated
+      })
+    }
+
+    window.addEventListener('commerce-location-update', handleLocationUpdate as EventListener)
+    
+    return () => {
+      window.removeEventListener('commerce-location-update', handleLocationUpdate as EventListener)
+    }
+  }, [])
+
+  // Démarrer automatiquement le suivi des commerces ambulants en ligne
+  useEffect(() => {
+    commerces
+      .filter(commerce => commerce.type === 'itinerant' && commerce.isOnline)
+      .forEach(commerce => {
+        if (!locationTrackingService.isTracking(commerce.id)) {
+          // Simuler le mouvement pour la démo
+          locationTrackingService.simulateMovement(commerce.id, {
+            latitude: commerce.latitude,
+            longitude: commerce.longitude
+          })
+        }
+      })
+
+    // Cleanup au démontage
+    return () => {
+      locationTrackingService.stopAllTracking()
+    }
+  }, [commerces])
+
   return (
     <>
       {commerces.map((commerce) => {
         if (!commerce.latitude || !commerce.longitude) return null
         
-        const isSelected = selectedCommerce?.id === commerce.id
+        // Vérifier si c'est un commerce suivi
+        const trackedCommerce = trackedCommerces.get(commerce.id)
+        const position = trackedCommerce 
+          ? [trackedCommerce.latitude, trackedCommerce.longitude] as [number, number]
+          : [commerce.latitude, commerce.longitude] as [number, number]
         
+        const isSelected = selectedCommerce?.id === commerce.id
+        const isAmbulant = commerce.type === 'itinerant'
+        const isOnline = commerce.isOnline || false
+        
+        // Déterminer le type de marker
+        let markerType: MarkerType = 'fixed_commerce'
+        if (isAmbulant) {
+          markerType = 'ambulant_commerce'
+        }
+
         return (
           <Marker
             key={commerce.id}
-            position={[commerce.latitude, commerce.longitude]}
-            icon={commerceIcons.sedentary}
+            position={position}
+            icon={createCustomIcon(markerType, { 
+              isOnline,
+              hasNotification: isSelected
+            })}
             eventHandlers={{
               click: () => onCommerceClick(commerce),
             }}
             zIndexOffset={isSelected ? 1000 : 0}
           >
             <Popup>
-              <div className="min-w-[200px]">
-                <h3 className="font-semibold text-lg text-gray-800 mb-2">
-                  {commerce.name}
-                </h3>
-                
-                <div className="space-y-1 text-sm text-gray-600">
-                  <p>📍 {commerce.adress1}</p>
-                  {commerce.phone && <p>📞 {commerce.phone}</p>}
-                  {commerce.distance && (
-                    <p className="text-blue-600 font-medium">
-                      📍 {commerce.distance.toFixed(1)} km
-                    </p>
-                  )}
-                </div>
-                
-                <div className="mt-3 space-y-2">
-                  <button
-                    onClick={() => onCommerceClick(commerce)}
-                    className="w-full px-3 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
-                  >
-                    Voir les produits
-                  </button>
-                  
-                  {commerce.productsCount && commerce.productsCount > 0 && (
-                    <p className="text-xs text-gray-500 text-center">
-                      {commerce.productsCount} produit{commerce.productsCount > 1 ? 's' : ''} disponible{commerce.productsCount > 1 ? 's' : ''}
-                    </p>
-                  )}
-                </div>
-              </div>
+              <div dangerouslySetInnerHTML={{
+                __html: createCommercePopup(
+                  { ...commerce, isOnline },
+                  () => {},
+                  () => {}
+                )
+              }} />
             </Popup>
           </Marker>
         )
@@ -141,100 +197,95 @@ function CommerceMarkers({
   )
 }
 
-// Props du composant principal
-interface LeafletMapProps {
-  center?: [number, number]
-  zoom?: number
-  commerces?: Commerce[]
-  userLocation?: Coordinates | null
+// Hook pour centrer la carte sur un élément sélectionné
+function MapController({ 
+  selectedCommerce, 
+  userLocation,
+  zoom 
+}: { 
   selectedCommerce?: Commerce | null
-  onCommerceClick?: (commerce: Commerce) => void
-  onMapClick?: (coordinates: Coordinates) => void
-  height?: string
-  className?: string
+  userLocation: Coordinates | null
+  zoom: number
+}) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (selectedCommerce && selectedCommerce.latitude && selectedCommerce.longitude) {
+      map.flyTo([selectedCommerce.latitude, selectedCommerce.longitude], zoom + 2, {
+        animate: true,
+        duration: 1.0
+      })
+    } else if (userLocation) {
+      map.flyTo([userLocation.latitude, userLocation.longitude], zoom, {
+        animate: true,
+        duration: 1.0
+      })
+    }
+  }, [map, selectedCommerce, userLocation, zoom])
+
+  return null
 }
 
-// Composant principal de la carte
-export default function LeafletMap({
-  center = [47.4742, -0.5490], // Angers par défaut
-  zoom = 13,
-  commerces = [],
-  userLocation = null,
-  selectedCommerce = null,
-  onCommerceClick = () => {},
-  // onMapClick, // Non utilisé pour l'instant
-  height = '400px',
-  className = ''
-}: LeafletMapProps) {
-  const [mapCenter, setMapCenter] = useState<[number, number]>(center)
-  const mapRef = useRef<L.Map | null>(null)
-
-  // Centrer sur la position de l'utilisateur si disponible
-  useEffect(() => {
-    if (userLocation) {
-      setMapCenter([userLocation.latitude, userLocation.longitude])
-    }
-  }, [userLocation])
-
-  // Gestionnaire de clic sur la carte (optionnel)
-  // const handleMapClick = (e: L.LeafletMouseEvent) => {
-  //   if (onMapClick) {
-  //     onMapClick({
-  //       latitude: e.latlng.lat,
-  //       longitude: e.latlng.lng
-  //     })
-  //   }
-  // }
+const LeafletMap = ({
+  userLocation,
+  commerces,
+  onCommerceClick,
+  height,
+  zoom,
+  center,
+  selectedCommerce
+}: LeafletMapProps) => {
+  const mapRef = useRef<L.Map>(null)
 
   return (
-    <div className={`rounded-lg overflow-hidden shadow-lg ${className}`} style={{ height }}>
+    <div style={{ height, width: '100%' }} className="relative">
+      <MapStyleInjector />
+      <MapEventHandlers commerces={commerces} />
+      
       <MapContainer
-        center={mapCenter}
+        center={center}
         zoom={zoom}
         style={{ height: '100%', width: '100%' }}
-        className="z-0"
+        className="rounded-xl"
         ref={mapRef}
       >
-        {/* Composant pour changer la vue */}
-        <ChangeView center={mapCenter} zoom={zoom} />
-        
-        {/* Couche de tuiles OpenStreetMap */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        
-        {/* Marker de la position utilisateur */}
-        <UserLocationMarker position={userLocation} />
-        
-        {/* Markers des commerces */}
+
+        <MapController 
+          selectedCommerce={selectedCommerce}
+          userLocation={userLocation}
+          zoom={zoom}
+        />
+
+        {/* Marker utilisateur */}
+        {userLocation && (
+          <UserMarker position={userLocation} />
+        )}
+
+        {/* Markers commerces */}
         <CommerceMarkers 
-          commerces={commerces} 
+          commerces={commerces}
           onCommerceClick={onCommerceClick}
           selectedCommerce={selectedCommerce}
         />
       </MapContainer>
-      
-      {/* Contrôles de la carte */}
-      <div className="absolute top-4 right-4 z-10 space-y-2">
-        {/* Bouton pour centrer sur l'utilisateur */}
-        {userLocation && (
-          <button
-            onClick={() => setMapCenter([userLocation.latitude, userLocation.longitude])}
-            className="bg-white p-2 rounded-lg shadow-md hover:bg-gray-50 transition-colors"
-            title="Centrer sur ma position"
-          >
-            🎯
-          </button>
-        )}
-        
-        {/* Information sur le nombre de commerces */}
-        {commerces.length > 0 && (
-          <div className="bg-white px-3 py-1 rounded-lg shadow-md text-sm font-medium text-gray-700">
-            {commerces.length} commerce{commerces.length > 1 ? 's' : ''}
+
+      {/* Indicateur de suivi en cours */}
+      {locationTrackingService.getTrackedCommerces().length > 0 && (
+        <div className="absolute top-4 right-4 bg-amber-100 border border-amber-300 rounded-lg px-3 py-2 text-sm">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+            <span className="text-amber-800 font-medium">
+              {locationTrackingService.getTrackedCommerces().length} commerce{locationTrackingService.getTrackedCommerces().length > 1 ? 's' : ''} suivi{locationTrackingService.getTrackedCommerces().length > 1 ? 's' : ''}
+            </span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
+
+export default LeafletMap
