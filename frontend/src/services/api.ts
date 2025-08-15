@@ -213,6 +213,11 @@ export const orderAPI = {
     return response.data
   },
   
+  getUserOrders: async (): Promise<ApiResponse<Order[]>> => {
+    const response = await api.get('/orders')
+    return response.data
+  },
+  
   getById: async (id: number): Promise<ApiResponse<Order>> => {
     const response = await api.get(`/orders/${id}`)
     return response.data

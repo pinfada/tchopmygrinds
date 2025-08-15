@@ -115,18 +115,47 @@ export interface LocationState {
   permissionGranted: boolean
 }
 
+// Types pour les adresses
+export interface Address {
+  id?: number
+  street: string
+  city: string
+  postalCode: string
+  country: string
+  latitude: number
+  longitude: number
+  isDefault?: boolean
+}
+
 // Types pour les commandes
 export interface Order {
   id: number
   userId: number
   items: CartItem[]
   totalAmount: number
+  deliveryFee: number
+  grandTotal: number
   status: 'pending' | 'confirmed' | 'preparing' | 'delivered' | 'cancelled'
-  deliveryAddress: string
+  deliveryAddress: Address
   phone: string
   notes?: string
+  paymentMethod: 'card' | 'cash'
   createdAt: string
   updatedAt: string
+}
+
+export interface OrderState {
+  orders: Order[]
+  currentOrder: Order | null
+  loading: boolean
+  error: string | null
+}
+
+export interface OrderFormData {
+  deliveryAddress: Address
+  phone: string
+  notes: string
+  paymentMethod: 'card' | 'cash'
 }
 
 // Types pour les API responses

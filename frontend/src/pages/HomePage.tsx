@@ -70,12 +70,20 @@ const HomePage = () => {
                   className="w-full px-6 py-4 rounded-lg text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-emerald-300 focus:outline-none"
                 />
               </div>
-              <Link 
-                to={`/products${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`}
-                className="px-8 py-4 bg-white text-emerald-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Rechercher
-              </Link>
+              <div className="flex gap-2">
+                <Link 
+                  to={`/products${searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''}`}
+                  className="px-6 py-4 bg-white text-emerald-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Rechercher
+                </Link>
+                <Link 
+                  to="/map"
+                  className="px-6 py-4 bg-white/20 text-white font-semibold rounded-lg hover:bg-white/30 transition-colors border-2 border-white/30"
+                >
+                  📍 Carte
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -219,7 +227,7 @@ const HomePage = () => {
               Carte des commerces
             </h2>
             <Link 
-              to="/commerces/map" 
+              to="/map" 
               className="text-emerald-600 hover:text-emerald-700 font-medium"
             >
               Voir en grand →

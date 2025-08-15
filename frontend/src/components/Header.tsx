@@ -116,6 +116,12 @@ const Header = () => {
                     >
                       Mon Profil
                     </Link>
+                    <Link 
+                      to="/orders" 
+                      className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Mes Commandes
+                    </Link>
                     {user.role !== 'others' && (
                       <Link 
                         to="/dashboard" 

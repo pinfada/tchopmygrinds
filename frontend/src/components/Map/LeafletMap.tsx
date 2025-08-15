@@ -78,15 +78,19 @@ function UserLocationMarker({ position }: { position: Coordinates | null }) {
 // Composant pour les markers des commerces
 function CommerceMarkers({ 
   commerces, 
-  onCommerceClick 
+  onCommerceClick,
+  selectedCommerce 
 }: { 
   commerces: Commerce[]
-  onCommerceClick: (commerce: Commerce) => void 
+  onCommerceClick: (commerce: Commerce) => void
+  selectedCommerce?: Commerce | null
 }) {
   return (
     <>
       {commerces.map((commerce) => {
         if (!commerce.latitude || !commerce.longitude) return null
+        
+        const isSelected = selectedCommerce?.id === commerce.id
         
         return (
           <Marker
@@ -96,6 +100,7 @@ function CommerceMarkers({
             eventHandlers={{
               click: () => onCommerceClick(commerce),
             }}
+            zIndexOffset={isSelected ? 1000 : 0}
           >
             <Popup>
               <div className="min-w-[200px]">
@@ -142,6 +147,7 @@ interface LeafletMapProps {
   zoom?: number
   commerces?: Commerce[]
   userLocation?: Coordinates | null
+  selectedCommerce?: Commerce | null
   onCommerceClick?: (commerce: Commerce) => void
   onMapClick?: (coordinates: Coordinates) => void
   height?: string
@@ -154,6 +160,7 @@ export default function LeafletMap({
   zoom = 13,
   commerces = [],
   userLocation = null,
+  selectedCommerce = null,
   onCommerceClick = () => {},
   // onMapClick, // Non utilisé pour l'instant
   height = '400px',
@@ -203,7 +210,8 @@ export default function LeafletMap({
         {/* Markers des commerces */}
         <CommerceMarkers 
           commerces={commerces} 
-          onCommerceClick={onCommerceClick} 
+          onCommerceClick={onCommerceClick}
+          selectedCommerce={selectedCommerce}
         />
       </MapContainer>
       

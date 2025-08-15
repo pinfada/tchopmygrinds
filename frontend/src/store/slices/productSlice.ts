@@ -138,7 +138,7 @@ const productSlice = createSlice({
       })
       .addCase(fetchProductById.fulfilled, (state, action) => {
         state.loading = false
-        state.currentProduct = action.payload
+        state.currentProduct = action.payload.product || action.payload
       })
       .addCase(fetchProductById.rejected, (state, action) => {
         state.loading = false
@@ -146,9 +146,17 @@ const productSlice = createSlice({
       })
       
       // Fetch products by commerce
+      .addCase(fetchProductsByCommerce.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
       .addCase(fetchProductsByCommerce.fulfilled, (state, action) => {
         state.loading = false
-        state.products = action.payload
+        state.products = action.payload.products || action.payload
+      })
+      .addCase(fetchProductsByCommerce.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.error.message || 'Erreur de chargement des produits'
       })
       
       // Search products
