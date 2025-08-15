@@ -21,19 +21,23 @@ export interface AuthState {
 export interface Commerce {
   id: number
   name: string
-  description: string
-  address: string
+  description?: string
+  adress1: string // Nom du champ dans la DB Rails
+  address?: string // Alias pour compatibilité
   latitude: number
   longitude: number
   phone?: string
   email?: string
-  category: string
-  isVerified: boolean
-  rating: number
+  category?: string
+  isVerified?: boolean
+  rating?: number
   distance?: number
-  userId: number
-  createdAt: string
-  updatedAt: string
+  userId?: number
+  createdAt?: string
+  updatedAt?: string
+  // Champs additionnels utilisés dans l'interface
+  ville?: string // Alias pour la ville
+  productsCount?: number // Nombre de produits du commerce
 }
 
 export interface CommerceState {

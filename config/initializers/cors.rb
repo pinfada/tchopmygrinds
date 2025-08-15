@@ -1,33 +1,62 @@
-# Be sure to restart your server when you modify this file.
+# Configuration CORS pour TchopMyGrinds React + Rails API
+# JWT Authentication - pas de cookies donc credentials: false
 
-# Avoid CORS issues when API is called from the frontend app.
-# Handle Cross-Origin Resource Sharing (CORS) in order to accept cross-origin Ajax requests.
-
-# Read more: https://github.com/cyu/rack-cors
-
-# Configuration CORS pour l'API React
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    # En développement: autoriser React (port 3001)
-    origins 'http://localhost:3001', 'http://127.0.0.1:3001'
+    # Origins autorisés pour le développement
+    origins 'http://localhost:3001', 'http://127.0.0.1:3001', 'localhost:3001'
     
-    resource '/api/*',
+    # Endpoints API publics (consultation sans auth)
+    resource '/api/v1/commerces*',
       headers: :any,
+      methods: [:get, :options, :head],
+      credentials: false, # JWT ne nécessite pas de cookies
+      max_age: 86400
+      
+    resource '/api/v1/products*',
+      headers: :any,
+      methods: [:get, :options, :head],
+      credentials: false,
+      max_age: 86400
+    
+    # Endpoints API authentifiés
+    resource '/api/v1/auth*',
+      headers: ['Authorization', 'Content-Type', 'Accept', 'Origin'],
+      methods: [:get, :post, :patch, :delete, :options, :head],
+      credentials: false,
+      expose: ['Authorization'], # Important pour récupérer le JWT token
+      max_age: 86400
+      
+    # Autres endpoints API nécessitant auth
+    resource '/api/v1/*',
+      headers: ['Authorization', 'Content-Type', 'Accept', 'Origin'],
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: true,
-      expose: ['Authorization']
+      credentials: false,
+      expose: ['Authorization'],
+      max_age: 86400
   end
   
-  # En production: autoriser le domaine principal
+  # Configuration production
   if Rails.env.production?
     allow do
       origins ENV['FRONTEND_URL'] || 'https://tchopmygrinds.onrender.com'
       
-      resource '/api/*',
+      resource '/api/v1/*',
         headers: :any,
         methods: [:get, :post, :put, :patch, :delete, :options, :head],
-        credentials: true,
-        expose: ['Authorization']
+        credentials: false,
+        expose: ['Authorization'],
+        max_age: 86400
     end
+  end
+  
+  # Fallback pour tous les OPTIONS (préflight)
+  allow do
+    origins '*'
+    resource '*',
+      headers: :any,
+      methods: [:options],
+      credentials: false,
+      max_age: 1728000
   end
 end

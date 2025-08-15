@@ -6,8 +6,10 @@ class Commerce < ApplicationRecord
 	belongs_to :user
 	has_many :categorizations
 	has_many :products, -> { distinct }, through: :categorizations
-	#geocoded_by :adress1
-	#after_validation :geocode, :if => :adress1_changed?
+	
+	# Configuration Geocoder pour la géolocalisation  
+	geocoded_by :adress1
+	after_validation :geocode, if: :adress1_changed?
 
 	reverse_geocoded_by :latitude, :longitude do |obj,results|
 		if geo = results.first

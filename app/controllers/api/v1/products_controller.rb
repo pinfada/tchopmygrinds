@@ -1,4 +1,6 @@
 class Api::V1::ProductsController < Api::V1::BaseController
+  # Skip authentication pour les endpoints publics de consultation
+  skip_before_action :authenticate_user_from_token!, only: [:index, :search, :categories, :show]
   before_action :set_product, only: [:show, :update, :destroy]
   before_action :authenticate_user!, only: [:create, :update, :destroy]
   

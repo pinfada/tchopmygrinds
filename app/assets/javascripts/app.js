@@ -5,8 +5,8 @@
 		'templates', 
 		'ui.bootstrap', 
 		'rails', 
-		'ui-leaflet',
-		'angularTrix'
+		'ui-leaflet'
+		// 'angularTrix' - module not available
 	];
 	var marketApp = angular.module('marketApp', modules);
 

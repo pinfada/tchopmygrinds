@@ -15,7 +15,7 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: { email: string; password: string }) => {
     const response = await authAPI.login(credentials)
-    localStorage.setItem('auth_token', response.token)
+    // Le token JWT est automatiquement géré par les intercepteurs Axios
     return response
   }
 )
@@ -24,7 +24,7 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData: { email: string; password: string; role: string; name?: string }) => {
     const response = await authAPI.register(userData)
-    localStorage.setItem('auth_token', response.token)
+    // Le token JWT est automatiquement géré par les intercepteurs Axios
     return response
   }
 )
@@ -65,8 +65,8 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false
         state.user = action.payload.user
-        state.token = action.payload.token
         state.isAuthenticated = true
+        // Le token JWT est géré automatiquement par les intercepteurs
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false
@@ -82,8 +82,8 @@ const authSlice = createSlice({
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false
         state.user = action.payload.user
-        state.token = action.payload.token
         state.isAuthenticated = true
+        // Le token JWT est géré automatiquement par les intercepteurs
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false
@@ -100,9 +100,9 @@ const authSlice = createSlice({
       // Check auth status
       .addCase(checkAuthStatus.fulfilled, (state, action) => {
         state.user = action.payload.user
-        state.token = action.payload.token
         state.isAuthenticated = true
         state.loading = false
+        // Le token est maintenu dans localStorage par les intercepteurs
       })
       .addCase(checkAuthStatus.rejected, (state) => {
         state.user = null

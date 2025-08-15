@@ -13,7 +13,7 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require turbolinks
+//= require turbo
 //= require angular
 //= require leaflet
 //= require angular-rails-templates
@@ -21,13 +21,13 @@
 //= require angular-ui-bootstrap
 //= require angular-ui-bootstrap-tpls
 //= require angular-leaflet
-//= require leaflet.js.erb
+//= require leaflet
 //= require leaflet.awesome-markers
 //= require modern-maps
 //= require angularjs/rails/resource
 //= require routes_helper
-//= require angular-trix
-//= require app.js.erb
+// angular-trix not available, skipped
+//= require app
 //= require directives/app_image
 //= require directives/simple_searchbox
 //= require directives/field_validator

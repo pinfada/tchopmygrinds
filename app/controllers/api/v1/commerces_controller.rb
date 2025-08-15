@@ -1,4 +1,6 @@
 class Api::V1::CommercesController < Api::V1::BaseController
+  # Skip authentication pour les endpoints publics de consultation
+  skip_before_action :authenticate_user_from_token!, only: [:index, :nearby, :search, :show]
   before_action :set_commerce, only: [:show, :update, :destroy]
   before_action :authenticate_user!, only: [:create, :update, :destroy]
   
@@ -36,8 +38,7 @@ class Api::V1::CommercesController < Api::V1::BaseController
     end
     
     commerces = Commerce.includes(:user)
-                        .near([latitude, longitude], radius)
-                        .order_by_distance_from([latitude, longitude])
+                        .near([latitude, longitude], radius, order: :distance)
     
     # Application des autres filtres
     commerces = commerces.where(category: params[:category]) if params[:category].present?
@@ -161,8 +162,8 @@ class Api::V1::CommercesController < Api::V1::BaseController
     {
       id: commerce.id,
       name: commerce.name,
-      description: commerce.details || "", # Use details field instead of description
-      address: commerce.adress1 || "", # Use adress1 field
+      description: commerce.details || "", 
+      address: commerce.adress1 || "",
       latitude: commerce.latitude,
       longitude: commerce.longitude,
       phone: commerce.phone,

@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNearbyCommerces } from '../store/slices/commerceSlice'
-import { getCurrentLocation } from '../store/slices/locationSlice'
+// import { getCurrentLocation } from '../store/slices/locationSlice'
+import LeafletMap from '../components/Map/LeafletMap'
+import GeolocationButton from '../components/Map/GeolocationButton'
+import type { Commerce } from '../types'
 
 const HomePage = () => {
   const dispatch = useAppDispatch()
@@ -22,8 +25,14 @@ const HomePage = () => {
     }
   }, [currentLocation, dispatch, commercesLoading, commerces.length])
 
-  const handleLocationRequest = () => {
-    dispatch(getCurrentLocation())
+  // Fonction de géolocalisation (utilisée dans le composant GeolocationButton)
+  // const handleLocationRequest = () => {
+  //   dispatch(getCurrentLocation())
+  // }
+
+  const handleCommerceClick = (commerce: Commerce) => {
+    // Navigation vers la page du commerce
+    window.location.href = `/commerces/${commerce.id}`
   }
 
   const nearbyCommerces = commerces.slice(0, 6) // Afficher seulement 6 commerces
@@ -81,13 +90,17 @@ const HomePage = () => {
                 <p className="text-gray-600">Trouvez les commerces les plus proches de vous</p>
               </div>
             </div>
-            <button
-              onClick={handleLocationRequest}
-              disabled={locationLoading}
+            <GeolocationButton
+              onLocationFound={(coords) => {
+                dispatch(fetchNearbyCommerces({ 
+                  location: coords, 
+                  radius: 50 
+                }))
+              }}
               className="btn-primary"
             >
               {locationLoading ? 'Localisation...' : 'Activer'}
-            </button>
+            </GeolocationButton>
           </div>
         </section>
       )}
@@ -163,7 +176,7 @@ const HomePage = () => {
                       {[...Array(5)].map((_, i) => (
                         <svg 
                           key={i} 
-                          className={`w-4 h-4 ${i < Math.floor(commerce.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                          className={`w-4 h-4 ${i < Math.floor(commerce.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
                           fill="currentColor" 
                           viewBox="0 0 20 20"
                         >
@@ -172,7 +185,7 @@ const HomePage = () => {
                       ))}
                     </div>
                     <span className="text-gray-500 text-sm ml-2">
-                      ({commerce.rating.toFixed(1)})
+                      ({(commerce.rating || 0).toFixed(1)})
                     </span>
                   </div>
                 </div>
@@ -191,6 +204,40 @@ const HomePage = () => {
           </div>
         )}
       </section>
+
+      {/* Carte des commerces */}
+      {currentLocation && commerces.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Carte des commerces
+            </h2>
+            <Link 
+              to="/commerces/map" 
+              className="text-emerald-600 hover:text-emerald-700 font-medium"
+            >
+              Voir en grand →
+            </Link>
+          </div>
+          
+          <div className="rounded-xl overflow-hidden shadow-lg">
+            <LeafletMap
+              userLocation={currentLocation}
+              commerces={commerces}
+              onCommerceClick={handleCommerceClick}
+              height="500px"
+              zoom={12}
+            />
+          </div>
+          
+          <div className="mt-4 text-center text-sm text-gray-600">
+            {commerces.length} commerce{commerces.length > 1 ? 's' : ''} affiché{commerces.length > 1 ? 's' : ''} 
+            {currentLocation && (
+              <span> • Recherche dans un rayon de 50km</span>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Catégories populaires */}
       <section>

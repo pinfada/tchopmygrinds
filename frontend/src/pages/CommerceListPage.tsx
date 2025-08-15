@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNearbyCommerces, searchCommerces } from '../store/slices/commerceSlice'
 import { getCurrentLocation } from '../store/slices/locationSlice'
+import LeafletMap from '../components/Map/LeafletMap'
+import GeolocationButton from '../components/Map/GeolocationButton'
+import type { Commerce } from '../types'
 
 const CommerceListPage = () => {
   const dispatch = useAppDispatch()
@@ -13,6 +16,7 @@ const CommerceListPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [minRating, setMinRating] = useState(0)
   const [verifiedOnly, setVerifiedOnly] = useState(false)
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
 
   const categories = [
     'Tous',
@@ -70,7 +74,7 @@ const CommerceListPage = () => {
     if (selectedCategory && selectedCategory !== 'Tous' && commerce.category !== selectedCategory) {
       return false
     }
-    if (minRating > 0 && commerce.rating < minRating) {
+    if (minRating > 0 && (commerce.rating || 0) < minRating) {
       return false
     }
     if (verifiedOnly && !commerce.isVerified) {
@@ -78,6 +82,11 @@ const CommerceListPage = () => {
     }
     return true
   })
+
+  const handleCommerceClick = (commerce: Commerce) => {
+    // Navigation vers la page du commerce
+    window.location.href = `/commerces/${commerce.id}`
+  }
 
   return (
     <div className="space-y-8">
@@ -106,12 +115,17 @@ const CommerceListPage = () => {
                 <p className="text-gray-600">Pour voir les commerces les plus proches</p>
               </div>
             </div>
-            <button
-              onClick={handleLocationRequest}
+            <GeolocationButton
+              onLocationFound={(coords) => {
+                dispatch(fetchNearbyCommerces({ 
+                  location: coords, 
+                  radius: 50 
+                }))
+              }}
               className="btn-primary"
             >
               Activer
-            </button>
+            </GeolocationButton>
           </div>
         </div>
       )}
@@ -187,6 +201,33 @@ const CommerceListPage = () => {
               </label>
             </div>
 
+            {/* Toggle vue */}
+            <div className="pt-8">
+              <label className="form-label mb-2">Mode d'affichage</label>
+              <div className="flex rounded-lg border border-gray-200 p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                    viewMode === 'grid' 
+                      ? 'bg-emerald-500 text-white' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  📋 Liste
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`px-3 py-2 rounded text-sm font-medium transition-colors ${
+                    viewMode === 'map' 
+                      ? 'bg-emerald-500 text-white' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  🗺️ Carte
+                </button>
+              </div>
+            </div>
+
             {/* Réinitialiser */}
             <div className="pt-8">
               <button
@@ -240,6 +281,25 @@ const CommerceListPage = () => {
                 </div>
               </div>
             ))}
+          </div>
+        ) : viewMode === 'map' && filteredCommerces.length > 0 ? (
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
+              <p className="text-gray-600">
+                {filteredCommerces.length} commerce{filteredCommerces.length > 1 ? 's' : ''} affiché{filteredCommerces.length > 1 ? 's' : ''} sur la carte
+              </p>
+            </div>
+            
+            <div className="rounded-xl overflow-hidden shadow-lg">
+              <LeafletMap
+                userLocation={currentLocation}
+                commerces={filteredCommerces}
+                onCommerceClick={handleCommerceClick}
+                height="600px"
+                zoom={currentLocation ? 12 : 6}
+                center={currentLocation ? [currentLocation.latitude, currentLocation.longitude] : [46.603354, 1.888334]} // Centre de la France
+              />
+            </div>
           </div>
         ) : filteredCommerces.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -296,7 +356,7 @@ const CommerceListPage = () => {
                         {[...Array(5)].map((_, i) => (
                           <svg 
                             key={i} 
-                            className={`w-4 h-4 ${i < Math.floor(commerce.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                            className={`w-4 h-4 ${i < Math.floor(commerce.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
                             fill="currentColor" 
                             viewBox="0 0 20 20"
                           >
@@ -305,7 +365,7 @@ const CommerceListPage = () => {
                         ))}
                       </div>
                       <span className="text-gray-500 text-sm ml-2">
-                        ({commerce.rating.toFixed(1)})
+                        ({(commerce.rating || 0).toFixed(1)})
                       </span>
                     </div>
                   </div>
