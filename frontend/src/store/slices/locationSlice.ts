@@ -2,10 +2,13 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { LocationState, Coordinates } from '../../types'
 
 const initialState: LocationState = {
-  currentLocation: null,
+  currentLocation: {
+    latitude: 4.0511,  // Douala, Cameroun - pour les tests
+    longitude: 9.7679
+  },
   loading: false,
   error: null,
-  permissionGranted: false,
+  permissionGranted: true,
 }
 
 // Action pour obtenir la géolocalisation

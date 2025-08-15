@@ -7,6 +7,8 @@ import Sidebar from './Sidebar'
 import LeafletMap from '../Map/LeafletMap'
 import GeolocationButton from '../Map/GeolocationButton'
 import Modal from '../ui/Modal'
+import MapSettings from '../Map/MapSettings'
+import { mapSettingsService } from '../../services/mapSettings'
 import type { Commerce } from '../../types'
 
 interface MapLayoutProps {
@@ -23,6 +25,8 @@ const MapLayout = ({ children }: MapLayoutProps) => {
   const [selectedCommerce, setSelectedCommerce] = useState<Commerce | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [modalTitle, setModalTitle] = useState('')
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  const [showSettings, setShowSettings] = useState(false)
 
   // Géolocalisation automatique au montage
   useEffect(() => {
@@ -31,15 +35,46 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     }
   }, [dispatch, currentLocation, locationLoading])
 
+  // Fonction pour recharger les commerces
+  const reloadCommerces = () => {
+    if (currentLocation) {
+      const settings = mapSettingsService.getSettings()
+      dispatch(fetchNearbyCommerces({ 
+        location: currentLocation, 
+        radius: settings.searchRadius 
+      }))
+      setLastRefresh(new Date())
+      console.log(`🔄 Rafraîchissement des commerces (rayon: ${settings.searchRadius}km)`)
+    }
+  }
+
   // Charger les commerces proches quand la position est disponible
   useEffect(() => {
     if (currentLocation && Array.isArray(commerces) && commerces.length === 0 && !loading) {
-      dispatch(fetchNearbyCommerces({ 
-        location: currentLocation, 
-        radius: 50 
-      }))
+      reloadCommerces()
     }
   }, [currentLocation, dispatch, commerces, loading])
+
+  // Écouter les événements de rafraîchissement automatique
+  useEffect(() => {
+    const handleAutoRefresh = () => {
+      console.log('🕐 Rafraîchissement automatique déclenché')
+      reloadCommerces()
+    }
+
+    const handleForceRefresh = () => {
+      console.log('🔄 Rafraîchissement forcé déclenché')
+      reloadCommerces()
+    }
+
+    window.addEventListener('map-auto-refresh', handleAutoRefresh)
+    window.addEventListener('map-force-refresh', handleForceRefresh)
+
+    return () => {
+      window.removeEventListener('map-auto-refresh', handleAutoRefresh)
+      window.removeEventListener('map-force-refresh', handleForceRefresh)
+    }
+  }, [currentLocation])
 
   // Gérer l'affichage des modals selon la route
   useEffect(() => {
@@ -128,6 +163,18 @@ const MapLayout = ({ children }: MapLayoutProps) => {
                   <span>Position active</span>
                 </div>
               )}
+              
+              {/* Bouton paramètres */}
+              <button
+                onClick={() => setShowSettings(true)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Paramètres de la carte"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -142,7 +189,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
             zoom={currentLocation ? 12 : 6}
             center={currentLocation 
               ? [currentLocation.latitude, currentLocation.longitude] 
-              : [46.603354, 1.888334] // Centre de la France
+              : [4.0511, 9.7679] // Douala, Cameroun
             }
           />
         </div>
@@ -166,13 +213,32 @@ const MapLayout = ({ children }: MapLayoutProps) => {
           </div>
         )}
 
-        {/* Statistiques (overlay) */}
+        {/* Statistiques et info refresh (overlay) */}
         {currentLocation && filteredCommerces.length > 0 && (
           <div className="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 z-10">
-            <div className="text-sm">
-              <p className="font-medium text-gray-900">Statistiques</p>
-              <p className="text-gray-600">{filteredCommerces.length} commerces</p>
-              <p className="text-gray-600">Rayon: 50km</p>
+            <div className="text-sm space-y-2">
+              <div>
+                <p className="font-medium text-gray-900">Statistiques</p>
+                <p className="text-gray-600">{filteredCommerces.length} commerces</p>
+                <p className="text-gray-600">Rayon: {mapSettingsService.getSettings().searchRadius}km</p>
+              </div>
+              
+              <div className="border-t border-gray-200 pt-2">
+                <p className="text-xs text-gray-500">
+                  Dernière MAJ: {lastRefresh.toLocaleTimeString()}
+                </p>
+                {mapSettingsService.getSettings().autoRefreshEnabled && (
+                  <p className="text-xs text-emerald-600">
+                    ⏰ Auto-refresh: {mapSettingsService.getSettings().mapRefreshInterval}min
+                  </p>
+                )}
+                <button
+                  onClick={() => mapSettingsService.forceRefresh()}
+                  className="mt-1 text-xs text-blue-600 hover:text-blue-800 underline"
+                >
+                  🔄 Actualiser maintenant
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -187,6 +253,12 @@ const MapLayout = ({ children }: MapLayoutProps) => {
       >
         {children}
       </Modal>
+
+      {/* Modal des paramètres */}
+      <MapSettings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
     </div>
   )
 }

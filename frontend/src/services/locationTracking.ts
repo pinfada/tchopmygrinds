@@ -2,6 +2,8 @@
  * Service de suivi en temps réel des commerces ambulants
  */
 
+import { mapSettingsService } from './mapSettings'
+
 interface AmbulantCommerce {
   id: string
   name: string
@@ -31,10 +33,50 @@ interface TrackingSettings {
 class LocationTrackingService {
   private trackedCommerces: Map<string, AmbulantCommerce> = new Map()
   private trackingIntervals: Map<string, NodeJS.Timeout> = new Map()
+  private trackingCallbacks: Map<string, (commerce: AmbulantCommerce) => void> = new Map()
   private settings: TrackingSettings = {
     updateInterval: 30000, // 30 secondes par défaut
     maxRetries: 3,
     timeout: 10000
+  }
+
+  constructor() {
+    // Initialiser avec les paramètres depuis mapSettingsService
+    this.updateSettingsFromConfig()
+    
+    // Écouter les changements de configuration
+    mapSettingsService.addListener((settings) => {
+      this.updateSettingsFromConfig()
+      this.restartAllTracking()
+    })
+  }
+
+  /**
+   * Met à jour les paramètres depuis la configuration globale
+   */
+  private updateSettingsFromConfig() {
+    const mapSettings = mapSettingsService.getSettings()
+    this.settings = {
+      updateInterval: mapSettings.ambulantTrackingInterval * 1000, // secondes -> ms
+      maxRetries: 3,
+      timeout: 10000
+    }
+  }
+
+  /**
+   * Redémarre tous les suivis avec les nouveaux paramètres
+   */
+  private restartAllTracking() {
+    const activeCommerces = Array.from(this.trackingCallbacks.entries())
+    
+    // Arrêter tous les suivis
+    this.stopAllTracking()
+    
+    // Redémarrer avec les nouveaux paramètres
+    activeCommerces.forEach(([commerceId, callback]) => {
+      console.log(`🔄 Redémarrage du suivi pour commerce ${commerceId} avec nouvel intervalle: ${this.settings.updateInterval}ms`)
+      this.startTracking(commerceId, callback)
+    })
   }
 
   /**
@@ -51,6 +93,9 @@ class LocationTrackingService {
     // Arrêter le suivi existant s'il y en a un
     this.stopTracking(commerceId)
 
+    // Stocker le callback pour pouvoir redémarrer
+    this.trackingCallbacks.set(commerceId, callback)
+
     // Créer un nouvel intervalle
     const interval = setInterval(async () => {
       try {
@@ -58,13 +103,18 @@ class LocationTrackingService {
         if (updatedCommerce) {
           this.trackedCommerces.set(commerceId, updatedCommerce)
           callback(updatedCommerce)
+          
+          // Log pour debug
+          console.log(`📍 Position mise à jour: ${updatedCommerce.name} (${updatedCommerce.latitude.toFixed(4)}, ${updatedCommerce.longitude.toFixed(4)})`)
         }
       } catch (error) {
-        console.error(`Erreur lors du suivi du commerce ${commerceId}:`, error)
+        console.error(`❌ Erreur lors du suivi du commerce ${commerceId}:`, error)
       }
     }, this.settings.updateInterval)
 
     this.trackingIntervals.set(commerceId, interval)
+    
+    console.log(`🚀 Démarrage du suivi pour commerce ${commerceId}, intervalle: ${this.settings.updateInterval/1000}s`)
 
     // Première mise à jour immédiate
     this.fetchCommerceLocation(commerceId)
@@ -75,7 +125,7 @@ class LocationTrackingService {
         }
       })
       .catch(error => {
-        console.error(`Erreur lors de la première mise à jour du commerce ${commerceId}:`, error)
+        console.error(`❌ Erreur lors de la première mise à jour du commerce ${commerceId}:`, error)
       })
   }
 
@@ -87,8 +137,10 @@ class LocationTrackingService {
     if (interval) {
       clearInterval(interval)
       this.trackingIntervals.delete(commerceId)
+      console.log(`⏹️ Arrêt du suivi pour commerce ${commerceId}`)
     }
     this.trackedCommerces.delete(commerceId)
+    this.trackingCallbacks.delete(commerceId)
   }
 
   /**
@@ -100,6 +152,8 @@ class LocationTrackingService {
     })
     this.trackingIntervals.clear()
     this.trackedCommerces.clear()
+    this.trackingCallbacks.clear()
+    console.log(`⏹️ Arrêt de tous les suivis`)
   }
 
   /**

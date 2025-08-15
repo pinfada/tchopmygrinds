@@ -4,7 +4,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
   
   # GET /api/v1/orders
   def index
-    orders = current_user.orders.includes(:order_details, products: :commerce)
+    orders = current_user.orders.includes(:orderdetails, products: :commerce)
     
     # Filtres
     orders = orders.where(status: params[:status]) if params[:status].present?
@@ -43,24 +43,26 @@ class Api::V1::OrdersController < Api::V1::BaseController
           product = Product.find(item_params[:product_id])
           
           # Vérifier le stock
-          if product.stock < item_params[:quantity].to_i
+          if product.unitsinstock < item_params[:quantity].to_i
             raise ActiveRecord::Rollback, "Stock insuffisant pour #{product.name}"
           end
           
-          order_detail = order.order_details.build(
+          order_detail = order.orderdetails.build(
             product: product,
             quantity: item_params[:quantity],
-            unit_price: product.price,
-            total_price: product.price * item_params[:quantity].to_i
+            unitprice: product.unitprice,
+            discount: 0
           )
           order_detail.save!
           
           # Décrémenter le stock
-          product.update!(stock: product.stock - item_params[:quantity].to_i)
+          product.update!(unitsinstock: product.unitsinstock - item_params[:quantity].to_i)
         end
         
         # Calculer le total
-        order.update!(total_amount: order.order_details.sum(:total_price))
+        # Calculer le total manuellement 
+        total = order.orderdetails.sum { |d| d.unitprice * d.quantity * (1 - d.discount) }
+        order.update!(total_amount: total)
       end
       
       # Envoyer notification email (si configuré)
@@ -109,8 +111,8 @@ class Api::V1::OrdersController < Api::V1::BaseController
     begin
       ActiveRecord::Base.transaction do
         # Remettre les produits en stock
-        @order.order_details.includes(:product).each do |detail|
-          detail.product.increment!(:stock, detail.quantity)
+        @order.orderdetails.includes(:product).each do |detail|
+          detail.product.increment!(:unitsinstock, detail.quantity)
         end
         
         @order.update!(status: 'cancelled', cancelled_at: Time.current)
@@ -144,7 +146,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
   private
   
   def set_order
-    @order = current_user.orders.includes(:order_details, products: :commerce).find(params[:id])
+    @order = current_user.orders.includes(:orderdetails, products: :commerce).find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render_not_found('Commande')
   end
@@ -194,7 +196,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
       deliveryAddress: order.delivery_address,
       phone: order.phone,
       notes: order.notes,
-      itemsCount: order.order_details.count,
+      itemsCount: order.orderdetails.count,
       createdAt: order.created_at.iso8601,
       updatedAt: order.updated_at.iso8601,
       cancelledAt: order.cancelled_at&.iso8601
@@ -203,12 +205,12 @@ class Api::V1::OrdersController < Api::V1::BaseController
   
   def order_data_detailed(order)
     data = order_data(order)
-    data[:items] = order.order_details.includes(:product).map do |detail|
+    data[:items] = order.orderdetails.includes(:product).map do |detail|
       {
         id: detail.id,
         quantity: detail.quantity,
-        unitPrice: detail.unit_price,
-        totalPrice: detail.total_price,
+        unitPrice: detail.unitprice,
+        totalPrice: detail.unitprice * detail.quantity * (1 - detail.discount),
         product: {
           id: detail.product.id,
           name: detail.product.name,
