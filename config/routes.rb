@@ -52,7 +52,8 @@ Rails.application.routes.draw do
   # Handle Chrome DevTools requests (ignore silently)
   get '/.well-known/*path', to: proc { |env| [204, {}, ['']] }
   
-  root "pages#home"
+  # Serve React app for all main routes
+  root "pages#react_app"
   get 'users/index'
   devise_for :users, controllers: { 
     #  sessions: 'users/sessions',
@@ -68,14 +69,19 @@ Rails.application.routes.draw do
     #  end
     #end
     
-    match '/home', to: 'pages#home', via: 'get'
-    match '/contact', to: 'pages#contact', via: 'get'
-    match '/propos', to: 'pages#propos', via: 'get'
-    match '/aide', to: 'pages#aide', via: 'get'
-    match '/agrimer', to: 'pages#agrimer', via: 'get'
-    match '/fail', to: 'pages#fail', via: 'get'
+    # React app routes (SPA)
+    get '/map', to: 'pages#react_app'
+    get '/commerces', to: 'pages#react_app'
+    get '/products', to: 'pages#react_app'
+    get '/cart', to: 'pages#react_app'
+    get '/checkout', to: 'pages#react_app'
+    get '/orders', to: 'pages#react_app'
+    get '/profile', to: 'pages#react_app'
+    get '/auth', to: 'pages#react_app'
+    
+    # Legacy routes still needed for APIs
     match '/serveraddress', to: 'pages#serveraddress', via: 'get'
-    match '/test-tailwind', to: 'pages#test_tailwind', via: 'get'
+    match '/agrimer', to: 'pages#agrimer', via: 'get'
   
     resources :newsletters
   

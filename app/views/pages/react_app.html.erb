@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= @titre %></title>
+  
+  <!-- React app built assets -->
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  
+  <!-- Always use built version to avoid Vite dev server conflicts -->
+  <link rel="stylesheet" href="/dist/assets/main-Bq0wDOMK.css">
+  <script type="module" src="/dist/assets/main-B1driWO3.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Pass Rails data to React -->
+  <script type="text/javascript">
+    window.railsData = {
+      csrfToken: '<%= form_authenticity_token %>',
+      currentUser: <%= current_user&.as_json&.to_json || 'null' %>,
+      apiBaseUrl: '<%= Rails.env.development? ? 'http://localhost:3000' : request.base_url %>',
+      environment: '<%= Rails.env %>'
+    };
+  </script>
+</body>
+</html>

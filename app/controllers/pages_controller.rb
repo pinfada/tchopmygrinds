@@ -47,4 +47,9 @@ class PagesController < ApplicationController
     render :json => @data
   end
 
+  def react_app
+    @titre = "TchopMyGrinds"
+    render 'react_app', layout: false
+  end
+
 end
