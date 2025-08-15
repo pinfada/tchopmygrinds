@@ -17,6 +17,9 @@ Rails.application.routes.draw do
           get :nearby
           get :search
         end
+        member do
+          get :products
+        end
       end
       
       # Produits

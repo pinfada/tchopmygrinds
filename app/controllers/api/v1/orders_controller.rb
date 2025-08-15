@@ -115,7 +115,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
           detail.product.increment!(:unitsinstock, detail.quantity)
         end
         
-        @order.update!(status: 'cancelled', cancelled_at: Time.current)
+        @order.update!(status: 'Cancelled')
       end
       
       render_success({
@@ -199,7 +199,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
       itemsCount: order.orderdetails.count,
       createdAt: order.created_at.iso8601,
       updatedAt: order.updated_at.iso8601,
-      cancelledAt: order.cancelled_at&.iso8601
+      cancelledAt: order.respond_to?(:cancelled_at) ? order.cancelled_at&.iso8601 : nil
     }
   end
   

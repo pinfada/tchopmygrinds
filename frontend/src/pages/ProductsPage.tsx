@@ -70,10 +70,10 @@ const ProductsPage = () => {
     if (selectedCategory && selectedCategory !== 'Tous' && product.category !== selectedCategory) {
       return false
     }
-    if (minPrice && product.price < Number(minPrice)) {
+    if (minPrice && product.price && product.price < Number(minPrice)) {
       return false
     }
-    if (maxPrice && product.price > Number(maxPrice)) {
+    if (maxPrice && product.price && product.price > Number(maxPrice)) {
       return false
     }
     return true
@@ -273,10 +273,10 @@ const ProductsPage = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-emerald-600">
-                        {product.price.toFixed(2)}€
+                        {product.price ? product.price.toFixed(2) : '0.00'}€
                       </span>
                       <span className="text-gray-500 text-sm">
-                        / {product.unit}
+                        / {product.unit || 'unité'}
                       </span>
                     </div>
                     
@@ -290,7 +290,7 @@ const ProductsPage = () => {
                         </div>
                         {product.commerce.distance && (
                           <div className="text-xs text-gray-500 mt-1">
-                            {product.commerce.distance.toFixed(1)} km
+                            {typeof product.commerce.distance === 'number' ? product.commerce.distance.toFixed(1) : product.commerce.distance} km
                           </div>
                         )}
                       </div>
@@ -298,24 +298,24 @@ const ProductsPage = () => {
                     
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-emerald-600 font-medium">
-                        {product.category}
+                        {product.category || 'Non catégorisé'}
                       </span>
                       <span className="text-sm text-gray-500">
-                        Stock: {product.stock}
+                        Stock: {product.stock || 0}
                       </span>
                     </div>
                     
                     <button
                       onClick={() => handleAddToCart(product)}
-                      disabled={!product.isAvailable || product.stock === 0}
+                      disabled={!product.isAvailable || (product.stock || 0) === 0}
                       className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
-                        product.isAvailable && product.stock > 0
+                        product.isAvailable && (product.stock || 0) > 0
                           ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                     >
                       {!product.isAvailable ? 'Indisponible' : 
-                       product.stock === 0 ? 'Rupture de stock' : 
+                       (product.stock || 0) === 0 ? 'Rupture de stock' : 
                        'Ajouter au panier'}
                     </button>
                   </div>

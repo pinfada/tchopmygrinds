@@ -1,7 +1,7 @@
 class Api::V1::CommercesController < Api::V1::BaseController
   # Skip authentication pour les endpoints publics de consultation
-  skip_before_action :authenticate_user_from_token!, only: [:index, :nearby, :search, :show]
-  before_action :set_commerce, only: [:show, :update, :destroy]
+  skip_before_action :authenticate_user_from_token!, only: [:index, :nearby, :search, :show, :products]
+  before_action :set_commerce, only: [:show, :update, :destroy, :products]
   before_action :authenticate_user!, only: [:create, :update, :destroy]
   
   # GET /api/v1/commerces
@@ -85,6 +85,42 @@ class Api::V1::CommercesController < Api::V1::BaseController
       commerce: commerce_data_detailed(@commerce)
     })
   end
+
+  # GET /api/v1/commerces/:id/products
+  def products
+    # Utiliser l'association many-to-many via categorizations
+    products = @commerce.products.includes(:categorizations)
+    
+    # Appliquer les filtres
+    products = products.where('name ILIKE ?', "%#{params[:search]}%") if params[:search].present?
+    products = products.where(category: params[:category]) if params[:category].present?
+    products = products.where('unitprice >= ?', params[:min_price]) if params[:min_price].present?
+    products = products.where('unitprice <= ?', params[:max_price]) if params[:max_price].present?
+    products = products.where('unitsinstock > 0') if params[:available] == 'true'
+    
+    # Tri
+    case params[:sort_by]
+    when 'name'
+      products = products.order(:name)
+    when 'price'
+      products = products.order(:unitprice)
+    when 'stock'
+      products = products.order(unitsinstock: :desc)
+    else
+      products = products.order(:name)
+    end
+    
+    result = paginate_collection(products)
+    
+    render_success({
+      products: result[:data].map { |product| product_data(product) },
+      meta: result[:meta],
+      commerce: {
+        id: @commerce.id,
+        name: @commerce.name
+      }
+    })
+  end
   
   # POST /api/v1/commerces
   def create
@@ -127,7 +163,7 @@ class Api::V1::CommercesController < Api::V1::BaseController
   private
   
   def set_commerce
-    @commerce = Commerce.includes(:user, :products).find(params[:id])
+    @commerce = Commerce.includes(:user).find(params[:id])
   rescue ActiveRecord::RecordNotFound
     render_not_found('Commerce')
   end
@@ -191,8 +227,28 @@ class Api::V1::CommercesController < Api::V1::BaseController
         id: commerce.user.id,
         name: commerce.user.name,
         email: commerce.user.email,
-        role: commerce.user.role
+        role: commerce.user.statut_type
       }
     })
+  end
+
+  def product_data(product)
+    {
+      id: product.id,
+      name: product.name,
+      description: product.description || "",
+      unitPrice: product.unitprice,
+      quantityPerUnit: product.quantityperunit,
+      unitsInStock: product.unitsinstock,
+      unitsOnOrder: product.unitsonorder || 0,
+      category: product.category,
+      available: (product.unitsinstock || 0) > 0,
+      createdAt: product.created_at.iso8601,
+      updatedAt: product.updated_at.iso8601,
+      commerce: {
+        id: product.commerce&.id,
+        name: product.commerce&.name
+      }
+    }
   end
 end

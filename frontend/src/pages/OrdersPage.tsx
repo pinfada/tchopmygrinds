@@ -180,10 +180,10 @@ const OrdersPage = () => {
                   </span>
                   <div className="text-right">
                     <div className="text-2xl font-bold text-gray-900">
-                      {order.grandTotal.toFixed(2)}€
+                      {order.grandTotal ? Number(order.grandTotal).toFixed(2) : '0.00'}€
                     </div>
                     <div className="text-sm text-gray-500">
-                      {order.items.reduce((sum, item) => sum + item.quantity, 0)} article{order.items.length > 1 ? 's' : ''}
+                      {order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 0), 0) : 0} article{(order.items?.length || 0) > 1 ? 's' : ''}
                     </div>
                   </div>
                 </div>
@@ -193,14 +193,14 @@ const OrdersPage = () => {
               <div className="border-t border-gray-100 pt-4 mb-6">
                 <h4 className="font-medium text-gray-900 mb-3">Articles commandés</h4>
                 <div className="space-y-3">
-                  {order.items.map((item, index) => (
+                  {(order.items || []).map((item, index) => (
                     <div key={index} className="flex items-center justify-between py-2">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-                          {item.product.imageUrl ? (
+                          {item.product?.imageUrl ? (
                             <img 
                               src={item.product.imageUrl} 
-                              alt={item.product.name}
+                              alt={item.product?.name || 'Produit'}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -212,11 +212,11 @@ const OrdersPage = () => {
                           )}
                         </div>
                         <div>
-                          <h5 className="font-medium text-gray-900">{item.product.name}</h5>
+                          <h5 className="font-medium text-gray-900">{item.product?.name || 'Produit inconnu'}</h5>
                           <p className="text-sm text-gray-500">
-                            {item.quantity} × {item.unitPrice.toFixed(2)}€
+                            {item.quantity || 0} × {item.unitPrice ? Number(item.unitPrice).toFixed(2) : '0.00'}€
                           </p>
-                          {item.product.commerce && (
+                          {item.product?.commerce && (
                             <p className="text-sm text-gray-500">
                               {item.product.commerce.name}
                             </p>
@@ -224,7 +224,7 @@ const OrdersPage = () => {
                         </div>
                       </div>
                       <div className="text-sm font-medium text-gray-900">
-                        {item.totalPrice.toFixed(2)}€
+                        {item.totalPrice ? Number(item.totalPrice).toFixed(2) : '0.00'}€
                       </div>
                     </div>
                   ))}
@@ -235,9 +235,9 @@ const OrdersPage = () => {
               <div className="border-t border-gray-100 pt-4 mb-6">
                 <h4 className="font-medium text-gray-900 mb-2">Adresse de livraison</h4>
                 <div className="text-sm text-gray-600">
-                  <p>{order.deliveryAddress.street}</p>
-                  <p>{order.deliveryAddress.postalCode} {order.deliveryAddress.city}</p>
-                  <p>{order.deliveryAddress.country}</p>
+                  <p>{order.deliveryAddress?.street || 'Adresse non renseignée'}</p>
+                  <p>{order.deliveryAddress?.postalCode || ''} {order.deliveryAddress?.city || ''}</p>
+                  <p>{order.deliveryAddress?.country || ''}</p>
                 </div>
                 {order.phone && (
                   <p className="text-sm text-gray-600 mt-1">
@@ -257,15 +257,15 @@ const OrdersPage = () => {
                   <div className="w-64 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Sous-total</span>
-                      <span>{order.totalAmount.toFixed(2)}€</span>
+                      <span>{order.totalAmount ? Number(order.totalAmount).toFixed(2) : '0.00'}€</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Frais de livraison</span>
-                      <span>{order.deliveryFee.toFixed(2)}€</span>
+                      <span>{order.deliveryFee ? Number(order.deliveryFee).toFixed(2) : '0.00'}€</span>
                     </div>
                     <div className="flex justify-between text-lg font-bold border-t pt-2">
                       <span>Total</span>
-                      <span>{order.grandTotal.toFixed(2)}€</span>
+                      <span>{order.grandTotal ? Number(order.grandTotal).toFixed(2) : '0.00'}€</span>
                     </div>
                   </div>
                 </div>

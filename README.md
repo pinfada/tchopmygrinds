@@ -8,20 +8,22 @@ TchopMyGrinds est une application web qui permet aux utilisateurs de découvrir 
 
 ## 🏗️ Architecture technique
 
-### Backend (Ruby on Rails 6.0)
-- **Framework**: Ruby on Rails avec architecture MVC
-- **Base de données**: PostgreSQL avec capacités spatiales
-- **Authentification**: Devise avec autorisation basée sur les rôles (CanCanCan)
+### Backend (Ruby on Rails 7.1.5)
+- **API Architecture**: RESTful API avec namespace `/api/v1`
+- **Base de données**: SQLite (dev) / PostgreSQL (prod) avec capacités spatiales
+- **Authentification**: Devise-JWT pour l'authentification par tokens
 - **Géolocalisation**: Gem Geocoder pour les recherches par proximité
 - **Email**: Intégration SendGrid pour les notifications
 - **Administration**: Interface RailsAdmin pour la gestion backend
+- **CORS**: Configuration pour intégration React
 
-### Frontend (AngularJS 1.8)
-- **Framework**: AngularJS en Single Page Application (SPA)
-- **Cartographie**: Leaflet.js avec marqueurs personnalisés
-- **UI**: Bootstrap 3.4.1 avec styles SCSS personnalisés
-- **Panier**: Module ngCart pour la gestion du shopping
-- **Templates**: Système de templates modulaires avec Asset Pipeline Rails
+### Frontend (React 18 + TypeScript)
+- **Framework**: React avec TypeScript et Vite comme build tool
+- **État global**: Redux Toolkit avec 7 slices spécialisés
+- **Cartographie**: Leaflet.js avec marqueurs personnalisés et suivi temps réel
+- **UI**: Tailwind CSS avec composants modernes et responsive
+- **Panier**: Gestion Redux avec persistance localStorage
+- **API**: Client Axios avec intercepteurs JWT et gestion d'erreurs
 
 ## 👥 Types d'utilisateurs
 
@@ -32,25 +34,28 @@ TchopMyGrinds est une application web qui permet aux utilisateurs de découvrir 
 ## 🌟 Fonctionnalités principales
 
 ### Pour les acheteurs
-- **Découverte géolocalisée** : Trouvez des commerces dans un rayon de 50km
-- **Navigation interactive** : Carte avec marqueurs des commerces disponibles
-- **Catalogue de produits** : Parcourez les produits par commerçant
-- **Panier d'achat** : Ajoutez et gérez vos articles
-- **Commandes** : Passez commande avec suivi du statut
-- **Notifications** : Recevez des emails de confirmation et de suivi
+- **Découverte géolocalisée** : Trouvez des commerces dans un rayon configurable (5-100km)
+- **Navigation interactive** : Carte Leaflet avec marqueurs distincts par type de commerce
+- **Catalogue de produits** : Parcourez les produits avec recherche et filtres avancés
+- **Panier d'achat** : Gestion complète avec persistance automatique
+- **Commandes** : Processus de commande moderne avec JWT
+- **Interface responsive** : Optimisé mobile avec sidebar collapsible
 
 ### Pour les marchands
-- **Gestion du commerce** : Créez et gérez votre profil commerçant
-- **Inventaire** : Ajoutez et mettez à jour vos produits
-- **Géolocalisation** : Définissez votre position pour être visible aux clients
-- **Commandes** : Recevez et traitez les commandes clients
-- **Interface d'administration** : Accès aux outils de gestion via RailsAdmin
+- **Types de commerce** : Support pour commerces fixes 🏪 et ambulants 🚚
+- **Suivi temps réel** : Trackng GPS pour marchands itinérants avec intervalles configurables
+- **Gestion du commerce** : API complète pour profil et géolocalisation
+- **Inventaire** : Gestion produits avec stock et statut de disponibilité
+- **Commandes** : Réception et traitement via interface moderne
+- **Tableau de bord** : Accès RailsAdmin pour gestion avancée
 
-### Fonctionnalités système
-- **Recherche par proximité** : Algorithme de géolocalisation intelligent
-- **Cartographie temps réel** : Visualisation des commerces sur carte interactive
-- **Système de commandes** : Workflow complet de la commande à la livraison
-- **Notifications automatiques** : Emails transactionnels pour toutes les étapes
+### Fonctionnalités système avancées
+- **Suivi temps réel** : Tracking automatique des commerces ambulants
+- **Auto-refresh** : Mise à jour automatique configurable (5-60 minutes)
+- **Paramètres utilisateur** : Configuration personnalisable des préférences carte
+- **API REST moderne** : Architecture découplée avec JWT
+- **Performance optimisée** : Code splitting et lazy loading React
+- **TypeScript** : Sécurité de type pour réduire les erreurs
 
 ## 🛠️ Installation et développement
 
