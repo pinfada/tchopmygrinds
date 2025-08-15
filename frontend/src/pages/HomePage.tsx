@@ -15,9 +15,15 @@ const HomePage = () => {
   
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Fonction utilitaire pour convertir le rating en nombre
+  const getRating = (rating: any): number => {
+    const num = Number(rating)
+    return isNaN(num) ? 0 : num
+  }
+
   useEffect(() => {
     // Charger les commerces proches si géolocalisation disponible
-    if (currentLocation && !commercesLoading && commerces.length === 0) {
+    if (currentLocation && !commercesLoading && Array.isArray(commerces) && commerces.length === 0) {
       dispatch(fetchNearbyCommerces({ 
         location: currentLocation, 
         radius: 50 
@@ -35,7 +41,7 @@ const HomePage = () => {
     window.location.href = `/commerces/${commerce.id}`
   }
 
-  const nearbyCommerces = commerces.slice(0, 6) // Afficher seulement 6 commerces
+  const nearbyCommerces = Array.isArray(commerces) ? commerces.slice(0, 6) : [] // Afficher seulement 6 commerces
 
   return (
     <div className="space-y-12">
@@ -176,7 +182,7 @@ const HomePage = () => {
                       {[...Array(5)].map((_, i) => (
                         <svg 
                           key={i} 
-                          className={`w-4 h-4 ${i < Math.floor(commerce.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                          className={`w-4 h-4 ${i < Math.floor(getRating(commerce.rating)) ? 'text-yellow-400' : 'text-gray-300'}`} 
                           fill="currentColor" 
                           viewBox="0 0 20 20"
                         >
@@ -185,7 +191,7 @@ const HomePage = () => {
                       ))}
                     </div>
                     <span className="text-gray-500 text-sm ml-2">
-                      ({(commerce.rating || 0).toFixed(1)})
+                      ({getRating(commerce.rating).toFixed(1)})
                     </span>
                   </div>
                 </div>
@@ -206,7 +212,7 @@ const HomePage = () => {
       </section>
 
       {/* Carte des commerces */}
-      {currentLocation && commerces.length > 0 && (
+      {currentLocation && Array.isArray(commerces) && commerces.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -231,7 +237,7 @@ const HomePage = () => {
           </div>
           
           <div className="mt-4 text-center text-sm text-gray-600">
-            {commerces.length} commerce{commerces.length > 1 ? 's' : ''} affiché{commerces.length > 1 ? 's' : ''} 
+            {Array.isArray(commerces) ? commerces.length : 0} commerce{(Array.isArray(commerces) ? commerces.length : 0) > 1 ? 's' : ''} affiché{(Array.isArray(commerces) ? commerces.length : 0) > 1 ? 's' : ''} 
             {currentLocation && (
               <span> • Recherche dans un rayon de 50km</span>
             )}

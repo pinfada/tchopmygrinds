@@ -1,0 +1,727 @@
+/*
+ * TchopMyGrinds - Marketplace Application Styles
+ * This manifest includes all stylesheets for the marketplace application
+ *
+
+
+
+
+ */
+
+/* Styles spécifiques à l'application qui ne sont pas dans Tailwind */
+
+/* Forcer l'application de Tailwind sur le contenu dynamique AngularJS */
+[data-tailwind-ready] * {
+  /* Assurer que toutes les classes Tailwind sont appliquées */
+  box-sizing: border-box;
+}
+
+/* Force le recalcul des styles pour ng-include */
+[ng-include], [ng-include] * {
+  /* Force le navigateur à recalculer les styles */
+  transform: translateZ(0);
+}
+
+/* Classes de base pour compatibilité */
+.w-full { width: 100% !important; }
+.h-full { height: 100% !important; }
+.h-screen { height: 100vh !important; }
+.bg-gray-50 { background-color: #f9fafb !important; }
+.font-body { font-family: Inter, system-ui, sans-serif !important; }
+
+/* Remplacement des classes Bootstrap par Tailwind */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background-color: #16a34a; color: white; border-color: #16a34a; }
+.btn-primary:hover { background-color: #15803d; }
+.btn-secondary { background-color: #f3f4f6; color: #374151; border-color: #d1d5db; }
+.btn-secondary:hover { background-color: #e5e7eb; }
+.row { display: flex; flex-wrap: wrap; margin: -0.5rem; }
+.col, .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 { padding: 0.5rem; flex: 1; }
+.col-12 { width: 100%; flex: none; }
+.col-6 { width: 50%; flex: none; }
+.col-4 { width: 33.333333%; flex: none; }
+.col-3 { width: 25%; flex: none; }
+
+/* Classes spécifiques pour éviter les conflits */
+.bootstrap-override { all: initial; font-family: Inter, system-ui, sans-serif; }
+/* line 2, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox {
+  position: relative;
+}
+
+/* line 5, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* line 12, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .search-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* line 19, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* line 33, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .suggestions-dropdown .suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* line 38, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .suggestions-dropdown .suggestion-item:hover, .simple-searchbox .suggestions-dropdown .suggestion-item.selected {
+  background-color: #f8f9fa;
+}
+
+/* line 43, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .suggestions-dropdown .suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* line 47, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .suggestions-dropdown .suggestion-item .param-name {
+  font-weight: 500;
+  color: #333;
+}
+
+/* line 52, app/assets/stylesheets/components/simple_searchbox.scss */
+.simple-searchbox .suggestions-dropdown .suggestion-item .param-type {
+  color: #666;
+  font-style: italic;
+  margin-left: 8px;
+}
+@charset "UTF-8";
+/* line 4, app/assets/stylesheets/components/form_validation.scss */
+.form-control, .form-input {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* line 7, app/assets/stylesheets/components/form_validation.scss */
+.form-control.is-valid, .form-input.is-valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* line 11, app/assets/stylesheets/components/form_validation.scss */
+.form-control.is-valid:focus, .form-input.is-valid:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* line 17, app/assets/stylesheets/components/form_validation.scss */
+.form-control.is-invalid, .form-input.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* line 21, app/assets/stylesheets/components/form_validation.scss */
+.form-control.is-invalid:focus, .form-input.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* line 29, app/assets/stylesheets/components/form_validation.scss */
+.field-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+  animation: slideDown 0.3s ease-out;
+}
+
+/* line 36, app/assets/stylesheets/components/form_validation.scss */
+.field-error:before {
+  content: "⚠ ";
+  font-size: 0.8rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* line 55, app/assets/stylesheets/components/form_validation.scss */
+.alert-validation {
+  border-radius: 8px;
+  border: 1px solid;
+  padding: 12px 16px;
+  margin-bottom: 1rem;
+}
+
+/* line 61, app/assets/stylesheets/components/form_validation.scss */
+.alert-validation.alert-danger {
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+/* line 67, app/assets/stylesheets/components/form_validation.scss */
+.alert-validation.alert-success {
+  background-color: #d1eddb;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+/* line 73, app/assets/stylesheets/components/form_validation.scss */
+.alert-validation.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+/* line 79, app/assets/stylesheets/components/form_validation.scss */
+.alert-validation ul {
+  margin-bottom: 0;
+  padding-left: 1.2rem;
+}
+
+/* line 84, app/assets/stylesheets/components/form_validation.scss */
+.alert-validation li {
+  margin-bottom: 0.25rem;
+}
+
+/* line 87, app/assets/stylesheets/components/form_validation.scss */
+.alert-validation li:last-child {
+  margin-bottom: 0;
+}
+
+/* line 94, app/assets/stylesheets/components/form_validation.scss */
+.form-group {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* line 98, app/assets/stylesheets/components/form_validation.scss */
+.form-group .validation-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* line 106, app/assets/stylesheets/components/form_validation.scss */
+.form-group .validation-icon.valid {
+  color: #28a745;
+}
+
+/* line 110, app/assets/stylesheets/components/form_validation.scss */
+.form-group .validation-icon.invalid {
+  color: #dc3545;
+}
+
+/* line 116, app/assets/stylesheets/components/form_validation.scss */
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+/* line 121, app/assets/stylesheets/components/form_validation.scss */
+.form-group label.required:after {
+  content: " *";
+  color: #dc3545;
+}
+
+/* line 132, app/assets/stylesheets/components/form_validation.scss */
+.validated-form .form-group.has-success .form-control {
+  border-color: #28a745;
+}
+
+/* line 136, app/assets/stylesheets/components/form_validation.scss */
+.validated-form .form-group.has-success label {
+  color: #28a745;
+}
+
+/* line 142, app/assets/stylesheets/components/form_validation.scss */
+.validated-form .form-group.has-error .form-control {
+  border-color: #dc3545;
+}
+
+/* line 146, app/assets/stylesheets/components/form_validation.scss */
+.validated-form .form-group.has-error label {
+  color: #dc3545;
+}
+
+@media (max-width: 768px) {
+  /* line 155, app/assets/stylesheets/components/form_validation.scss */
+  .field-error {
+    font-size: 0.8rem;
+  }
+  /* line 159, app/assets/stylesheets/components/form_validation.scss */
+  .alert-validation {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+}
+
+/* line 166, app/assets/stylesheets/components/form_validation.scss */
+.validating {
+  position: relative;
+}
+
+/* line 169, app/assets/stylesheets/components/form_validation.scss */
+.validating:after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+@layer components {
+  /* line 191, app/assets/stylesheets/components/form_validation.scss */
+  .form-error {
+    @apply text-red-600 text-sm mt-1 block;
+  }
+  /* line 195, app/assets/stylesheets/components/form_validation.scss */
+  .form-success {
+    @apply text-green-600 text-sm mt-1 block;
+  }
+  /* line 199, app/assets/stylesheets/components/form_validation.scss */
+  .input-error {
+    @apply border-red-500 focus:border-red-500 focus:ring-red-500;
+  }
+  /* line 203, app/assets/stylesheets/components/form_validation.scss */
+  .input-success {
+    @apply border-green-500 focus:border-green-500 focus:ring-green-500;
+  }
+}
+/* line 4, app/assets/stylesheets/components/notifications.scss */
+.notification-container {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 420px;
+  width: 100%;
+}
+
+/* line 12, app/assets/stylesheets/components/notifications.scss */
+.notification-container.position-top-right {
+  top: 20px;
+  right: 20px;
+}
+
+/* line 17, app/assets/stylesheets/components/notifications.scss */
+.notification-container.position-top-left {
+  top: 20px;
+  left: 20px;
+}
+
+/* line 22, app/assets/stylesheets/components/notifications.scss */
+.notification-container.position-bottom-right {
+  bottom: 20px;
+  right: 20px;
+}
+
+/* line 27, app/assets/stylesheets/components/notifications.scss */
+.notification-container.position-bottom-left {
+  bottom: 20px;
+  left: 20px;
+}
+
+@media (max-width: 768px) {
+  /* line 4, app/assets/stylesheets/components/notifications.scss */
+  .notification-container {
+    left: 10px;
+    right: 10px;
+    max-width: none;
+  }
+  /* line 37, app/assets/stylesheets/components/notifications.scss */
+  .notification-container.position-top-left, .notification-container.position-top-right {
+    top: 10px;
+  }
+  /* line 42, app/assets/stylesheets/components/notifications.scss */
+  .notification-container.position-bottom-left, .notification-container.position-bottom-right {
+    bottom: 10px;
+  }
+}
+
+/* line 50, app/assets/stylesheets/components/notifications.scss */
+.notification-item {
+  pointer-events: auto;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  position: relative;
+  transform: translateX(0);
+  opacity: 1;
+  transition: all 0.3s ease-in-out;
+}
+
+/* line 62, app/assets/stylesheets/components/notifications.scss */
+.notification-item.notification-entering {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* line 66, app/assets/stylesheets/components/notifications.scss */
+.notification-item.notification-hiding {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* line 72, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-success {
+  background-color: #d1f2eb;
+  border-left: 4px solid #28a745;
+}
+
+/* line 76, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-success .notification-icon {
+  color: #28a745;
+}
+
+/* line 81, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-danger {
+  background-color: #f8d7da;
+  border-left: 4px solid #dc3545;
+}
+
+/* line 85, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-danger .notification-icon {
+  color: #dc3545;
+}
+
+/* line 90, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-warning {
+  background-color: #fff3cd;
+  border-left: 4px solid #ffc107;
+}
+
+/* line 94, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-warning .notification-icon {
+  color: #856404;
+}
+
+/* line 99, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-info {
+  background-color: #d1ecf1;
+  border-left: 4px solid #17a2b8;
+}
+
+/* line 103, app/assets/stylesheets/components/notifications.scss */
+.notification-item.alert-info .notification-icon {
+  color: #17a2b8;
+}
+
+/* line 110, app/assets/stylesheets/components/notifications.scss */
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  background-color: white;
+  position: relative;
+}
+
+/* line 119, app/assets/stylesheets/components/notifications.scss */
+.notification-icon {
+  font-size: 20px;
+  margin-right: 12px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* line 127, app/assets/stylesheets/components/notifications.scss */
+.notification-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* line 132, app/assets/stylesheets/components/notifications.scss */
+.notification-message {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+/* line 138, app/assets/stylesheets/components/notifications.scss */
+.notification-message:last-child {
+  margin-bottom: 0;
+}
+
+/* line 144, app/assets/stylesheets/components/notifications.scss */
+.notification-progress {
+  width: 100%;
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+/* line 152, app/assets/stylesheets/components/notifications.scss */
+.notification-progress .progress-bar {
+  height: 100%;
+  background-color: #007bff;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+/* line 161, app/assets/stylesheets/components/notifications.scss */
+.notification-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+/* line 166, app/assets/stylesheets/components/notifications.scss */
+.notification-actions .btn {
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* line 175, app/assets/stylesheets/components/notifications.scss */
+.notification-actions .btn.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+/* line 179, app/assets/stylesheets/components/notifications.scss */
+.notification-actions .btn.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* line 184, app/assets/stylesheets/components/notifications.scss */
+.notification-actions .btn.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* line 188, app/assets/stylesheets/components/notifications.scss */
+.notification-actions .btn.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+/* line 196, app/assets/stylesheets/components/notifications.scss */
+.notification-close {
+  margin-left: 8px;
+}
+
+/* line 199, app/assets/stylesheets/components/notifications.scss */
+.notification-close .btn-close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+/* line 209, app/assets/stylesheets/components/notifications.scss */
+.notification-close .btn-close:hover {
+  color: #666;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* line 217, app/assets/stylesheets/components/notifications.scss */
+.notification-timer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: rgba(0, 0, 0, 0.2);
+  animation: timerCountdown linear;
+  transform-origin: left;
+}
+
+/* line 226, app/assets/stylesheets/components/notifications.scss */
+.notification-timer.timer-success {
+  background-color: #28a745;
+}
+
+/* line 230, app/assets/stylesheets/components/notifications.scss */
+.notification-timer.timer-error {
+  background-color: #dc3545;
+}
+
+/* line 234, app/assets/stylesheets/components/notifications.scss */
+.notification-timer.timer-warning {
+  background-color: #ffc107;
+}
+
+/* line 238, app/assets/stylesheets/components/notifications.scss */
+.notification-timer.timer-info {
+  background-color: #17a2b8;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes timerCountdown {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* line 265, app/assets/stylesheets/components/notifications.scss */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 14px;
+  z-index: 10000;
+  opacity: 0;
+  transition: all 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+/* line 280, app/assets/stylesheets/components/notifications.scss */
+.toast-notification.toast-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+/* line 286, app/assets/stylesheets/components/notifications.scss */
+.toast-notification .toast-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* line 292, app/assets/stylesheets/components/notifications.scss */
+.toast-notification .toast-message {
+  font-weight: 500;
+}
+
+/* line 297, app/assets/stylesheets/components/notifications.scss */
+.toast-notification.toast-success {
+  background-color: rgba(40, 167, 69, 0.9);
+}
+
+/* line 301, app/assets/stylesheets/components/notifications.scss */
+.toast-notification.toast-error {
+  background-color: rgba(220, 53, 69, 0.9);
+}
+
+/* line 305, app/assets/stylesheets/components/notifications.scss */
+.toast-notification.toast-warning {
+  background-color: rgba(255, 193, 7, 0.9);
+  color: #333;
+}
+
+/* line 310, app/assets/stylesheets/components/notifications.scss */
+.toast-notification.toast-info {
+  background-color: rgba(23, 162, 184, 0.9);
+}
+
+@media (max-width: 480px) {
+  /* line 317, app/assets/stylesheets/components/notifications.scss */
+  .notification-item {
+    margin-bottom: 8px;
+  }
+  /* line 321, app/assets/stylesheets/components/notifications.scss */
+  .notification-content {
+    padding: 12px;
+  }
+  /* line 325, app/assets/stylesheets/components/notifications.scss */
+  .notification-message {
+    font-size: 13px;
+  }
+  /* line 329, app/assets/stylesheets/components/notifications.scss */
+  .notification-actions {
+    margin-top: 8px;
+  }
+  /* line 332, app/assets/stylesheets/components/notifications.scss */
+  .notification-actions .btn {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+  /* line 338, app/assets/stylesheets/components/notifications.scss */
+  .toast-notification {
+    left: 10px;
+    right: 10px;
+    transform: translateX(0) translateY(100px);
+  }
+  /* line 343, app/assets/stylesheets/components/notifications.scss */
+  .toast-notification.toast-visible {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@layer components {
+  /* line 351, app/assets/stylesheets/components/notifications.scss */
+  .notification-success {
+    @apply bg-green-50 border-l-4 border-green-400 text-green-700;
+  }
+  /* line 355, app/assets/stylesheets/components/notifications.scss */
+  .notification-error {
+    @apply bg-red-50 border-l-4 border-red-400 text-red-700;
+  }
+  /* line 359, app/assets/stylesheets/components/notifications.scss */
+  .notification-warning {
+    @apply bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700;
+  }
+  /* line 363, app/assets/stylesheets/components/notifications.scss */
+  .notification-info {
+    @apply bg-blue-50 border-l-4 border-blue-400 text-blue-700;
+  }
+}

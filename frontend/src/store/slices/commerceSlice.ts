@@ -93,7 +93,7 @@ const commerceSlice = createSlice({
       })
       .addCase(fetchNearbyCommerces.fulfilled, (state, action) => {
         state.loading = false
-        state.commerces = action.payload
+        state.commerces = action.payload.commerces || []
       })
       .addCase(fetchNearbyCommerces.rejected, (state, action) => {
         state.loading = false
@@ -107,7 +107,7 @@ const commerceSlice = createSlice({
       })
       .addCase(fetchCommerceById.fulfilled, (state, action) => {
         state.loading = false
-        state.currentCommerce = action.payload
+        state.currentCommerce = action.payload.commerce || action.payload
       })
       .addCase(fetchCommerceById.rejected, (state, action) => {
         state.loading = false
@@ -121,7 +121,7 @@ const commerceSlice = createSlice({
       })
       .addCase(searchCommerces.fulfilled, (state, action) => {
         state.loading = false
-        state.commerces = action.payload
+        state.commerces = action.payload.commerces || []
       })
       .addCase(searchCommerces.rejected, (state, action) => {
         state.loading = false
@@ -130,18 +130,20 @@ const commerceSlice = createSlice({
       
       // Create commerce
       .addCase(createCommerce.fulfilled, (state, action) => {
-        state.commerces.push(action.payload)
-        state.currentCommerce = action.payload
+        const commerce = action.payload.commerce || action.payload
+        state.commerces.push(commerce)
+        state.currentCommerce = commerce
       })
       
       // Update commerce
       .addCase(updateCommerce.fulfilled, (state, action) => {
-        const index = state.commerces.findIndex(c => c.id === action.payload.id)
+        const commerce = action.payload.commerce || action.payload
+        const index = state.commerces.findIndex(c => c.id === commerce.id)
         if (index !== -1) {
-          state.commerces[index] = action.payload
+          state.commerces[index] = commerce
         }
-        if (state.currentCommerce?.id === action.payload.id) {
-          state.currentCommerce = action.payload
+        if (state.currentCommerce?.id === commerce.id) {
+          state.currentCommerce = commerce
         }
       })
   },

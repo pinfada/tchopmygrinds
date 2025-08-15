@@ -1,0 +1,330 @@
+/**
+ * Modern Map Styles for TchopMyGrinds
+ * Optimized for banana plantain marketplace
+ * Mobile-first responsive design
+ */
+/* line 19, app/assets/stylesheets/modern-maps.scss */
+.map-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* line 29, app/assets/stylesheets/modern-maps.scss */
+.custom-marker {
+  background: none;
+  border: none;
+}
+
+/* line 34, app/assets/stylesheets/modern-maps.scss */
+.merchant-marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 3px solid #28a745;
+}
+
+/* line 46, app/assets/stylesheets/modern-maps.scss */
+.merchant-marker.mobile {
+  border-color: #FFB61C;
+  animation: pulse 2s infinite;
+}
+
+/* line 51, app/assets/stylesheets/modern-maps.scss */
+.merchant-marker .emoji {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* line 56, app/assets/stylesheets/modern-maps.scss */
+.merchant-marker .merchant-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #E94B3B;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+/* line 74, app/assets/stylesheets/modern-maps.scss */
+.user-location-marker {
+  background: none;
+  border: none;
+}
+
+/* line 79, app/assets/stylesheets/modern-maps.scss */
+.user-marker {
+  position: relative;
+  font-size: 24px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* line 84, app/assets/stylesheets/modern-maps.scss */
+.user-marker .pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: #007AFF;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+/* line 115, app/assets/stylesheets/modern-maps.scss */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: none;
+}
+
+/* line 122, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup .leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+/* line 128, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content {
+  padding: 16px;
+}
+
+/* line 131, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* line 138, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content .merchant-type {
+  display: inline-block;
+  background: #28a745;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+}
+
+/* line 149, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content .distance {
+  color: #6c757d;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+/* line 155, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content .address {
+  color: #6c757d;
+  font-size: 14px;
+  margin: 4px 0 12px 0;
+}
+
+/* line 161, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content .merchant-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* line 165, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content .merchant-actions .btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* line 174, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content .merchant-actions .btn.btn-primary {
+  background: #28a745;
+  color: #ffffff;
+}
+
+/* line 178, app/assets/stylesheets/modern-maps.scss */
+.merchant-popup-content .merchant-actions .btn.btn-primary:hover {
+  background: #1e7e34;
+  transform: translateY(-1px);
+}
+
+/* line 188, app/assets/stylesheets/modern-maps.scss */
+.search-circle {
+  stroke-dasharray: 5, 5;
+  animation: dash 1s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
+
+/* line 200, app/assets/stylesheets/modern-maps.scss */
+.accuracy-circle {
+  opacity: 0.6;
+}
+
+/* line 206, app/assets/stylesheets/modern-maps.scss */
+.leaflet-control-container .leaflet-control {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* line 211, app/assets/stylesheets/modern-maps.scss */
+.leaflet-control-container .leaflet-control a {
+  background: #ffffff;
+  color: #2c3e50;
+  border-radius: 8px;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* line 221, app/assets/stylesheets/modern-maps.scss */
+.leaflet-control-container .leaflet-control a:hover {
+  background: #f8f9fa;
+  transform: translateY(-1px);
+}
+
+/* line 230, app/assets/stylesheets/modern-maps.scss */
+.map-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  font-weight: 500;
+  animation: slideIn 0.3s ease;
+}
+
+/* line 241, app/assets/stylesheets/modern-maps.scss */
+.map-notification.info {
+  background: #007AFF;
+  color: #ffffff;
+}
+
+/* line 246, app/assets/stylesheets/modern-maps.scss */
+.map-notification.success {
+  background: #28a745;
+  color: #ffffff;
+}
+
+/* line 251, app/assets/stylesheets/modern-maps.scss */
+.map-notification.error {
+  background: #E94B3B;
+  color: #ffffff;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  /* line 270, app/assets/stylesheets/modern-maps.scss */
+  .map-container {
+    border-radius: 0;
+  }
+  /* line 274, app/assets/stylesheets/modern-maps.scss */
+  .merchant-marker {
+    width: 36px;
+    height: 36px;
+  }
+  /* line 278, app/assets/stylesheets/modern-maps.scss */
+  .merchant-marker .emoji {
+    font-size: 18px;
+  }
+  /* line 282, app/assets/stylesheets/modern-maps.scss */
+  .merchant-marker .merchant-badge {
+    width: 16px;
+    height: 16px;
+    font-size: 9px;
+  }
+  /* line 290, app/assets/stylesheets/modern-maps.scss */
+  .leaflet-popup-content-wrapper .merchant-popup-content {
+    padding: 12px;
+  }
+  /* line 293, app/assets/stylesheets/modern-maps.scss */
+  .leaflet-popup-content-wrapper .merchant-popup-content h4 {
+    font-size: 15px;
+  }
+  /* line 299, app/assets/stylesheets/modern-maps.scss */
+  .map-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    padding: 10px 14px;
+  }
+  /* line 307, app/assets/stylesheets/modern-maps.scss */
+  .leaflet-control a {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  /* line 315, app/assets/stylesheets/modern-maps.scss */
+  .merchant-marker {
+    background: #2c3e50;
+    color: #ffffff;
+  }
+  /* line 320, app/assets/stylesheets/modern-maps.scss */
+  .leaflet-popup-content-wrapper {
+    background: #2c3e50;
+    color: #ffffff;
+  }
+  /* line 325, app/assets/stylesheets/modern-maps.scss */
+  .leaflet-control a {
+    background: #2c3e50;
+    color: #ffffff;
+  }
+}

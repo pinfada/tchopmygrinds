@@ -1,0 +1,146 @@
+<div class="content">
+	<h1 class="page-title">User - <span class="fw-semi-bold"></span>Profile</h1>
+	<div class="row UserProfile">
+		<div class="col-md-6">
+			<section class="widget">
+				<div class="widget-body">
+					<div class="widget-top-overflow text-white">
+						<div class="height-250 overflow-hidden">	
+							<%= image_tag "tchopeat.jpg", class:"img-responsive" %>
+						</div>
+						<div class="btn-toolbar">
+							<a href="" class="btn btn-outline btn-sm pull-right">
+								<i class="fa fa-twitter mr-xs"></i> Follow
+							</a>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-5 text-center">
+							<div class="post-user post-user-profile">
+								<span class="thumb-xlg">
+									<%= image_tag "logo.png", class: "img-circle" %>
+								</span>
+								<h4 class="fw-normal">Andre <span class="fw-semi-bold">Pinfada</span></h4>
+								<p>Itinerant</p>
+								<a href="" class="btn btn-danger btn-sm mt"> Send 
+									<i class="fa fa-envelope ml-xs"></i>
+								</a>
+								<ul class="contacts">
+									<li>
+										<i class="fa fa-phone fa-fw mr-xs"></i>
+										<a href="#">+33 6 555-55-55</a>
+									</li>
+									<li>
+										<i class="fa fa-envelope fa-fw mr-xs"></i>
+										<a href="#">example@tchopit.com</a>
+									</li>
+									<li>
+										<i class="fa fa-map-marker fa-fw mr-xs"></i>
+										<a href="#">Paris, France</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="col-sm-7">
+							<div class="stats-row stats-row-profile mt">
+								<div class="stat-item">
+									<p class="value">300</p>
+									<h5 class="name">Posts</h5>
+								</div>
+								<div class="stat-item">
+									<p class="value">25</p>
+									<h5 class="name">Followers</h5>
+								</div>
+							</div>
+							<p class="mt-lg">
+								<a href="#" class="label label-warning">Seller</a>
+								<a href="#" class="label label-danger ml-xs">Itinerant</a>
+							</p>
+							<p class="lead mt-lg">Some comments about the Seller</p>
+							<p>
+								Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, 
+								and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+		<div class="col-md-6">
+			<section class="Activities">
+				<h2>activities</h2>
+				<section class="event">
+					<span class="thumb-sm avatar pull-left mr-sm">
+						<%= image_tag "logo.png", class: "img-circle" %>
+					</span>
+					<h4 class="event-heading">
+						<a href="#">Jessica Smith</a>
+						<small>@jess</small>
+					</h4>
+					<p class="fs-sm text-muted">February 22, 2014 at 01:59 PM</p>
+					<p class="fs-mini">
+						Check out this awesome photo I made in Italy last summer. 
+						Seems it was lost somewhere deep inside my brand new HDD 40TB. Thanks god I found it!
+					</p>
+					<footer>
+						<div class="clearfix">
+							<ul class="post-links mt-sm pull-left">
+								<li>
+									<a href="#">1 hour</a>
+								</li>
+								<li>
+									<a href="#">
+										<span class="text-danger"><i class="fa fa-heart-o"></i> Like</span>
+									</a>
+								</li>
+								<li>
+									<a href="#">Comment</a>
+								</li>
+							</ul>
+							<span class="thumb thumb-sm pull-right">
+								<a href="#">
+									<%= image_tag "logo.png", class: "img-circle" %>
+								</a>
+							</span>
+							<span class="thumb thumb-sm pull-right">
+								<a href="#">
+									<%= image_tag "logo.png", class: "img-circle" %>
+								</a>
+							</span>
+							<span class="thumb thumb-sm pull-right">
+								<a href="#">
+									<%= image_tag "logo.png", class: "img-circle" %>
+								</a>
+							</span>
+						</div>
+						<ul class="post-comments mt-sm">
+							<li>
+								<span class="thumb-xs avatar pull-left mr-sm">
+									<%= image_tag "logo.png", class: "img-circle" %>
+								</span>
+								<div class="comment-body">
+									<h6 class="author fw-semi-bold">Ignacio Abad 
+										<small>6 mins ago</small>
+									</h6>
+									<p>Hey, have you heard anything about that?</p>
+								</div>
+							</li>
+							<li>
+								<span class="thumb-xs avatar pull-left mr-sm">
+									<%= image_tag "logo.png", class: "img-circle" %>
+								</span>
+								<div class="comment-body">
+									<input class="form-control input-sm" type="text" placeholder="Write your comment...">
+								</div>
+							</li>
+						</ul>
+					</footer>
+				</section>
+				<trix-editor angular-trix ng-model="foo"></trix-editor>
+				<div class="btn-toolbar">
+					<button type="submit" class="btn btn-danger btn-sm pull-right">Post</button>
+				</div>
+			</section>
+		</div>
+	</div>
+</div>
