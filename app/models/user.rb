@@ -1,10 +1,11 @@
 class User < ApplicationRecord
   enum statut_type: { itinerant: 0, sedentary: 1, others: 2 }
   has_many :orders, dependent: :destroy
-  has_many :orderdetails, through: :oders
+  has_many :orderdetails, through: :orders
   has_many :commerces
   has_many :addresses
   has_many :product_interests, dependent: :destroy
+  has_many :ratings, dependent: :destroy
 	before_save { self.email = email.downcase }
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i 
 	validates :email, presence: true, 
@@ -30,6 +31,10 @@ class User < ApplicationRecord
     begin
       self[column] = SecureRandom.urlsafe_base64
     end while User.exists?(column => self[column])
+  end
+
+  def admin?
+    admin == true
   end
 
   private

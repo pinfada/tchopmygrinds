@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_15_085953) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_16_162418) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -151,6 +151,34 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_15_085953) do
     t.index ["commerce_id"], name: "index_products_on_commerce_id"
   end
 
+  create_table "ratings", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "rateable_type", null: false
+    t.integer "rateable_id", null: false
+    t.integer "rating", null: false
+    t.text "comment"
+    t.boolean "verified", default: false
+    t.boolean "moderated", default: false
+    t.integer "helpful_count", default: 0
+    t.integer "order_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "moderated_at"
+    t.integer "moderated_by"
+    t.integer "status", default: 0
+    t.index ["moderated"], name: "index_ratings_on_moderated"
+    t.index ["moderated_at"], name: "index_ratings_on_moderated_at"
+    t.index ["moderated_by"], name: "index_ratings_on_moderated_by"
+    t.index ["order_id"], name: "index_ratings_on_order_id"
+    t.index ["rateable_type", "rateable_id"], name: "index_ratings_on_rateable"
+    t.index ["rateable_type", "rateable_id"], name: "index_ratings_on_rateable_type_and_rateable_id"
+    t.index ["rating"], name: "index_ratings_on_rating"
+    t.index ["status"], name: "index_ratings_on_status"
+    t.index ["user_id", "rateable_type", "rateable_id"], name: "index_ratings_unique_per_user", unique: true
+    t.index ["user_id"], name: "index_ratings_on_user_id"
+    t.index ["verified"], name: "index_ratings_on_verified"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -183,4 +211,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_15_085953) do
   add_foreign_key "orders", "users"
   add_foreign_key "product_interests", "users"
   add_foreign_key "products", "commerces"
+  add_foreign_key "ratings", "orders"
+  add_foreign_key "ratings", "users"
 end

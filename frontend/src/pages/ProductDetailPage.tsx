@@ -5,6 +5,7 @@ import { fetchProductById } from '../store/slices/productSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import { ProductInterestForm } from '../components/ProductInterest'
 import { Modal } from '../components/ui'
+import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
 import type { Product } from '../types'
 
 const ProductDetailPage = () => {
@@ -16,6 +17,7 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const [showInterestModal, setShowInterestModal] = useState(false)
+  const [showRatingModal, setShowRatingModal] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -364,6 +366,39 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
+      {/* Section des évaluations */}
+      <div className="mt-16 border-t border-gray-200 pt-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Résumé des évaluations */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <RatingSummary 
+                entityId={product.id}
+                entityType="product"
+              />
+              {user && (
+                <div className="mt-6">
+                  <button
+                    onClick={() => setShowRatingModal(true)}
+                    className="w-full btn-secondary"
+                  >
+                    ⭐ Laisser un avis
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Liste des évaluations */}
+          <div className="lg:col-span-2">
+            <RatingsList 
+              entityId={product.id}
+              entityType="product"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Modal pour manifestation d'intérêt */}
       <Modal
         isOpen={showInterestModal}
@@ -375,6 +410,21 @@ const ProductDetailPage = () => {
           initialProductName={product?.name || ''}
           onSuccess={handleInterestSuccess}
           onCancel={() => setShowInterestModal(false)}
+        />
+      </Modal>
+
+      {/* Modal pour évaluation */}
+      <Modal
+        isOpen={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+        title="Laisser un avis"
+        size="md"
+      >
+        <RatingForm
+          entityId={product.id}
+          entityType="product"
+          onSuccess={() => setShowRatingModal(false)}
+          onCancel={() => setShowRatingModal(false)}
         />
       </Modal>
     </div>

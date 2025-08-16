@@ -7,6 +7,7 @@ import locationSlice from './slices/locationSlice'
 import orderSlice from './slices/orderSlice'
 import notificationSlice from './slices/notificationSlice'
 import productInterestSlice from './slices/productInterestSlice'
+import ratingSlice from './slices/ratingSlice'
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     order: orderSlice,
     notification: notificationSlice,
     productInterest: productInterestSlice,
+    rating: ratingSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

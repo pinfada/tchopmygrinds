@@ -53,6 +53,29 @@ Rails.application.routes.draw do
         end
       end
       
+      # Évaluations et avis
+      resources :ratings do
+        collection do
+          get :my_ratings
+        end
+        member do
+          post :mark_helpful
+        end
+      end
+      
+      # Administration
+      namespace :admin do
+        resources :ratings do
+          collection do
+            get :stats
+          end
+          member do
+            patch :approve
+            patch :reject
+          end
+        end
+      end
+      
       # Utilitaires
       namespace :utils do
         get 'geocode', to: 'utils#geocode'

@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  rateable: one
+  rateable_type: Rateable
+  rating: 1
+  comment: MyText
+  verified: false
+  moderated: false
+  helpful_count: 1
+
+two:
+  user: two
+  rateable: two
+  rateable_type: Rateable
+  rating: 1
+  comment: MyText
+  verified: false
+  moderated: false
+  helpful_count: 1

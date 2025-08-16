@@ -174,3 +174,49 @@ export interface PaginatedResponse<T> {
     perPage: number
   }
 }
+
+// Types pour les évaluations et avis
+export interface Rating {
+  id: number
+  rating: number
+  comment?: string
+  verified: boolean
+  helpfulCount: number
+  createdAt: string
+  updatedAt?: string
+  user: {
+    id: number
+    name: string
+    initials: string
+  }
+  rateable?: {
+    type: 'Commerce' | 'Product'
+    id: number
+    name: string
+  }
+  canEdit?: boolean
+  canDelete?: boolean
+}
+
+export interface RatingStats {
+  averageRating: number
+  totalRatings: number
+  verifiedRatings: number
+  distribution: Record<string, number>
+}
+
+export interface RatingFormData {
+  rating: number
+  comment: string
+  rateableType: 'Commerce' | 'Product'
+  rateableId: number
+  orderId?: number
+}
+
+export interface RatingState {
+  ratings: Rating[]
+  myRatings: Rating[]
+  currentRatingStats: RatingStats | null
+  loading: boolean
+  error: string | null
+}

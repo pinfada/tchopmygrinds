@@ -5,6 +5,8 @@ import { fetchCommerceById } from '../store/slices/commerceSlice'
 import { fetchProductsByCommerce } from '../store/slices/productSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import LeafletMap from '../components/Map/LeafletMap'
+import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
+import { Modal } from '../components/ui'
 import type { Product } from '../types'
 
 const CommerceDetailPage = () => {
@@ -14,9 +16,11 @@ const CommerceDetailPage = () => {
   const { currentCommerce, loading: commerceLoading, error } = useAppSelector((state) => state.commerce)
   const { products, loading: productsLoading } = useAppSelector((state) => state.product)
   const { currentLocation } = useAppSelector((state) => state.location)
+  const { user } = useAppSelector((state) => state.auth)
   
   const [selectedCategory, setSelectedCategory] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock'>('name')
+  const [showRatingModal, setShowRatingModal] = useState(false)
 
   useEffect(() => {
     if (id) {
@@ -121,25 +125,36 @@ const CommerceDetailPage = () => {
                   )}
                 </div>
 
-                {currentCommerce.rating && (
-                  <div className="flex items-center space-x-2">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <svg 
-                          key={i} 
-                          className={`w-5 h-5 ${i < Math.floor(Number(currentCommerce.rating) || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
-                          fill="currentColor" 
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
+                <div className="flex items-center space-x-4">
+                  {currentCommerce.rating && (
+                    <div className="flex items-center space-x-2">
+                      <div className="flex text-yellow-400">
+                        {[...Array(5)].map((_, i) => (
+                          <svg 
+                            key={i} 
+                            className={`w-5 h-5 ${i < Math.floor(Number(currentCommerce.rating) || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                            fill="currentColor" 
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                      </div>
+                      <span className="text-sm font-medium text-gray-600">
+                        {Number(currentCommerce.rating || 0).toFixed(1)}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-600">
-                      {Number(currentCommerce.rating || 0).toFixed(1)}
-                    </span>
-                  </div>
-                )}
+                  )}
+                  
+                  {user && (
+                    <button
+                      onClick={() => setShowRatingModal(true)}
+                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                    >
+                      ⭐ Laisser un avis
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Informations de contact */}
@@ -328,6 +343,47 @@ const CommerceDetailPage = () => {
           )}
         </div>
       </div>
+
+      {/* Section des évaluations */}
+      <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200">
+        <div className="p-6 lg:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Résumé des évaluations */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Avis clients</h3>
+                <RatingSummary 
+                  entityId={currentCommerce.id}
+                  entityType="commerce"
+                />
+              </div>
+            </div>
+
+            {/* Liste des évaluations */}
+            <div className="lg:col-span-2">
+              <RatingsList 
+                entityId={currentCommerce.id}
+                entityType="commerce"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal pour évaluation */}
+      <Modal
+        isOpen={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+        title="Laisser un avis sur ce commerce"
+        size="md"
+      >
+        <RatingForm
+          entityId={currentCommerce.id}
+          entityType="commerce"
+          onSuccess={() => setShowRatingModal(false)}
+          onCancel={() => setShowRatingModal(false)}
+        />
+      </Modal>
     </div>
   )
 }

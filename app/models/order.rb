@@ -9,6 +9,22 @@ class Order < ApplicationRecord
   after_update :change_status
   validates :user_id, presence: true
 
+  # Méthode pour vérifier si une commande peut être évaluée pour un objet spécifique
+  def can_be_rated_for?(rateable)
+    return false unless ['Delivered', 'Completed'].include?(status)
+    
+    case rateable.class.name
+    when 'Commerce'
+      # Vérifier si la commande contient des produits de ce commerce
+      orderdetails.joins(:product).where(products: { commerce_id: rateable.id }).exists?
+    when 'Product'
+      # Vérifier si la commande contient ce produit
+      orderdetails.where(product_id: rateable.id).exists?
+    else
+      false
+    end
+  end
+
 	private
 
   def change_status
