@@ -85,6 +85,19 @@ const Sidebar = () => {
     }
   ]
 
+  // Ajout d'un menu spécial pour les vendeurs
+  const vendorItems = [
+    {
+      key: 'dashboard',
+      path: '/dashboard',
+      icon: '📊',
+      label: 'Dashboard',
+      description: 'Gestion vendeur',
+      requireAuth: true,
+      onlyVendor: true
+    }
+  ]
+
   const isActive = (path: string) => {
     return location.pathname === path
   }
@@ -174,6 +187,38 @@ const Sidebar = () => {
             </Link>
           )
         })}
+
+        {/* Section vendeur */}
+        {isAuthenticated && user && (user.role === 'itinerant' || user.role === 'sedentary') && (
+          <>
+            {!isCollapsed && (
+              <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider border-t border-gray-200 mt-4 pt-4">
+                Espace vendeur
+              </div>
+            )}
+            {vendorItems.map((item) => (
+              <Link
+                key={item.key}
+                to={item.path}
+                className={`flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors group ${
+                  isActive(item.path)
+                    ? 'bg-green-100 text-green-700 border-r-2 border-green-500'
+                    : 'text-gray-700 hover:bg-green-50 hover:text-green-700'
+                }`}
+              >
+                <span className="text-lg mr-3">{item.icon}</span>
+                {!isCollapsed && (
+                  <div className="flex-1">
+                    <div>{item.label}</div>
+                    <div className="text-xs text-gray-500 group-hover:text-green-600">
+                      {item.description}
+                    </div>
+                  </div>
+                )}
+              </Link>
+            ))}
+          </>
+        )}
       </nav>
 
       {/* Actions */}

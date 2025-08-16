@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../hooks/redux';
-import Layout from '../components/Layout';
 import { Modal } from '../components/ui';
 import { 
   ProductInterestForm, 
@@ -21,9 +20,7 @@ const ProductInterestPage: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto p-6">
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -107,9 +104,7 @@ const ProductInterestPage: React.FC = () => {
               onCancel={() => setShowCreateModal(false)}
             />
           </Modal>
-        </div>
-      </div>
-    </Layout>
+    </div>
   );
 };
 

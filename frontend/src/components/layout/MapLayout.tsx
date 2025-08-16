@@ -103,6 +103,18 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     } else if (path === '/cart') {
       setModalTitle('Mon panier')
       setShowModal(true)
+    } else if (path === '/interests') {
+      setModalTitle('Manifestations d\'intérêt')
+      setShowModal(true)
+    } else if (path === '/dashboard') {
+      setModalTitle('Dashboard Vendeur')
+      setShowModal(true)
+    } else if (path.startsWith('/commerces/')) {
+      setModalTitle('Détails du commerce')
+      setShowModal(true)
+    } else if (path.startsWith('/products/')) {
+      setModalTitle('Détails du produit')
+      setShowModal(true)
     } else {
       setShowModal(false)
     }

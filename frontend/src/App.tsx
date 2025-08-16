@@ -18,6 +18,7 @@ import ProfilePage from './pages/ProfilePage'
 import AuthPage from './pages/AuthPage'
 import ProductInterestPage from './pages/ProductInterestPage'
 import UnauthorizedPage from './pages/UnauthorizedPage'
+import VendorDashboardPage from './pages/VendorDashboardPage'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -46,6 +47,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/interests" element={<ProductInterestPage />} />
+          <Route path="/dashboard" element={<VendorDashboardPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
         </Routes>
       </MapLayout>
