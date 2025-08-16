@@ -109,6 +109,9 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     } else if (path === '/dashboard') {
       setModalTitle('Dashboard Vendeur')
       setShowModal(true)
+    } else if (path === '/messages') {
+      setModalTitle('Messagerie')
+      setShowModal(true)
     } else if (path.startsWith('/commerces/')) {
       setModalTitle('Détails du commerce')
       setShowModal(true)
