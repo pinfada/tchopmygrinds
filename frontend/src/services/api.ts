@@ -27,13 +27,16 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => {
     // Extraire le token JWT du header Authorization de la réponse (devise-jwt)
+    // Uniquement pour les endpoints d'authentification
+    const isAuthEndpoint = response.config.url?.includes('/auth/')
     const authHeader = response.headers.authorization || response.headers.Authorization || response.headers['authorization']
-    if (authHeader) {
+    
+    if (authHeader && isAuthEndpoint) {
       const token = authHeader.replace('Bearer ', '')
       secureStorage.setToken(token, { expiryMinutes: 60 }) // Token valide 1 heure
       console.log('Token JWT reçu et stocké:', token.substring(0, 20) + '...')
-    } else {
-      console.log('Aucun token JWT trouvé dans les headers:', Object.keys(response.headers))
+    } else if (isAuthEndpoint) {
+      console.log('Aucun token JWT trouvé dans les headers d\'auth:', Object.keys(response.headers))
     }
     return response
   },

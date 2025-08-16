@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { logout } from '../../store/slices/authSlice'
 import { toggleCart } from '../../store/slices/cartSlice'
 import Logo from '../ui/Logo'
+import MessageIcon from '../messages/MessageIcon'
 
 const Sidebar = () => {
   const dispatch = useAppDispatch()
@@ -66,6 +67,15 @@ const Sidebar = () => {
       label: 'Intérêts',
       description: 'Manifestations d\'intérêt',
       requireAuth: true
+    },
+    {
+      key: 'messages',
+      path: '/messages',
+      icon: '💬',
+      label: 'Messages',
+      description: 'Messagerie vendeur-client',
+      requireAuth: true,
+      isCustom: true
     },
     {
       key: 'orders',
@@ -164,6 +174,31 @@ const Sidebar = () => {
       <nav className="flex-1 px-2 py-4 space-y-1">
         {menuItems.map((item) => {
           if (item.requireAuth && !isAuthenticated) return null
+          
+          // Messages avec badge de notification
+          if (item.key === 'messages' && (item as any).isCustom) {
+            return (
+              <Link
+                key={item.key}
+                to={item.path}
+                className={`flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors group ${
+                  isActive(item.path)
+                    ? 'bg-emerald-100 text-emerald-700 border-r-2 border-emerald-500'
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <MessageIcon className="text-lg mr-3" />
+                {!isCollapsed && (
+                  <div className="flex-1">
+                    <div>{item.label}</div>
+                    <div className="text-xs text-gray-500 group-hover:text-gray-700">
+                      {item.description}
+                    </div>
+                  </div>
+                )}
+              </Link>
+            )
+          }
           
           return (
             <Link

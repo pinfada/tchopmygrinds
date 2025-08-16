@@ -96,7 +96,7 @@ export const fetchConversations = createAsyncThunk(
   'message/fetchConversations',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/api/v1/messages/conversations');
+      const response = await apiClient.get('/messages/conversations');
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors du chargement des conversations');
@@ -112,7 +112,7 @@ export const fetchMessages = createAsyncThunk(
       if (params.conversation_id) queryParams.append('conversation_id', params.conversation_id);
       if (params.user_id) queryParams.append('user_id', params.user_id.toString());
       
-      const response = await apiClient.get(`/api/v1/messages?${queryParams.toString()}`);
+      const response = await apiClient.get(`/messages?${queryParams.toString()}`);
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors du chargement des messages');
@@ -124,7 +124,7 @@ export const sendMessage = createAsyncThunk(
   'message/sendMessage',
   async (messageData: CreateMessageData, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post('/api/v1/messages', { message: messageData });
+      const response = await apiClient.post('/messages', { message: messageData });
       return response.data.data.message;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors de l\'envoi du message');
@@ -136,7 +136,7 @@ export const markMessageAsRead = createAsyncThunk(
   'message/markAsRead',
   async (messageId: number, { rejectWithValue }) => {
     try {
-      const response = await apiClient.patch(`/api/v1/messages/${messageId}/mark_as_read`);
+      const response = await apiClient.patch(`/messages/${messageId}/mark_as_read`);
       return response.data.data.message;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors de la mise à jour du message');
@@ -148,7 +148,7 @@ export const fetchUnreadCount = createAsyncThunk(
   'message/fetchUnreadCount',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await apiClient.get('/api/v1/messages/unread_count');
+      const response = await apiClient.get('/messages/unread_count');
       return response.data.data.unread_count;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors du chargement du nombre de messages non lus');
@@ -160,7 +160,7 @@ export const startConversation = createAsyncThunk(
   'message/startConversation',
   async (data: StartConversationData, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post('/api/v1/messages/start_conversation', data);
+      const response = await apiClient.post('/messages/start_conversation', data);
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors du démarrage de la conversation');
@@ -172,7 +172,7 @@ export const deleteMessage = createAsyncThunk(
   'message/deleteMessage',
   async (messageId: number, { rejectWithValue }) => {
     try {
-      await apiClient.delete(`/api/v1/messages/${messageId}`);
+      await apiClient.delete(`/messages/${messageId}`);
       return messageId;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors de la suppression du message');

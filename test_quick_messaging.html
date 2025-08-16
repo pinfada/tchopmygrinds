@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Messagerie TchopMyGrinds</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #c0392b; }
+        .disabled { background: #bdc3c7 !important; cursor: not-allowed !important; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        .token { font-family: monospace; word-break: break-all; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Système de Messagerie - TchopMyGrinds</h1>
+        
+        <div class="step" id="step1">
+            <h3>1. Test de connexion</h3>
+            <button onclick="testLogin()">Se connecter</button>
+            <div id="login-result"></div>
+        </div>
+
+        <div class="step" id="step2">
+            <h3>2. Test des services</h3>
+            <button onclick="checkServices()" class="disabled" id="services-btn" disabled>Vérifier les services</button>
+            <div id="services-result"></div>
+        </div>
+
+        <div class="step" id="step3">
+            <h3>3. Test Messagerie</h3>
+            <button onclick="testMessaging()" class="disabled" id="messaging-btn" disabled>Tester la messagerie</button>
+            <div id="messaging-result"></div>
+        </div>
+
+        <div class="step" id="step4">
+            <h3>4. Test Frontend</h3>
+            <button onclick="testFrontend()" class="disabled" id="frontend-btn" disabled>Tester le frontend</button>
+            <div id="frontend-result"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/v1';
+        const FRONTEND_BASE = 'http://localhost:3001';
+        let authToken = null;
+
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, content, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = content;
+            element.className = type;
+        }
+
+        // Fonction utilitaire pour activer un bouton
+        function enableButton(buttonId) {
+            const btn = document.getElementById(buttonId);
+            btn.disabled = false;
+            btn.classList.remove('disabled');
+        }
+
+        // 1. Test de connexion
+        async function testLogin() {
+            try {
+                showResult('login-result', '⏳ Connexion en cours...', 'warning');
+                
+                const response = await axios.post(`${API_BASE}/auth/login`, {
+                    email: 'customer@test.com',
+                    password: 'password123'
+                });
+
+                authToken = response.headers.authorization?.replace('Bearer ', '');
+                
+                if (authToken) {
+                    showResult('login-result', `
+                        ✅ <strong>Connexion réussie !</strong><br>
+                        👤 Utilisateur: ${response.data.data.user.name}<br>
+                        🔑 Token: <span class="token">${authToken.substring(0, 50)}...</span><br>
+                        📧 Email: ${response.data.data.user.email}
+                    `, 'success');
+                    enableButton('services-btn');
+                } else {
+                    showResult('login-result', '❌ Token JWT non reçu', 'error');
+                }
+            } catch (error) {
+                showResult('login-result', `❌ Erreur de connexion: ${error.message}`, 'error');
+            }
+        }
+
+        // 2. Vérification des services
+        async function checkServices() {
+            try {
+                showResult('services-result', '⏳ Vérification des services...', 'warning');
+                
+                const tests = [
+                    { name: 'Backend Rails', url: `${API_BASE.replace('/api/v1', '')}/api/v1/commerces` },
+                    { name: 'Frontend React', url: FRONTEND_BASE },
+                    { name: 'API Messages', url: `${API_BASE}/messages/unread_count` }
+                ];
+
+                let results = '';
+                let allGood = true;
+
+                for (const test of tests) {
+                    try {
+                        const headers = test.name === 'API Messages' ? 
+                            { Authorization: `Bearer ${authToken}` } : {};
+                        
+                        await axios.get(test.url, { headers });
+                        results += `✅ ${test.name}: OK<br>`;
+                    } catch (error) {
+                        results += `❌ ${test.name}: ${error.response?.status || 'ERREUR'}<br>`;
+                        allGood = false;
+                    }
+                }
+
+                showResult('services-result', results, allGood ? 'success' : 'error');
+                if (allGood) enableButton('messaging-btn');
+            } catch (error) {
+                showResult('services-result', `❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // 3. Test de la messagerie
+        async function testMessaging() {
+            try {
+                showResult('messaging-result', '⏳ Test de la messagerie...', 'warning');
+                
+                const headers = { Authorization: `Bearer ${authToken}` };
+                let results = '';
+
+                // Test 1: Compter les messages non lus
+                try {
+                    const unreadResponse = await axios.get(`${API_BASE}/messages/unread_count`, { headers });
+                    results += `✅ Messages non lus: ${unreadResponse.data.data.unread_count}<br>`;
+                } catch (error) {
+                    results += `❌ Compteur messages: ${error.response?.status}<br>`;
+                }
+
+                // Test 2: Récupérer les conversations
+                try {
+                    const convResponse = await axios.get(`${API_BASE}/messages/conversations`, { headers });
+                    results += `✅ Conversations: ${convResponse.data.data.conversations.length} trouvées<br>`;
+                } catch (error) {
+                    results += `❌ Conversations: ${error.response?.status}<br>`;
+                }
+
+                // Test 3: Démarrer une conversation
+                try {
+                    const startResponse = await axios.post(`${API_BASE}/messages/start_conversation`, 
+                        { receiver_id: 16 }, { headers });
+                    results += `✅ Démarrage conversation: ${startResponse.data.data.conversation_id}<br>`;
+                } catch (error) {
+                    results += `❌ Démarrage conversation: ${error.response?.status}<br>`;
+                }
+
+                // Test 4: Envoyer un message
+                try {
+                    const messageResponse = await axios.post(`${API_BASE}/messages`, {
+                        message: {
+                            content: `Test automatique - ${new Date().toLocaleTimeString()}`,
+                            receiver_id: 16,
+                            message_type: 'general'
+                        }
+                    }, { headers });
+                    results += `✅ Envoi message: ID ${messageResponse.data.data.message.id}<br>`;
+                } catch (error) {
+                    results += `❌ Envoi message: ${error.response?.status}<br>`;
+                }
+
+                showResult('messaging-result', results, 'success');
+                enableButton('frontend-btn');
+            } catch (error) {
+                showResult('messaging-result', `❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // 4. Test du frontend
+        async function testFrontend() {
+            try {
+                showResult('frontend-result', '⏳ Test du frontend...', 'warning');
+                
+                let results = '';
+
+                // Test 1: Page d'accueil
+                try {
+                    await axios.get(FRONTEND_BASE);
+                    results += `✅ Page d'accueil: accessible<br>`;
+                } catch (error) {
+                    results += `❌ Page d'accueil: ${error.response?.status}<br>`;
+                }
+
+                // Test 2: Page messages
+                try {
+                    await axios.get(`${FRONTEND_BASE}/messages`);
+                    results += `✅ Page messages: accessible<br>`;
+                } catch (error) {
+                    results += `❌ Page messages: ${error.response?.status}<br>`;
+                }
+
+                results += `<br><strong>🎯 URLs de test:</strong><br>`;
+                results += `• Frontend: <a href="${FRONTEND_BASE}" target="_blank">${FRONTEND_BASE}</a><br>`;
+                results += `• Messages: <a href="${FRONTEND_BASE}/messages" target="_blank">${FRONTEND_BASE}/messages</a><br>`;
+                results += `• Auth: <a href="${FRONTEND_BASE}/auth" target="_blank">${FRONTEND_BASE}/auth</a><br>`;
+
+                showResult('frontend-result', results, 'success');
+            } catch (error) {
+                showResult('frontend-result', `❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-démarrage
+        window.addEventListener('load', () => {
+            console.log('🧪 Test automatique du système de messagerie - TchopMyGrinds');
+        });
+    </script>
+</body>
+</html>

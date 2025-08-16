@@ -13,6 +13,7 @@ import {
   type Message
 } from '../store/slices/messageSlice';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import MessageTestPanel from '../components/messages/MessageTestPanel';
 
 const MessagesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -122,6 +123,7 @@ const MessagesPage: React.FC = () => {
               ← Retour
             </button>
           </div>
+          <MessageTestPanel />
         </div>
 
         <div className="flex h-[calc(100vh-120px)]">
