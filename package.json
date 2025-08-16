@@ -21,6 +21,8 @@
     "test:auth": "node tests/features/authentication.test.js",
     "test:commerces": "node tests/features/commerces.test.js",
     "test:rating-system": "node tests/features/ratings.test.js",
+    "test:messaging": "node tests/features/messaging.test.js",
+    "test:api-messaging": "node test_api_messaging.js",
     "test:regression": "node tests/run-regression-tests.js",
     "test:ci": "node tests/ci-pipeline.js",
     "test:baseline": "node tests/run-regression-tests.js --update-baseline",

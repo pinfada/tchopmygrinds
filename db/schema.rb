@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_16_162418) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_16_204154) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -74,6 +74,28 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_16_162418) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["jti"], name: "index_jwt_denylists_on_jti"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer "sender_id", null: false
+    t.integer "receiver_id", null: false
+    t.text "content", null: false
+    t.string "subject"
+    t.datetime "read_at"
+    t.string "conversation_id", null: false
+    t.integer "message_type", default: 0
+    t.integer "product_id"
+    t.integer "commerce_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["commerce_id"], name: "index_messages_on_commerce_id"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["created_at"], name: "index_messages_on_created_at"
+    t.index ["product_id"], name: "index_messages_on_product_id"
+    t.index ["read_at"], name: "index_messages_on_read_at"
+    t.index ["receiver_id"], name: "index_messages_on_receiver_id"
+    t.index ["sender_id", "receiver_id"], name: "index_messages_on_sender_id_and_receiver_id"
+    t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
 
   create_table "newsletters", force: :cascade do |t|
@@ -206,6 +228,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_16_162418) do
 
   add_foreign_key "addresses", "users"
   add_foreign_key "commerces", "users"
+  add_foreign_key "messages", "commerces"
+  add_foreign_key "messages", "products"
+  add_foreign_key "messages", "users", column: "receiver_id"
+  add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "orderdetails", "orders"
   add_foreign_key "orderdetails", "products"
   add_foreign_key "orders", "users"

@@ -14,6 +14,7 @@ const RatingsTests = require('./features/ratings.test');
 const CommercesTests = require('./features/commerces.test');
 const ProductInterestTests = require('./features/product-interest.test');
 const CartCheckoutTests = require('./features/cart-checkout.test');
+const MessagingTests = require('./features/messaging.test');
 
 class TestRunner {
   constructor(options = {}) {
@@ -68,6 +69,10 @@ class TestRunner {
         case 'checkout':
         case 'cart-checkout':
           testClass = new CartCheckoutTests();
+          break;
+        case 'messaging':
+        case 'messages':
+          testClass = new MessagingTests();
           break;
         default:
           throw new Error(`Fonctionnalité de test inconnue: ${featureName}`);

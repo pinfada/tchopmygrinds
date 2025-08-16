@@ -8,6 +8,7 @@ import orderSlice from './slices/orderSlice'
 import notificationSlice from './slices/notificationSlice'
 import productInterestSlice from './slices/productInterestSlice'
 import ratingSlice from './slices/ratingSlice'
+import messageSlice from './slices/messageSlice'
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     notification: notificationSlice,
     productInterest: productInterestSlice,
     rating: ratingSlice,
+    message: messageSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau message - TchopMyGrinds</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      .header {
+        text-align: center;
+        padding: 20px 0;
+        border-bottom: 2px solid #e74c3c;
+        margin-bottom: 30px;
+      }
+      .header h1 {
+        color: #e74c3c;
+        margin: 0;
+        font-size: 28px;
+      }
+      .message-card {
+        background-color: #f8f9fa;
+        border-left: 4px solid #e74c3c;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .sender-info {
+        background-color: #e8f5e8;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+      }
+      .product-info {
+        background-color: #fff3cd;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 15px 0;
+        border: 1px solid #ffeaa7;
+      }
+      .action-button {
+        display: inline-block;
+        background-color: #e74c3c;
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 5px;
+        margin: 20px 0;
+        font-weight: bold;
+      }
+      .footer {
+        text-align: center;
+        padding: 20px 0;
+        border-top: 1px solid #ddd;
+        margin-top: 30px;
+        color: #666;
+        font-size: 14px;
+      }
+      .message-content {
+        font-size: 16px;
+        line-height: 1.8;
+        margin: 20px 0;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📨 TchopMyGrinds</h1>
+        <p>Vous avez reçu un nouveau message</p>
+      </div>
+
+      <div class="sender-info">
+        <h3>👤 Message de : <strong><%= @sender.name %></strong></h3>
+        <p><strong>Email :</strong> <%= @sender.email %></p>
+        <p><strong>Type d'utilisateur :</strong> 
+          <%= @sender.statut_type == 'itinerant' ? '🚚 Marchand ambulant' : 
+              @sender.statut_type == 'sedentary' ? '🏪 Marchand sédentaire' : 
+              '👤 Client' %>
+        </p>
+        <% if @message.subject.present? %>
+          <p><strong>Sujet :</strong> <%= @message.subject %></p>
+        <% end %>
+      </div>
+
+      <% if @product.present? %>
+        <div class="product-info">
+          <h4>🛍️ Concernant le produit :</h4>
+          <p><strong><%= @product.name %></strong></p>
+          <p>Prix : <%= number_to_currency(@product.unitprice, unit: "FCFA ", separator: ",", delimiter: " ") %></p>
+          <% if @commerce.present? %>
+            <p>Commerce : <strong><%= @commerce.name %></strong></p>
+          <% end %>
+        </div>
+      <% elsif @commerce.present? %>
+        <div class="product-info">
+          <h4>🏪 Concernant le commerce :</h4>
+          <p><strong><%= @commerce.name %></strong></p>
+          <p>Catégorie : <%= @commerce.category %></p>
+        </div>
+      <% end %>
+
+      <div class="message-card">
+        <h4>💬 Message :</h4>
+        <div class="message-content"><%= @message.content %></div>
+        <p><small>Envoyé le <%= @message.created_at.strftime('%d/%m/%Y à %H:%M') %></small></p>
+      </div>
+
+      <div style="text-align: center;">
+        <a href="<%= root_url %>" class="action-button">
+          Répondre sur TchopMyGrinds
+        </a>
+      </div>
+
+      <div class="footer">
+        <p>
+          <strong>TchopMyGrinds</strong><br>
+          Votre marketplace local pour les bananes plantain
+        </p>
+        <p>
+          <small>
+            Cet email a été envoyé automatiquement. Pour répondre, connectez-vous sur 
+            <a href="<%= root_url %>">TchopMyGrinds</a>
+          </small>
+        </p>
+        <p>
+          <small>
+            Si vous ne souhaitez plus recevoir ces notifications, 
+            vous pouvez les désactiver dans vos paramètres de compte.
+          </small>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

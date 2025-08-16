@@ -63,6 +63,18 @@ Rails.application.routes.draw do
         end
       end
       
+      # Messagerie
+      resources :messages do
+        collection do
+          get :conversations
+          get :unread_count
+          post :start_conversation
+        end
+        member do
+          patch :mark_as_read
+        end
+      end
+      
       # Administration
       namespace :admin do
         resources :ratings do
@@ -115,6 +127,8 @@ Rails.application.routes.draw do
     get '/interests', to: 'pages#react_app'
     get '/profile', to: 'pages#react_app'
     get '/auth', to: 'pages#react_app'
+    get '/messages', to: 'pages#react_app'
+    get '/messages/:id', to: 'pages#react_app'
     
     # Legacy routes still needed for APIs
     match '/serveraddress', to: 'pages#serveraddress', via: 'get'

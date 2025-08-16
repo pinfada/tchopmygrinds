@@ -102,6 +102,11 @@ const config = {
       priority: 'medium',
       endpoints: ['/api/v1/orders']
     },
+    messaging: {
+      enabled: true,
+      priority: 'high',
+      endpoints: ['/api/v1/messages', '/api/v1/messages/conversations', '/api/v1/messages/start_conversation']
+    },
     geolocation: {
       enabled: true,
       priority: 'medium',

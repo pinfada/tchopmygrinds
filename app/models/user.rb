@@ -6,6 +6,8 @@ class User < ApplicationRecord
   has_many :addresses
   has_many :product_interests, dependent: :destroy
   has_many :ratings, dependent: :destroy
+  has_many :sent_messages, class_name: 'Message', foreign_key: 'sender_id', dependent: :destroy
+  has_many :received_messages, class_name: 'Message', foreign_key: 'receiver_id', dependent: :destroy
 	before_save { self.email = email.downcase }
 	VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i 
 	validates :email, presence: true, 
@@ -35,6 +37,28 @@ class User < ApplicationRecord
 
   def admin?
     admin == true
+  end
+
+  def all_messages
+    Message.where("sender_id = ? OR receiver_id = ?", id, id)
+  end
+
+  def unread_messages_count
+    received_messages.unread.count
+  end
+
+  def conversations
+    Message.conversations_for_user(self)
+  end
+
+  def conversation_with(other_user)
+    Message.conversation_between(self, other_user)
+  end
+
+  def can_message?(other_user)
+    return false if other_user == self
+    return false unless other_user.is_a?(User)
+    true
   end
 
   private
