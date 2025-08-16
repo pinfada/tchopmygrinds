@@ -1,0 +1,46 @@
+{
+  "lastRun": "2025-08-16T18:20:55.041Z",
+  "summary": {
+    "totalTests": 0,
+    "totalPassed": 0,
+    "totalFailed": 0,
+    "totalErrors": 5,
+    "totalSkipped": 0,
+    "successRate": 0,
+    "duration": 0
+  },
+  "regressions": 0,
+  "recommendations": 2,
+  "features": [
+    {
+      "name": "authentication",
+      "passed": 0,
+      "failed": 0,
+      "errors": 1
+    },
+    {
+      "name": "commerces",
+      "passed": 0,
+      "failed": 0,
+      "errors": 1
+    },
+    {
+      "name": "ratings",
+      "passed": 0,
+      "failed": 0,
+      "errors": 1
+    },
+    {
+      "name": "product-interest",
+      "passed": 0,
+      "failed": 0,
+      "errors": 1
+    },
+    {
+      "name": "cart-checkout",
+      "passed": 0,
+      "failed": 0,
+      "errors": 1
+    }
+  ]
+}

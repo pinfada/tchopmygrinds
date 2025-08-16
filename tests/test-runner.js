@@ -12,6 +12,8 @@ const ReportGenerator = require('./utils/report-generator');
 const AuthenticationTests = require('./features/authentication.test');
 const RatingsTests = require('./features/ratings.test');
 const CommercesTests = require('./features/commerces.test');
+const ProductInterestTests = require('./features/product-interest.test');
+const CartCheckoutTests = require('./features/cart-checkout.test');
 
 class TestRunner {
   constructor(options = {}) {
@@ -57,6 +59,15 @@ class TestRunner {
           break;
         case 'commerces':
           testClass = new CommercesTests();
+          break;
+        case 'product-interest':
+        case 'productinterest':
+          testClass = new ProductInterestTests();
+          break;
+        case 'cart':
+        case 'checkout':
+        case 'cart-checkout':
+          testClass = new CartCheckoutTests();
           break;
         default:
           throw new Error(`Fonctionnalité de test inconnue: ${featureName}`);
@@ -168,19 +179,36 @@ class TestRunner {
   async checkEnvironment() {
     this.log('🔍 Vérification de l\'environnement...', 'info');
     
-    const envCheck = await TestHelpers.verifyEnvironment();
-    const failedChecks = envCheck.checks.filter(c => c.status === 'FAIL');
+    // Vérifier les services requis
+    const servicesCheck = await TestHelpers.verifyServices();
     
-    if (failedChecks.length > 0) {
-      this.log('⚠️  Problèmes d\'environnement détectés:', 'warning');
-      failedChecks.forEach(check => {
-        this.log(`   - ${check.name}: ${check.details}`, 'warning');
+    if (!servicesCheck.success) {
+      this.log('❌ Services non disponibles:', 'error');
+      servicesCheck.services.forEach(service => {
+        if (service.status === 'FAIL') {
+          this.log(`   - ${service.service}: ${service.error}`, 'error');
+        } else {
+          this.log(`   - ${service.service}: ✅`, 'success');
+        }
       });
-    } else {
-      this.log('✅ Environnement validé', 'success');
+      
+      this.log('', 'info');
+      this.log('💡 Pour démarrer les services automatiquement:', 'warning');
+      this.log('   ./scripts/start-test-servers.sh', 'warning');
+      this.log('', 'info');
+      this.log('💡 Ou manuellement dans 2 terminaux:', 'warning');
+      this.log('   Terminal 1: rails server -p 3000', 'warning');
+      this.log('   Terminal 2: cd frontend && npm run dev', 'warning');
+      
+      throw new Error('Services requis non disponibles. Veuillez les démarrer avant d\'exécuter les tests.');
     }
     
-    return envCheck;
+    this.log('✅ Tous les services sont disponibles', 'success');
+    servicesCheck.services.forEach(service => {
+      this.log(`   - ${service.service}: ✅ (${service.statusCode})`, 'success');
+    });
+    
+    return servicesCheck;
   }
 
   async cleanup() {

@@ -1,0 +1,236 @@
+name: Tests E2E TchopMyGrinds
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    # Exécution quotidienne à 6h UTC pour détecter les régressions
+    - cron: '0 6 * * *'
+
+# Permissions pour les commentaires de PR et artifacts
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+env:
+  NODE_ENV: test
+  RAILS_ENV: test
+  CI: true
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: false
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    # Configuration des services (base de données, etc.)
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: tchopmygrinds_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: tchopmygrinds_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    strategy:
+      matrix:
+        # Tests en parallèle sur différentes configurations
+        test-suite:
+          - { name: "Authentication", pattern: "authentication" }
+          - { name: "Commerce", pattern: "commerces" }
+          - { name: "Ratings", pattern: "ratings" }
+          - { name: "Full Workflow", pattern: "full" }
+      fail-fast: false # Continuer même si un test échoue
+
+    steps:
+    - name: 📥 Checkout du code
+      uses: actions/checkout@v4
+      with:
+        # Récupérer l'historique pour la comparaison de baseline
+        fetch-depth: 0
+
+    - name: 📦 Configuration Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: 💎 Configuration Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.2.3'
+        bundler-cache: true
+
+    - name: 🔧 Installation des dépendances JavaScript
+      run: |
+        npm ci
+        cd frontend && npm ci && cd ..
+
+    - name: 🗄️ Configuration de la base de données
+      env:
+        DATABASE_URL: postgresql://tchopmygrinds_test:test_password@localhost:5432/tchopmygrinds_test
+        RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      run: |
+        bundle exec rails db:create RAILS_ENV=test
+        bundle exec rails db:migrate RAILS_ENV=test
+        bundle exec rails runner db/seeds_test_users_simple.rb
+
+    - name: 🏗️ Build du frontend
+      run: |
+        cd frontend
+        npm run build
+        cd ..
+
+    - name: 🚀 Démarrage des services
+      run: |
+        # Démarrer Rails en arrière-plan
+        bundle exec rails server -e test -p 3000 &
+        sleep 10
+        
+        # Démarrer le frontend en arrière-plan
+        cd frontend
+        npm run preview -- --port 3001 &
+        sleep 5
+        cd ..
+        
+        # Vérifier que les services sont accessibles
+        curl -f http://localhost:3000/api/v1/commerces || exit 1
+        curl -f http://localhost:3001 || exit 1
+
+    - name: 🧪 Exécution des tests E2E
+      env:
+        BACKEND_URL: http://localhost:3000
+        FRONTEND_URL: http://localhost:3001
+        PUPPETEER_HEADLESS: true
+        E2E_PARALLEL: true
+        E2E_RETRIES: 3
+        E2E_SCREENSHOT_ON_FAILURE: true
+        TEST_PATTERN: ${{ matrix.test-suite.pattern }}
+      run: |
+        # Exécuter le pipeline CI complet
+        npm run test:ci
+
+    - name: 📊 Upload des artefacts de test
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-artifacts-${{ matrix.test-suite.name }}
+        path: |
+          test-artifacts/
+          test-reports/
+          test-screenshots/
+        retention-days: 30
+
+    - name: 📈 Publication des résultats de test
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: Tests E2E - ${{ matrix.test-suite.name }}
+        path: test-reports/*.xml
+        reporter: jest-junit
+
+    - name: 💬 Commentaire de PR
+      if: always() && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = './test-artifacts/pr-report.md';
+          
+          if (fs.existsSync(path)) {
+            const report = fs.readFileSync(path, 'utf8');
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🧪 Tests E2E - ${{ matrix.test-suite.name }}\n\n${report}`
+            });
+          }
+
+  # Job de synthèse qui attend tous les tests
+  test-summary:
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: 📥 Téléchargement des artefacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts/
+
+    - name: 📊 Génération du rapport de synthèse
+      run: |
+        echo "## 📋 Rapport de Synthèse des Tests E2E" > summary.md
+        echo "" >> summary.md
+        
+        # Analyser les résultats de chaque suite de tests
+        for dir in artifacts/*/; do
+          if [ -f "$dir/ci-summary.json" ]; then
+            suite_name=$(basename "$dir" | sed 's/test-artifacts-//')
+            success_rate=$(jq -r '.tests.successRate' "$dir/ci-summary.json")
+            total_tests=$(jq -r '.tests.total' "$dir/ci-summary.json")
+            passed_tests=$(jq -r '.tests.passed' "$dir/ci-summary.json")
+            
+            if [ "$success_rate" -ge 90 ]; then
+              icon="✅"
+            elif [ "$success_rate" -ge 70 ]; then
+              icon="⚠️"
+            else
+              icon="❌"
+            fi
+            
+            echo "- $icon **$suite_name**: $passed_tests/$total_tests tests ($success_rate%)" >> summary.md
+          fi
+        done
+        
+        echo "" >> summary.md
+        echo "📅 Exécuté le: $(date)" >> summary.md
+        echo "🔗 Commit: ${{ github.sha }}" >> summary.md
+
+    - name: 📝 Commentaire de synthèse PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = fs.readFileSync('summary.md', 'utf8');
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: summary
+          });
+
+    - name: ✅ Définition du statut final
+      run: |
+        # Vérifier si tous les tests ont réussi
+        success=true
+        for dir in artifacts/*/; do
+          if [ -f "$dir/ci-summary.json" ]; then
+            recommendation=$(jq -r '.recommendation' "$dir/ci-summary.json")
+            if [ "$recommendation" = "BLOCK" ]; then
+              success=false
+              break
+            fi
+          fi
+        done
+        
+        if [ "$success" = "true" ]; then
+          echo "✅ Tous les tests ont réussi"
+          exit 0
+        else
+          echo "❌ Certains tests ont échoué ou des régressions ont été détectées"
+          exit 1
+        fi

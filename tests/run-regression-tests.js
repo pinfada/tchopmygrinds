@@ -5,6 +5,7 @@
 
 const TestRunner = require('./test-runner');
 const RegressionDetector = require('./regression-detector');
+const VisualRegressionDetector = require('./visual-regression-detector');
 
 class RegressionTestRunner {
   constructor(options = {}) {
@@ -12,7 +13,8 @@ class RegressionTestRunner {
       updateBaseline: options.updateBaseline || false,
       exitOnRegression: options.exitOnRegression !== false,
       verbose: options.verbose || false,
-      features: options.features || null
+      features: options.features || ['authentication', 'commerces', 'ratings', 'product-interest', 'cart-checkout'],
+      visualTests: options.visualTests !== false
     };
   }
 
@@ -53,6 +55,19 @@ class RegressionTestRunner {
 
       const regressionAnalysis = await detector.analyzeRegressions();
       detector.printRegressionReport(regressionAnalysis);
+
+      // 2b. Analyser les régressions visuelles
+      let visualAnalysis = null;
+      if (this.options.visualTests) {
+        console.log('\n📋 Phase 2b: Analyse des régressions visuelles...');
+        const visualDetector = new VisualRegressionDetector();
+        visualAnalysis = await visualDetector.analyzeVisualRegressions();
+        visualDetector.printVisualReport(visualAnalysis);
+        
+        if (this.options.updateBaseline) {
+          await visualDetector.updateBaseline();
+        }
+      }
 
       // 3. Décision sur la baseline
       if (this.options.updateBaseline || regressionAnalysis.isBaseline) {

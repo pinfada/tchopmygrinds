@@ -7,6 +7,57 @@ const path = require('path');
 const config = require('../config/test-config');
 
 class TestHelpers {
+  static async verifyServices() {
+    const axios = require('axios');
+    const results = [];
+    
+    // Vérifier Rails backend
+    try {
+      const railsResponse = await axios.get('http://localhost:3000/api/v1/commerces', { timeout: 5000 });
+      results.push({
+        service: 'Rails Backend',
+        url: 'http://localhost:3000',
+        status: 'OK',
+        statusCode: railsResponse.status
+      });
+    } catch (error) {
+      results.push({
+        service: 'Rails Backend',
+        url: 'http://localhost:3000',
+        status: 'FAIL',
+        error: error.code === 'ECONNREFUSED' ? 'Service non démarré' : error.message
+      });
+    }
+    
+    // Vérifier React frontend
+    try {
+      const reactResponse = await axios.get('http://localhost:3001', { timeout: 5000 });
+      results.push({
+        service: 'React Frontend',
+        url: 'http://localhost:3001',
+        status: 'OK',
+        statusCode: reactResponse.status
+      });
+    } catch (error) {
+      results.push({
+        service: 'React Frontend',
+        url: 'http://localhost:3001',
+        status: 'FAIL',
+        error: error.code === 'ECONNREFUSED' ? 'Service non démarré' : error.message
+      });
+    }
+    
+    const allServicesOk = results.every(r => r.status === 'OK');
+    
+    return {
+      success: allServicesOk,
+      services: results,
+      message: allServicesOk ? 
+        'Tous les services sont disponibles' : 
+        'Certains services ne sont pas disponibles'
+    };
+  }
+
   static async takeScreenshot(page, name, testName) {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');

@@ -19,11 +19,13 @@
     "test:ratings": "npm run test:api && npm run test:e2e",
     "test:full": "node tests/test-runner.js",
     "test:auth": "node tests/features/authentication.test.js",
-    "test:commerces": "node tests/features/commerces.test.js", 
+    "test:commerces": "node tests/features/commerces.test.js",
     "test:rating-system": "node tests/features/ratings.test.js",
     "test:regression": "node tests/run-regression-tests.js",
     "test:ci": "node tests/ci-pipeline.js",
-    "test:baseline": "node tests/run-regression-tests.js --update-baseline"
+    "test:baseline": "node tests/run-regression-tests.js --update-baseline",
+    "start:test-servers": "./scripts/start-test-servers.sh",
+    "test:check-services": "node -e \"require('./tests/utils/test-helpers').verifyServices().then(r => console.log(JSON.stringify(r,null,2)))\""
   },
   "devDependencies": {
     "@tailwindcss/aspect-ratio": "^0.4.2",
@@ -37,6 +39,7 @@
     "@typescript-eslint/parser": "^8.20.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.11.0",
     "concurrently": "^8.2.2",
     "eslint": "^9.17.0",
     "postcss": "^8.4.41",
@@ -52,7 +55,6 @@
     "angular": "^1.8.3",
     "angular-cookies": "^1.8.3",
     "angular-route": "^1.8.3",
-    "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
     "react": "^18.3.1",

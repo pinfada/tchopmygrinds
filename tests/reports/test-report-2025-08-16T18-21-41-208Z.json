@@ -1,0 +1,97 @@
+{
+  "metadata": {
+    "generatedAt": "2025-08-16T18:20:55.041Z",
+    "environment": "development",
+    "version": "2.0.0",
+    "testSuite": "TchopMyGrinds E2E Tests"
+  },
+  "features": [
+    {
+      "feature": "authentication",
+      "timestamp": "2025-08-16T18:21:13.676Z",
+      "results": [],
+      "summary": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 1
+      },
+      "error": "this.getConsoleErrors is not a function"
+    },
+    {
+      "feature": "commerces",
+      "timestamp": "2025-08-16T18:21:27.580Z",
+      "results": [],
+      "summary": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 1
+      },
+      "error": "this.getConsoleErrors is not a function"
+    },
+    {
+      "feature": "ratings",
+      "timestamp": "2025-08-16T18:21:30.240Z",
+      "results": [],
+      "summary": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 1
+      },
+      "error": "this.getConsoleErrors is not a function"
+    },
+    {
+      "feature": "product-interest",
+      "timestamp": "2025-08-16T18:21:38.030Z",
+      "results": [],
+      "summary": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 1
+      },
+      "error": "this.getConsoleErrors is not a function"
+    },
+    {
+      "feature": "cart-checkout",
+      "timestamp": "2025-08-16T18:21:41.208Z",
+      "results": [],
+      "summary": {
+        "total": 0,
+        "passed": 0,
+        "failed": 0,
+        "errors": 1
+      },
+      "error": "this.getConsoleErrors is not a function"
+    }
+  ],
+  "summary": {
+    "totalTests": 0,
+    "totalPassed": 0,
+    "totalFailed": 0,
+    "totalErrors": 5,
+    "totalSkipped": 0,
+    "successRate": 0,
+    "duration": 0
+  },
+  "performance": {
+    "slowestTest": null,
+    "fastestTest": null,
+    "averageDuration": 0
+  },
+  "regressions": [],
+  "recommendations": [
+    {
+      "type": "Quality",
+      "priority": "High",
+      "message": "Taux de réussite faible (0%). Réviser les fonctionnalités critiques."
+    },
+    {
+      "type": "Stability",
+      "priority": "High",
+      "message": "5 erreurs détectées. Vérifier la stabilité de l'environnement."
+    }
+  ]
+}
