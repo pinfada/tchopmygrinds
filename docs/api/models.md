@@ -6,6 +6,7 @@
 User (1) ←→ (N) Commerce (1) ←→ (N) Categorization (N) ←→ (1) Product
 User (1) ←→ (N) Order (1) ←→ (N) OrderDetail (N) ←→ (1) Product  
 User (1) ←→ (N) Address
+User (1) ←→ (N) ProductInterest
 ```
 
 ## Modèle User
@@ -33,6 +34,7 @@ Modèle principal pour l'authentification et la gestion des utilisateurs.
 - `has_many :commerces` - Commerces appartenant à l'utilisateur
 - `has_many :orders` - Commandes passées par l'utilisateur
 - `has_many :addresses` - Adresses de livraison
+- `has_many :product_interests` - Manifestations d'intérêt exprimées
 
 ### Types d'Utilisateurs
 - **itinerant**: Marchands mobiles (food trucks, marchés)
@@ -113,6 +115,7 @@ Catalogue des produits disponibles dans les commerces.
 - `has_many :categorizations`
 - `has_many :commerces, through: :categorizations`
 - `has_many :orderdetails`
+- `has_many :product_interests` - Manifestations d'intérêt pour ce produit
 
 ### Gestion du Stock
 ```ruby
@@ -253,6 +256,102 @@ Table de liaison entre Commerce et Product (many-to-many).
 - `belongs_to :commerce`
 - `belongs_to :product`
 
+## Modèle ProductInterest
+
+Système de manifestation d'intérêt pour les produits non disponibles ou en rupture de stock.
+
+### Attributs
+```ruby
+{
+  id: Integer,
+  user_id: Integer, # Utilisateur qui manifeste l'intérêt
+  product_name: String, # Nom du produit recherché
+  message: Text, # Message optionnel (préférences, quantité, etc.)
+  user_latitude: Decimal(10,6), # Position de l'utilisateur
+  user_longitude: Decimal(10,6), # Position de l'utilisateur
+  search_radius: Integer, # Rayon de recherche en km (défaut: 25)
+  fulfilled: Boolean, # Intérêt satisfait (défaut: false)
+  fulfilled_at: DateTime, # Date de satisfaction
+  email_sent: Boolean, # Notification email envoyée (défaut: false)
+  created_at: DateTime,
+  updated_at: DateTime
+}
+```
+
+### Relations
+- `belongs_to :user` - Utilisateur qui a exprimé l'intérêt
+
+### Scopes Disponibles
+```ruby
+# Intérêts actifs (non satisfaits)
+ProductInterest.active
+
+# Recherche dans une zone géographique
+ProductInterest.in_area(latitude, longitude, radius)
+
+# Recherche par nom de produit (insensible à la casse)
+ProductInterest.for_product(product_name)
+```
+
+### Méthodes d'Instance
+```ruby
+# Marquer comme satisfait
+product_interest.fulfill!
+
+# Calculer la distance depuis des coordonnées
+product_interest.distance_from(lat, lng)
+```
+
+### Fonctionnalités Principales
+
+#### 1. Vérification Immédiate
+Lors de la création d'une manifestation d'intérêt, le système vérifie automatiquement s'il existe des produits correspondants en stock dans la zone géographique spécifiée.
+
+#### 2. Notifications Automatiques
+- **Immédiate**: Email envoyé si des produits sont disponibles à la création
+- **Différée**: Les marchands peuvent notifier manuellement la disponibilité
+
+#### 3. Géolocalisation
+- Stockage de la position de l'utilisateur
+- Recherche par proximité géographique
+- Calcul de distance avec formule Haversine
+
+#### 4. Dashboard Marchand
+Interface spécialisée pour que les marchands puissent :
+- Voir les manifestations d'intérêt pour leurs produits
+- Notifier la disponibilité quand ils ajoutent du stock
+- Filtrer par distance et rayon
+
+### Exemple JSON
+```json
+{
+  "id": 1,
+  "product_name": "Tomates Bio",
+  "message": "Je recherche des tomates de qualité bio, environ 2kg",
+  "user_latitude": 45.7640,
+  "user_longitude": 4.8357,
+  "search_radius": 25,
+  "fulfilled": false,
+  "fulfilled_at": null,
+  "email_sent": false,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z",
+  "user": {
+    "id": 3,
+    "name": "Marie Dubois",
+    "email": "marie@example.com"
+  }
+}
+```
+
+### Workflow Complet
+1. **Utilisateur** : Manifeste son intérêt pour un produit indisponible
+2. **Système** : Vérifie immédiatement les stocks disponibles dans la zone
+3. **Email automatique** : Envoyé si des produits correspondants sont trouvés
+4. **Marchand** : Peut voir les demandes via son dashboard
+5. **Notification manuelle** : Le marchand notifie quand il ajoute du stock
+6. **Satisfaction** : L'intérêt est marqué comme satisfait
+
 ## Newsletter
 
 Gestion des inscriptions newsletter.
@@ -291,4 +390,10 @@ Gestion des inscriptions newsletter.
 
 ### Address
 - `street`, `city`: présents
+- `user_id`: présent
+
+### ProductInterest
+- `product_name`: présent
+- `user_latitude`, `user_longitude`: présents (géolocalisation requise)
+- `search_radius`: présent, > 0
 - `user_id`: présent

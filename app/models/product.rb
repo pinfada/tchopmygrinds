@@ -13,6 +13,7 @@ class Product < ApplicationRecord
     # Many-to-many association for legacy compatibility
     has_many :categorizations
     has_many :orderdetails, dependent: :destroy
+    has_many :product_interests, dependent: :destroy
     has_many :commerces_through_categorizations, -> { distinct }, through: :categorizations, source: :commerce
     has_many :orders, -> { distinct }, through: :orderdetails
     accepts_nested_attributes_for :commerces_through_categorizations, :orders

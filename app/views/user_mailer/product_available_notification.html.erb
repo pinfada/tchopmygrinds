@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #8B5CF6; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
+    .product-info { background: white; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #8B5CF6; }
+    .commerce-info { background: #f3e8ff; padding: 15px; margin: 15px 0; border-radius: 8px; }
+    .message-info { background: #fef3c7; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #f59e0b; }
+    .btn { display: inline-block; background: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0; }
+    .btn:hover { background: #7C3AED; }
+    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎉 Votre manifestation d'intérêt a été satisfaite !</h1>
+    </div>
+    
+    <div class="content">
+      <p>Bonjour <strong><%= @user.name %></strong>,</p>
+      
+      <p>Un commerçant vient de nous informer qu'il a en stock le produit pour lequel vous aviez manifesté votre intérêt :</p>
+      
+      <div class="product-info">
+        <h3><%= @product.name %></h3>
+        <p><strong>Prix :</strong> <%= number_to_currency(@product.unitprice, unit: "FCFA", format: "%n %u") %></p>
+        <p><strong>Quantité disponible :</strong> <%= @product.unitsinstock %> <%= @product.quantityperunit %></p>
+        <% if @product.description.present? %>
+          <p><strong>Description :</strong> <%= @product.description %></p>
+        <% end %>
+      </div>
+      
+      <% if @product_interest.message.present? %>
+        <div class="message-info">
+          <h4>💬 Votre message :</h4>
+          <p><em>"<%= @product_interest.message %>"</em></p>
+        </div>
+      <% end %>
+      
+      <div class="commerce-info">
+        <h4>🏪 Disponible chez : <%= @commerce.name %></h4>
+        <p><strong>Type :</strong> <%= @commerce.user.statut_type == 'itinerant' ? 'Marchand ambulant' : 'Commerce fixe' %></p>
+        <p><strong>Adresse :</strong> <%= @commerce.address %></p>
+        <% if @distance %>
+          <p><strong>Distance :</strong> <%= @distance %> km de votre position de recherche</p>
+        <% end %>
+        <% if @commerce.phonenumber.present? %>
+          <p><strong>Téléphone :</strong> <%= @commerce.phonenumber %></p>
+        <% end %>
+        <% if @commerce.email.present? %>
+          <p><strong>Email :</strong> <%= @commerce.email %></p>
+        <% end %>
+      </div>
+      
+      <p><strong>⏰ Action recommandée :</strong> Contactez rapidement le commerçant pour confirmer la disponibilité et réserver le produit. Les stocks peuvent être limités !</p>
+      
+      <center>
+        <a href="<%= root_url %>commerces/<%= @commerce.id %>" class="btn">Voir le commerce</a>
+        <a href="<%= root_url %>products/<%= @product.id %>" class="btn">Voir le produit</a>
+      </center>
+      
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e5e5;">
+      
+      <p><small><strong>Rappel de votre manifestation d'intérêt :</strong></p>
+      <p><small>• Produit recherché : "<%= @product_interest.product_name %>"</small></p>
+      <p><small>• Zone de recherche : <%= @product_interest.search_radius %> km</small></p>
+      <p><small>• Créée le : <%= l(@product_interest.created_at, format: :long) %></small></p>
+    </div>
+    
+    <div class="footer">
+      <p>TchopMyGrinds - Votre marketplace local</p>
+      <p>Cet email a été envoyé automatiquement, merci de ne pas répondre.</p>
+    </div>
+  </div>
+</body>
+</html>

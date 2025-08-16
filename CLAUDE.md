@@ -93,7 +93,7 @@ Custom rake tasks are available in `lib/tasks/`:
 
 ### Frontend Structure (React 18 + TypeScript)
 - **Framework**: React with TypeScript and Vite build tool
-- **State Management**: Redux Toolkit with 7 slices (auth, commerce, product, cart, location, order, notification)
+- **State Management**: Redux Toolkit with 8 slices (auth, commerce, product, cart, location, order, notification, productInterest)
 - **API Client**: Axios with JWT interceptors and error handling
 - **Routing**: React Router Dom v6 with protected routes
 - **UI Framework**: Tailwind CSS with custom components
@@ -105,6 +105,7 @@ Custom rake tasks are available in `lib/tasks/`:
 User (merchant/buyer) ←→ Commerce (shop) ←→ Product (inventory)
 User ←→ Order ←→ OrderDetail ←→ Product
 User ←→ Address (delivery locations)
+User ←→ ProductInterest (manifestations d'intérêt)
 ```
 
 ### Core API Controllers
@@ -112,6 +113,7 @@ User ←→ Address (delivery locations)
 - **Api::V1::ProductsController**: Product catalog with search and filtering
 - **Api::V1::OrdersController**: E-commerce workflow with status management
 - **Api::V1::AuthController**: JWT authentication (login/register/logout)
+- **Api::V1::ProductInterestsController**: Manifestations d'intérêt and merchant notifications
 - **PagesController**: Serves React SPA (`/` route)
 
 ## Development Guidelines
@@ -134,7 +136,7 @@ Three user types (`statut_type` enum):
 - **Components**: Organized in `frontend/src/components/` with TypeScript
 - **Pages**: Route-based pages in `frontend/src/pages/`
 - **Services**: API client, location tracking, map settings in `frontend/src/services/`
-- **State**: Redux Toolkit slices in `frontend/src/store/slices/`
+- **State**: Redux Toolkit slices in `frontend/src/store/slices/` (8 slices including productInterest)
 - **Styling**: Tailwind CSS with responsive design
 - **Maps**: Leaflet with custom markers, popups, and real-time updates
 
@@ -174,6 +176,7 @@ Three user types (`statut_type` enum):
 - **Location Slice**: Geolocation management and position tracking
 - **Order Slice**: Order creation and management
 - **Notification Slice**: Global notification system
+- **Product Interest Slice**: Manifestations d'intérêt with merchant dashboard functionality
 
 ### Modern UI Components
 - **Modal System**: Overlay navigation with high z-index (9999+)
@@ -181,6 +184,7 @@ Three user types (`statut_type` enum):
 - **Loading States**: Skeleton loaders and progress indicators
 - **Error Handling**: Global error boundaries and user feedback
 - **Accessibility**: ARIA labels and keyboard navigation support
+- **Product Interest Components**: Complete manifestation d'intérêt system with merchant dashboard
 
 ## Deployment Configuration
 
@@ -206,7 +210,7 @@ Three user types (`statut_type` enum):
 
 ## Migration Status & Roadmap
 
-### ✅ **Completed Features (75% Migration)**
+### ✅ **Completed Features (80% Migration)**
 - Core architecture (Redux, API, routing)
 - Authentication and user management
 - Geolocation and interactive mapping
@@ -214,6 +218,7 @@ Three user types (`statut_type` enum):
 - Shopping cart and basic ordering
 - Real-time tracking for ambulant merchants
 - Responsive UI with modern design
+- **Product Interest System**: Manifestation d'intérêt complete with merchant dashboard
 
 ### ⚠️ **Partially Implemented**
 - Order workflow (basic implementation, needs status management)
@@ -221,7 +226,6 @@ Three user types (`statut_type` enum):
 - Email notifications (backend ready, frontend integration needed)
 
 ### ❌ **Missing Features (from AngularJS)**
-- **Product Interest System**: Manifestation d'intérêt for out-of-stock products
 - **Vendor Management**: Specialized modals for merchant operations
 - **Reviews & Ratings**: Product and commerce rating system
 - **Favorites/Wishlist**: User favorites functionality
@@ -230,8 +234,8 @@ Three user types (`statut_type` enum):
 - **Newsletter**: Email marketing integration
 
 ### 🎯 **Priority Implementation Order**
-1. **High Priority**: Product interest system, complete order workflow
-2. **Medium Priority**: Reviews system, advanced vendor features
+1. **High Priority**: Complete order workflow, advanced vendor features
+2. **Medium Priority**: Reviews system, favorites/wishlist
 3. **Low Priority**: Messaging, newsletter, advanced search features
 
 ## Key Technical Decisions

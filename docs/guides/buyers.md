@@ -314,6 +314,187 @@ Action : Bouton "Annuler" dans les détails
 - **Support plateforme** : Pour litiges
 - **Délai** : 7 jours après livraison
 
+## Système de Manifestation d'Intérêt
+
+### Qu'est-ce qu'une Manifestation d'Intérêt ?
+
+Le système de manifestation d'intérêt vous permet d'être notifié automatiquement lorsqu'un produit que vous recherchez devient disponible près de chez vous.
+
+#### Cas d'usage
+- **Produit introuvable** : Vous cherchez un produit spécifique non disponible
+- **Produit en rupture** : Un marchand n'a plus de stock mais peut se réapprovisionner
+- **Produit saisonnier** : Vous voulez être alerté dès qu'il est de nouveau en saison
+- **Nouveau commerce** : Un marchand peut ajouter ce produit à son catalogue
+
+### Comment Créer une Manifestation d'Intérêt
+
+#### Accès à la Fonctionnalité
+```
+Menu principal → Manifestations d'intérêt
+ou
+Page produit → "Produit non trouvé ?" → Manifester votre intérêt
+```
+
+#### Création Pas à Pas
+
+1. **Cliquer "Nouvelle manifestation d'intérêt"**
+   
+2. **Remplir le formulaire** :
+   - **Nom du produit*** : "Tomates cerises bio", "Pain complet", etc.
+   - **Message (optionnel)** : Précisez vos préférences
+     ```
+     Exemple : "Je recherche environ 2kg de tomates cerises bio, 
+     de préférence de production locale et sans traitement"
+     ```
+   - **Rayon de recherche** : 5km à 100km (défaut : 25km)
+
+3. **Géolocalisation automatique** :
+   - Votre position est utilisée pour la recherche de proximité
+   - Autorisation de géolocalisation requise
+
+4. **Validation** :
+   ```
+   Cliquer "Notifier quand disponible"
+   → Vérification immédiate des stocks
+   → Email automatique si produit trouvé
+   → Manifestation enregistrée sinon
+   ```
+
+#### Vérification Immédiate
+Le système vérifie automatiquement si des produits correspondants sont déjà en stock dans votre zone :
+- ✅ **Produits trouvés** : Email immédiat avec les commerces
+- ⏳ **Pas de stock** : Manifestation enregistrée pour notifications futures
+
+### Gestion de vos Manifestations d'Intérêt
+
+#### Consultation de la Liste
+```
+Menu → Manifestations d'intérêt → Onglet "Mes manifestations"
+```
+
+#### Informations Affichées
+Pour chaque manifestation :
+- **Nom du produit** recherché
+- **Statut actuel** :
+  - ⏳ **En attente** : Recherche active
+  - ✅ **Satisfait** : Produit trouvé et notifié
+  - 📧 **Notifié** : Email de disponibilité envoyé
+- **Rayon de recherche** : Distance configurée
+- **Date de création** : Quand vous avez manifesté l'intérêt
+- **Message** : Vos préférences (si renseignées)
+
+#### Actions Disponibles
+- **Modifier** : Ajuster le rayon ou le message (à venir)
+- **Supprimer** : Annuler la manifestation d'intérêt
+- **Voir détails** : Informations complètes
+
+### Notifications et Emails
+
+#### Email de Disponibilité Immédiate
+Reçu automatiquement si des produits correspondants sont trouvés lors de la création :
+
+```
+Objet : "Produit disponible : [Nom du produit]"
+
+Votre recherche pour "[Nom du produit]" a donné des résultats !
+
+Commerce : [Nom du commerce]
+Adresse : [Adresse complète]
+Distance : [X.X km de chez vous]
+Produit : [Nom exact] - [Prix]€
+Stock disponible : [Quantité]
+
+Accéder au commerce : [Lien direct]
+```
+
+#### Email de Notification Marchand
+Reçu lorsqu'un marchand notifie la disponibilité d'un produit :
+
+```
+Objet : "Nouveau produit disponible : [Nom du produit]"
+
+Bonne nouvelle ! Un marchand vient d'ajouter un produit 
+correspondant à votre recherche.
+
+Votre recherche : "[Nom du produit]"
+Nouveau produit : "[Nom exact]" 
+Commerce : [Nom du commerce]
+Prix : [Prix]€
+Distance : [X.X km]
+
+Commander maintenant : [Lien direct]
+```
+
+### Conseils d'Utilisation
+
+#### Optimisation des Manifestations
+
+**Noms de produits efficaces** :
+- ✅ "Tomates cerises bio" 
+- ✅ "Pain complet au levain"
+- ✅ "Miel de châtaignier"
+- ❌ "Des trucs bons" (trop vague)
+
+**Messages utiles** :
+```
+Exemples de messages précis :
+- "Quantité souhaitée : 1kg environ"
+- "Pour une allergie au gluten"
+- "De préférence production locale"
+- "Budget maximum : 15€/kg"
+```
+
+**Rayon adapté** :
+- **5-10km** : Zone urbaine dense
+- **25km** : Banlieue, petites villes  
+- **50km** : Zones rurales
+- **100km** : Produits très spécifiques
+
+#### Stratégies de Recherche
+
+**Produits de saison** :
+```
+Créer la manifestation avant la saison :
+- Fraises → Fin février
+- Champignons → Début automne  
+- Truffes → Hiver
+```
+
+**Produits artisanaux** :
+- Soyez patient, production souvent limitée
+- Messages détaillés appréciés par les artisans
+- Rayon élargi pour plus de chances
+
+**Nouveaux commerces** :
+- Manifestations d'intérêt aident les marchands à orienter leur offre
+- Possibilité de découvrir de nouveaux producteurs
+
+### Gestion des Préférences
+
+#### Fréquence des Notifications
+- **Email immédiat** : Dès qu'un produit correspond
+- **Pas de spam** : Maximum 1 email par produit et par marchand
+- **Désabonnement** : Lien dans chaque email
+
+#### Vie Privée et Données
+- **Position** : Stockée uniquement pour la recherche de proximité
+- **Préférences** : Visibles par les marchands correspondants
+- **Email** : Utilisé uniquement pour les notifications produits
+
+### Interaction avec les Marchands
+
+#### Ce que voient les Marchands
+Dans leur dashboard, ils peuvent voir :
+- **Nom du produit** recherché
+- **Nombre de personnes intéressées**
+- **Messages** avec préférences détaillées
+- **Zone géographique** (pas votre adresse exacte)
+
+#### Communication Indirecte
+- Les marchands ne voient pas vos coordonnées personnelles
+- Ils peuvent notifier la disponibilité via la plateforme
+- Contact direct possible après notification
+
 ## Fonctionnalités Avancées
 
 ### Recherche Avancée

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #10B981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    .content { background: #f9f9f9; padding: 20px; border-radius: 0 0 8px 8px; }
+    .product-info { background: white; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #10B981; }
+    .commerce-info { background: #e6f7ff; padding: 15px; margin: 15px 0; border-radius: 8px; }
+    .btn { display: inline-block; background: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0; }
+    .btn:hover { background: #059669; }
+    .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>✅ Produit disponible !</h1>
+    </div>
+    
+    <div class="content">
+      <p>Bonjour <strong><%= @user.name %></strong>,</p>
+      
+      <p>Excellente nouvelle ! Le produit que vous recherchiez est maintenant disponible près de vous :</p>
+      
+      <div class="product-info">
+        <h3><%= @product.name %></h3>
+        <p><strong>Prix :</strong> <%= number_to_currency(@product.unitprice, unit: "FCFA", format: "%n %u") %></p>
+        <p><strong>Quantité disponible :</strong> <%= @product.unitsinstock %> <%= @product.quantityperunit %></p>
+        <% if @product.description.present? %>
+          <p><strong>Description :</strong> <%= @product.description %></p>
+        <% end %>
+      </div>
+      
+      <div class="commerce-info">
+        <h4>📍 Disponible chez : <%= @commerce.name %></h4>
+        <p><strong>Adresse :</strong> <%= @commerce.address %></p>
+        <% if @distance %>
+          <p><strong>Distance :</strong> <%= @distance %> km de votre position</p>
+        <% end %>
+        <% if @commerce.phonenumber.present? %>
+          <p><strong>Téléphone :</strong> <%= @commerce.phonenumber %></p>
+        <% end %>
+        <% if @commerce.email.present? %>
+          <p><strong>Email :</strong> <%= @commerce.email %></p>
+        <% end %>
+      </div>
+      
+      <p>Nous vous recommandons de contacter rapidement le commerçant pour vérifier la disponibilité et réserver votre produit.</p>
+      
+      <center>
+        <a href="<%= root_url %>commerces/<%= @commerce.id %>" class="btn">Voir le commerce</a>
+      </center>
+      
+      <p><small><strong>Note :</strong> Cette notification est envoyée car vous avez manifesté votre intérêt pour "<%= @product_interest.product_name %>" le <%= l(@product_interest.created_at, format: :long) %>.</small></p>
+    </div>
+    
+    <div class="footer">
+      <p>TchopMyGrinds - Votre marketplace local</p>
+      <p>Cet email a été envoyé automatiquement, merci de ne pas répondre.</p>
+    </div>
+  </div>
+</body>
+</html>

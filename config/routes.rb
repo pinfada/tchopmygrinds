@@ -43,6 +43,16 @@ Rails.application.routes.draw do
         end
       end
       
+      # Manifestations d'intérêt
+      resources :product_interests do
+        collection do
+          get :for_merchant
+        end
+        member do
+          post :notify_availability
+        end
+      end
+      
       # Utilitaires
       namespace :utils do
         get 'geocode', to: 'utils#geocode'
@@ -79,6 +89,7 @@ Rails.application.routes.draw do
     get '/cart', to: 'pages#react_app'
     get '/checkout', to: 'pages#react_app'
     get '/orders', to: 'pages#react_app'
+    get '/interests', to: 'pages#react_app'
     get '/profile', to: 'pages#react_app'
     get '/auth', to: 'pages#react_app'
     

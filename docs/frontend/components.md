@@ -1,4 +1,173 @@
-# Documentation Frontend - Composants AngularJS
+# Documentation Frontend - Composants React et AngularJS
+
+## Composants React (Architecture Moderne)
+
+### Vue d'ensemble
+L'application utilise React 18 avec TypeScript, Redux Toolkit pour la gestion d'état, et Tailwind CSS pour le styling. Les composants sont organisés de manière modulaire avec une séparation claire des responsabilités.
+
+### Composants ProductInterest
+
+#### ProductInterestForm
+**Fichier**: `frontend/src/components/ProductInterest/ProductInterestForm.tsx`
+
+Formulaire de création de manifestations d'intérêt pour des produits non disponibles.
+
+**Props:**
+```typescript
+interface ProductInterestFormProps {
+  initialProductName?: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
+  className?: string;
+}
+```
+
+**Fonctionnalités:**
+- Saisie du nom du produit recherché
+- Message optionnel avec préférences détaillées
+- Sélection du rayon de recherche (5-100 km)
+- Géolocalisation automatique de l'utilisateur
+- Validation en temps réel
+- Notifications de succès/erreur
+
+**État Local:**
+```typescript
+const [formData, setFormData] = useState({
+  product_name: initialProductName,
+  message: '',
+  search_radius: 25
+});
+const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+```
+
+**Intégration Redux:**
+- `createProductInterest` - Action pour créer la manifestation
+- `addNotification` - Notifications utilisateur
+- `position` - Géolocalisation depuis le store
+
+#### ProductInterestList
+**Fichier**: `frontend/src/components/ProductInterest/ProductInterestList.tsx`
+
+Affichage des manifestations d'intérêt de l'utilisateur avec pagination.
+
+**Props:**
+```typescript
+interface ProductInterestListProps {
+  className?: string;
+  showCreateButton?: boolean;
+  onCreateClick?: () => void;
+}
+```
+
+**Fonctionnalités:**
+- Liste paginée des manifestations d'intérêt
+- Statuts visuels (en attente, satisfait, notifié)
+- Suppression avec confirmation
+- Informations détaillées (rayon, date, message)
+- État vide avec call-to-action
+
+**États des manifestations:**
+- 🔔 **En attente** - Manifestation active
+- ✅ **Satisfait** - Produit trouvé et notifié
+- 📧 **Notifié** - Email de notification envoyé
+
+#### MerchantInterestDashboard
+**Fichier**: `frontend/src/components/ProductInterest/MerchantInterestDashboard.tsx`
+
+Dashboard spécialisé pour les marchands afin de gérer les manifestations d'intérêt.
+
+**Fonctionnalités principales:**
+- Vue groupée par nom de produit
+- Informations clients (nom, email, distance)
+- Matching automatique avec l'inventaire
+- Notifications manuelles de disponibilité
+- Configuration du rayon de notification
+
+**Autorisation:**
+Accessible uniquement aux utilisateurs avec `statut_type` : "itinerant" ou "sedentary"
+
+**Workflow marchand:**
+1. Voir les manifestations d'intérêt pour leurs produits
+2. Identifier les produits en stock correspondants
+3. Notifier les clients intéressés dans un rayon donné
+4. Suivre le nombre de notifications envoyées
+
+### ProductInterestPage
+**Fichier**: `frontend/src/pages/ProductInterestPage.tsx`
+
+Page principale organisant tous les composants de manifestation d'intérêt.
+
+**Interface utilisateur:**
+- **Onglet "Mes manifestations"** - Pour tous les utilisateurs
+- **Onglet "Dashboard marchand"** - Pour les marchands uniquement
+- **Modal de création** - Formulaire dans une overlay
+- **Navigation par onglets** - Interface adaptée au rôle utilisateur
+
+### Redux Store - productInterestSlice
+**Fichier**: `frontend/src/store/slices/productInterestSlice.ts`
+
+Gestion d'état centralisée pour les manifestations d'intérêt.
+
+**Actions disponibles:**
+```typescript
+// Actions utilisateur
+fetchProductInterests({ page, perPage })
+createProductInterest(data)
+deleteProductInterest(id)
+
+// Actions marchand
+fetchMerchantProductInterests({ page, perPage })
+notifyProductAvailability({ productId, radius })
+
+// Actions utilitaires
+clearErrors()
+setCurrentPage(page)
+setMerchantCurrentPage(page)
+resetState()
+```
+
+**État du store:**
+```typescript
+interface ProductInterestState {
+  // États utilisateur
+  interests: ProductInterest[];
+  loading: boolean;
+  error: string | null;
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+  
+  // États marchand
+  merchantInterests: MerchantProductInterest[];
+  merchantLoading: boolean;
+  merchantError: string | null;
+  merchantCurrentPage: number;
+  merchantTotalPages: number;
+  merchantTotalCount: number;
+  
+  // États globaux
+  creating: boolean;
+  createError: string | null;
+}
+```
+
+### Intégration avec l'écosystème React
+
+#### Services utilisés:
+- **apiClient** - Client HTTP avec intercepteurs JWT
+- **locationSlice** - Géolocalisation partagée
+- **notificationSlice** - Système de notifications
+
+#### Hooks personnalisés:
+- **useAppDispatch** - Hook Redux typé
+- **useAppSelector** - Sélecteur Redux typé
+
+#### Styling:
+- **Tailwind CSS** - Classes utilitaires responsives
+- **Design cohérent** - Même style que le reste de l'application
+- **Icônes emoji** - Interface conviviale et moderne
+
+## Composants AngularJS (Architecture Historique)
 
 ## Contrôleurs Principaux
 

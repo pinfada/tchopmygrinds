@@ -51,4 +51,34 @@ class UserMailer < ApplicationMailer
     mail(to: emails, subject: "Hi, this is a test mail.")
   end
 
+  # Notification de produit disponible immédiatement
+  def immediate_product_availability(product_interest, product)
+    @user = product_interest.user
+    @product_interest = product_interest
+    @product = product
+    @commerce = product.commerce
+    @distance = product_interest.distance_from(@commerce.latitude, @commerce.longitude)&.round(2)
+    
+    sendgrid_category "Product Available"
+    mail(
+      to: @user.email,
+      subject: "✅ #{@product.name} est maintenant disponible près de vous !"
+    )
+  end
+
+  # Notification de produit disponible (suite à manifestation d'intérêt)
+  def product_available_notification(product_interest, product)
+    @user = product_interest.user
+    @product_interest = product_interest
+    @product = product
+    @commerce = product.commerce
+    @distance = product_interest.distance_from(@commerce.latitude, @commerce.longitude)&.round(2)
+    
+    sendgrid_category "Product Interest Fulfilled"
+    mail(
+      to: @user.email,
+      subject: "🎉 Bonne nouvelle ! #{@product.name} est disponible"
+    )
+  end
+
 end

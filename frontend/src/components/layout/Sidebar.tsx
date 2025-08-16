@@ -60,6 +60,14 @@ const Sidebar = () => {
       description: 'Catalogue complet'
     },
     {
+      key: 'interests',
+      path: '/interests',
+      icon: '🔔',
+      label: 'Intérêts',
+      description: 'Manifestations d\'intérêt',
+      requireAuth: true
+    },
+    {
       key: 'orders',
       path: '/orders',
       icon: '📋',
