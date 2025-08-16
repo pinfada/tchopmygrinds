@@ -1,5 +1,4 @@
-class Api::V1::Admin::RatingsController < ApplicationController
-  before_action :authenticate_user!
+class Api::V1::Admin::RatingsController < Api::V1::BaseController
   before_action :ensure_admin
   before_action :set_rating, only: [:show, :approve, :reject, :destroy]
 
@@ -122,7 +121,9 @@ class Api::V1::Admin::RatingsController < ApplicationController
   end
 
   def ensure_admin
-    unless current_user&.admin?
+    return render_unauthorized unless current_user
+    
+    unless current_user.admin?
       render json: { error: 'Accès refusé - droits administrateur requis' }, status: :forbidden
     end
   end
