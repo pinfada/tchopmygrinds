@@ -8,13 +8,28 @@ class MessageMailer < ApplicationMailer
     @product = message.product
     @commerce = message.commerce
 
-    mail(
-      to: @receiver.email,
-      subject: new_message_subject
-    )
+    # Protection contre les erreurs d'encodage
+    begin
+      mail(
+        to: safe_encoding(@receiver.email),
+        subject: safe_encoding(new_message_subject)
+      )
+    rescue Encoding::UndefinedConversionError => e
+      Rails.logger.error "Erreur d'encodage dans MessageMailer: #{e.message}"
+      # Envoyer un email basique sans caractères spéciaux
+      mail(
+        to: @receiver.email,
+        subject: "Nouveau message - TchopMyGrinds"
+      )
+    end
   end
 
   private
+
+  def safe_encoding(text)
+    return text if text.nil?
+    text.to_s.force_encoding('UTF-8').scrub('?')
+  end
 
   def new_message_subject
     case @message.message_type

@@ -26,6 +26,18 @@ module StatExo1
     # Mise à jour du format de cache pour Rails 7.1
     config.active_support.cache_format_version = 7.1
 
+    # Configuration de l'encodage pour éviter les erreurs UTF-8
+    config.encoding = "utf-8"
+    
+    # Configuration spécifique pour les environnements cloud (Render, Heroku, etc.)
+    if Rails.env.production?
+      # Forcer l'encodage UTF-8 pour tous les strings
+      config.before_configuration do
+        Encoding.default_external = Encoding::UTF_8
+        Encoding.default_internal = Encoding::UTF_8
+      end
+    end
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
