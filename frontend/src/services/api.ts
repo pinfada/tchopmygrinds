@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { User, Commerce, Product, Order, ApiResponse, PaginatedResponse, Coordinates } from '../types'
+import { secureStorage } from './secureStorage'
 
 // Configuration axios
 const API_BASE_URL = import.meta.env.VITE_RAILS_API_URL || 'http://localhost:3000'
@@ -9,11 +10,13 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 secondes timeout pour éviter les attaques DoS
+  withCredentials: false, // Pas de cookies pour éviter CSRF
 })
 
 // Intercepteur pour ajouter le token JWT
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token')
+  const token = secureStorage.getToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -24,23 +27,32 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => {
     // Extraire le token JWT du header Authorization de la réponse (devise-jwt)
-    const authHeader = response.headers.authorization || response.headers.Authorization
+    const authHeader = response.headers.authorization || response.headers.Authorization || response.headers['authorization']
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '')
-      localStorage.setItem('auth_token', token)
+      secureStorage.setToken(token, { expiryMinutes: 60 }) // Token valide 1 heure
+      console.log('Token JWT reçu et stocké:', token.substring(0, 20) + '...')
+    } else {
+      console.log('Aucun token JWT trouvé dans les headers:', Object.keys(response.headers))
     }
     return response
   },
   (error) => {
+    // Gestion plus robuste des erreurs
     if (error.response?.status === 401) {
       // Token expiré ou invalide
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('current_user')
+      secureStorage.clearAll()
       
       // Rediriger vers login seulement si pas déjà sur la page auth
       if (!window.location.pathname.includes('/auth')) {
         window.location.href = '/auth'
       }
+    } else if (error.response?.status === 403) {
+      // Accès refusé - rediriger vers page non autorisé
+      window.location.href = '/unauthorized'
+    } else if (error.code === 'ECONNABORTED') {
+      // Timeout - probable attaque DoS
+      console.error('Requête timeout - possible attaque DoS')
     }
     return Promise.reject(error)
   }
@@ -51,9 +63,9 @@ export const authAPI = {
   login: async (credentials: { email: string; password: string }): Promise<{ user: User }> => {
     const response = await api.post('/auth/login', credentials)
     
-    // Stocker l'utilisateur en localStorage
+    // Stocker l'utilisateur de manière sécurisée
     if (response.data.data.user) {
-      localStorage.setItem('current_user', JSON.stringify(response.data.data.user))
+      secureStorage.setUser(response.data.data.user)
     }
     
     return response.data.data
@@ -67,9 +79,9 @@ export const authAPI = {
   }): Promise<{ user: User }> => {
     const response = await api.post('/auth/register', { user: userData })
     
-    // Stocker l'utilisateur en localStorage
+    // Stocker l'utilisateur de manière sécurisée
     if (response.data.data.user) {
-      localStorage.setItem('current_user', JSON.stringify(response.data.data.user))
+      secureStorage.setUser(response.data.data.user)
     }
     
     return response.data.data
@@ -79,9 +91,8 @@ export const authAPI = {
     try {
       await api.post('/auth/logout')
     } finally {
-      // Nettoyer le stockage local même si la requête échoue
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('current_user')
+      // Nettoyer le stockage sécurisé même si la requête échoue
+      secureStorage.clearAll()
     }
   },
   
@@ -89,8 +100,8 @@ export const authAPI = {
     const response = await api.get('/auth/me')
     const user = response.data.data.user
     
-    // Mettre à jour le localStorage
-    localStorage.setItem('current_user', JSON.stringify(user))
+    // Mettre à jour le stockage sécurisé
+    secureStorage.setUser(user)
     
     return user
   },
@@ -99,8 +110,8 @@ export const authAPI = {
     const response = await api.patch('/auth/profile', { user: userData })
     const user = response.data.data.user
     
-    // Mettre à jour le localStorage
-    localStorage.setItem('current_user', JSON.stringify(user))
+    // Mettre à jour le stockage sécurisé
+    secureStorage.setUser(user)
     
     return user
   },
@@ -240,6 +251,44 @@ export const orderAPI = {
   
   cancel: async (id: number): Promise<ApiResponse<Order>> => {
     const response = await api.patch(`/orders/${id}/cancel`)
+    return response.data
+  },
+}
+
+// API Product Interest
+export const productInterestAPI = {
+  // User functions
+  create: async (data: {
+    product_name: string
+    message?: string
+    search_radius: number
+    latitude: number
+    longitude: number
+  }): Promise<ApiResponse<any>> => {
+    const response = await api.post('/product_interests', data)
+    return response.data
+  },
+
+  getMyInterests: async (params?: { page?: number }): Promise<PaginatedResponse<any>> => {
+    const response = await api.get('/product_interests', { params })
+    return response.data
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/product_interests/${id}`)
+  },
+
+  // Merchant functions
+  getMerchantInterests: async (params?: { page?: number }): Promise<PaginatedResponse<any>> => {
+    const response = await api.get('/product_interests/for_merchant', { params })
+    return response.data
+  },
+
+  notifyAvailability: async (data: {
+    productId: number
+    radius: number
+  }): Promise<ApiResponse<{ interests_notified: number }>> => {
+    const response = await api.post('/product_interests/notify_availability', data)
     return response.data
   },
 }

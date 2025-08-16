@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { apiClient } from '../../services/apiClient';
+import { productInterestAPI } from '../../services/api';
 
 // Types
 export interface ProductInterest {
@@ -89,10 +89,8 @@ const initialState: ProductInterestState = {
 export const fetchProductInterests = createAsyncThunk(
   'productInterest/fetchProductInterests',
   async ({ page = 1, perPage = 10 }: { page?: number; perPage?: number } = {}) => {
-    const response = await apiClient.get('/api/v1/product_interests', {
-      params: { page, per_page: perPage }
-    });
-    return response.data;
+    const response = await productInterestAPI.getMyInterests({ page });
+    return response;
   }
 );
 
@@ -101,17 +99,15 @@ export const createProductInterest = createAsyncThunk(
   async (data: CreateProductInterestData, { rejectWithValue }) => {
     try {
       const payload = {
-        product_interest: {
-          product_name: data.product_name,
-          message: data.message,
-          search_radius: data.search_radius || 25,
-        },
-        latitude: data.latitude,
-        longitude: data.longitude,
+        product_name: data.product_name,
+        message: data.message,
+        search_radius: data.search_radius || 25,
+        latitude: data.latitude!,
+        longitude: data.longitude!,
       };
       
-      const response = await apiClient.post('/api/v1/product_interests', payload);
-      return response.data;
+      const response = await productInterestAPI.create(payload);
+      return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.errors || ['Erreur lors de la création']);
     }
@@ -121,7 +117,7 @@ export const createProductInterest = createAsyncThunk(
 export const deleteProductInterest = createAsyncThunk(
   'productInterest/deleteProductInterest',
   async (id: number) => {
-    await apiClient.delete(`/api/v1/product_interests/${id}`);
+    await productInterestAPI.delete(id);
     return id;
   }
 );
@@ -130,10 +126,8 @@ export const deleteProductInterest = createAsyncThunk(
 export const fetchMerchantProductInterests = createAsyncThunk(
   'productInterest/fetchMerchantProductInterests',
   async ({ page = 1, perPage = 10 }: { page?: number; perPage?: number } = {}) => {
-    const response = await apiClient.get('/api/v1/product_interests/for_merchant', {
-      params: { page, per_page: perPage }
-    });
-    return response.data;
+    const response = await productInterestAPI.getMerchantInterests({ page });
+    return response;
   }
 );
 
@@ -141,10 +135,8 @@ export const notifyProductAvailability = createAsyncThunk(
   'productInterest/notifyProductAvailability',
   async ({ productId, radius = 50 }: { productId: number; radius?: number }, { rejectWithValue }) => {
     try {
-      const response = await apiClient.post(`/api/v1/product_interests/${productId}/notify_availability`, {
-        radius
-      });
-      return response.data;
+      const response = await productInterestAPI.notifyAvailability({ productId, radius });
+      return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.error || 'Erreur lors de la notification');
     }

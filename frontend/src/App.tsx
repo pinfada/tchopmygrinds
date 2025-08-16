@@ -17,6 +17,7 @@ import OrdersPage from './pages/OrdersPage'
 import ProfilePage from './pages/ProfilePage'
 import AuthPage from './pages/AuthPage'
 import ProductInterestPage from './pages/ProductInterestPage'
+import UnauthorizedPage from './pages/UnauthorizedPage'
 
 function App() {
   const dispatch = useAppDispatch()
@@ -45,6 +46,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/interests" element={<ProductInterestPage />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
         </Routes>
       </MapLayout>
 

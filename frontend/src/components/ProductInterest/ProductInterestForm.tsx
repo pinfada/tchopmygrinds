@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { createProductInterest, clearErrors } from '../../store/slices/productInterestSlice';
 import { addNotification } from '../../store/slices/notificationSlice';
+import { Card, Button, Input, Alert } from '../ui';
 
 interface ProductInterestFormProps {
   initialProductName?: string;
@@ -109,143 +110,133 @@ const ProductInterestForm: React.FC<ProductInterestFormProps> = ({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 ${className}`}>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">
-          🔍 Manifester votre intérêt
-        </h3>
-        {onCancel && (
-          <button
-            onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            ✕
-          </button>
-        )}
-      </div>
+    <Card className={className}>
+      <Card.Header>
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-slate-900">
+            🔍 Manifester votre intérêt
+          </h3>
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              className="text-slate-400 hover:text-slate-600 p-1 rounded transition-all duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        <p className="text-sm text-slate-600 mt-2">
+          Vous ne trouvez pas un produit ? Manifestez votre intérêt et nous vous notifierons 
+          dès qu'il sera disponible près de vous !
+        </p>
+      </Card.Header>
 
-      <p className="text-sm text-gray-600 mb-6">
-        Vous ne trouvez pas un produit ? Manifestez votre intérêt et nous vous notifierons 
-        dès qu'il sera disponible près de vous !
-      </p>
+      <Card.Body>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="product_name" className="block text-sm font-medium text-gray-700 mb-1">
-            Nom du produit *
-          </label>
-          <input
+        <form id="product-interest-form" onSubmit={handleSubmit} className="space-y-6">
+          <Input
+            label="Nom du produit *"
             type="text"
-            id="product_name"
             name="product_name"
             value={formData.product_name}
             onChange={handleInputChange}
             placeholder="Ex: Tomates fraîches, Pain complet, etc."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             disabled={creating}
             required
           />
-        </div>
 
-        <div>
-          <label htmlFor="search_radius" className="block text-sm font-medium text-gray-700 mb-1">
-            Rayon de recherche: {formData.search_radius} km
-          </label>
-          <input
-            type="range"
-            id="search_radius"
-            name="search_radius"
-            min="5"
-            max="100"
-            step="5"
-            value={formData.search_radius}
-            onChange={handleInputChange}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            disabled={creating}
-          />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>5 km</span>
-            <span>100 km</span>
+          <div>
+            <label htmlFor="search_radius" className="block text-sm font-medium text-slate-700 mb-2">
+              Rayon de recherche: {formData.search_radius} km
+            </label>
+            <input
+              type="range"
+              id="search_radius"
+              name="search_radius"
+              min="5"
+              max="100"
+              step="5"
+              value={formData.search_radius}
+              onChange={handleInputChange}
+              className="w-full h-2 bg-slate-200 rounded-pill appearance-none cursor-pointer accent-brand-500"
+              disabled={creating}
+            />
+            <div className="flex justify-between text-xs text-slate-500 mt-2">
+              <span>5 km</span>
+              <span>100 km</span>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-            Message complémentaire (optionnel)
-          </label>
-          <textarea
-            id="message"
+          <Input.Textarea
+            label="Message complémentaire (optionnel)"
             name="message"
             value={formData.message}
             onChange={handleInputChange}
             placeholder="Précisez vos préférences (quantité, qualité, prix, etc.)"
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
             disabled={creating}
           />
-        </div>
 
-        {/* Position info */}
-        <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <span className="text-sm text-blue-800">
-                📍 Position: {position ? 'Détectée' : 'Non disponible'}
-              </span>
+          {/* Position info */}
+          <Alert variant="info">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <span className="text-sm">
+                  📍 Position: {position ? 'Détectée' : 'Non disponible'}
+                </span>
+              </div>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={useCurrentLocation}
+                  onChange={(e) => setUseCurrentLocation(e.target.checked)}
+                  className="mr-2 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                  disabled={!position || creating}
+                />
+                <span className="text-sm">Utiliser ma position</span>
+              </label>
             </div>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={useCurrentLocation}
-                onChange={(e) => setUseCurrentLocation(e.target.checked)}
-                className="mr-2"
-                disabled={!position || creating}
-              />
-              <span className="text-sm text-blue-800">Utiliser ma position</span>
-            </label>
-          </div>
-          {position && (
-            <p className="text-xs text-blue-600 mt-1">
-              Lat: {position.latitude.toFixed(4)}, Lng: {position.longitude.toFixed(4)}
-            </p>
-          )}
-        </div>
-
-        {createError && (
-          <div className="bg-red-50 border border-red-200 rounded-md p-3">
-            <p className="text-sm text-red-800">{createError}</p>
-          </div>
-        )}
-
-        <div className="flex space-x-3 pt-4">
-          {onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              disabled={creating}
-            >
-              Annuler
-            </button>
-          )}
-          
-          <button
-            type="submit"
-            disabled={creating || !position || !formData.product_name.trim()}
-            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            {creating ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Enregistrement...
-              </>
-            ) : (
-              '🔔 Notifier quand disponible'
+            {position && (
+              <p className="text-xs mt-2 opacity-75">
+                Lat: {position.latitude.toFixed(4)}, Lng: {position.longitude.toFixed(4)}
+              </p>
             )}
-          </button>
-        </div>
-      </form>
-    </div>
+          </Alert>
+
+          {createError && (
+            <Alert variant="error">
+              {createError}
+            </Alert>
+          )}
+
+        </form>
+      </Card.Body>
+      
+      <Card.Footer className="justify-between">
+        {onCancel && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onCancel}
+            disabled={creating}
+          >
+            Annuler
+          </Button>
+        )}
+        
+        <Button
+          type="submit"
+          form="product-interest-form"
+          loading={creating}
+          disabled={!position || !formData.product_name.trim()}
+          className={onCancel ? '' : 'ml-auto'}
+        >
+          {creating ? 'Enregistrement...' : '🔔 Notifier quand disponible'}
+        </Button>
+      </Card.Footer>
+    </Card>
   );
 };
 

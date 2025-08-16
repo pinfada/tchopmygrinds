@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchProductById } from '../store/slices/productSlice'
 import { addToCart } from '../store/slices/cartSlice'
 import { ProductInterestForm } from '../components/ProductInterest'
-import { Modal } from '../components/ui/Modal'
+import { Modal } from '../components/ui'
 import type { Product } from '../types'
 
 const ProductDetailPage = () => {

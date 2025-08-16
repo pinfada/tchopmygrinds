@@ -1,64 +1,70 @@
 module.exports = {
+  darkMode: 'class',
   content: [
-    // React frontend files (PRIORITY)
+    './app/**/*.html.erb',
+    './app/**/*.rb',
+    './app/javascript/**/*.{js,ts,jsx,tsx}',
+    './app/views/**/*.html.erb',
     './frontend/src/**/*.{js,ts,jsx,tsx}',
-    './frontend/index.html',
-    // Legacy Rails files (minimal)
-    './app/views/pages/react_app.html.erb',
-    './app/helpers/**/*.rb'
-  ],
-  safelist: [
-    // Classes dynamiques pour React (réduites)
-    {
-      pattern: /^(bg|text|border|hover|focus)-(primary|emerald|amber|lime)-(50|100|200|300|400|500|600|700|800|900)$/
-    }
+    './frontend/index.html'
   ],
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d'
+        brand: {
+          50: '#f0f8f4',
+          100: '#daf0e6',
+          200: '#b7e1cc',
+          300: '#8fcfb0',
+          400: '#55b987',
+          500: '#1f9c5f',
+          600: '#187a4b',
+          700: '#125e3a',
+          800: '#0e4a2e',
+          900: '#0b3a24',
         },
-        banana: {
-          50: '#fffbeb',
-          100: '#fef3c7',
-          200: '#fde68a',
-          300: '#fcd34d',
-          400: '#fbbf24',
-          500: '#f59e0b',
-          600: '#d97706',
-          700: '#b45309',
-          800: '#92400e',
-          900: '#78350f'
+        accent: {
+          100: '#fff7e6',
+          300: '#ffd27a',
+          500: '#f0b323',
+          700: '#b57d12'
         },
-        plantain: {
-          50: '#f7fee7',
-          100: '#ecfccb',
-          200: '#d9f99d',
-          300: '#bef264',
-          400: '#a3e635',
-          500: '#84cc16',
-          600: '#65a30d',
-          700: '#4d7c0f',
-          800: '#3f6212',
-          900: '#365314'
-        }
-      },
-      fontFamily: {
-        'display': ['Inter', 'system-ui', 'sans-serif']
+        // Couleurs sémantiques selon le design system
+        ink: '#0f172a',
+        muted: '#475569',
+        line: '#e2e8f0',
+        surface: '#f8fafc',
+        // États
+        success: '#16a34a',
+        warning: '#f59e0b',
+        error: '#dc2626',
+        info: '#2563eb'
       },
       boxShadow: {
-        'card': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+        card: '0 2px 8px rgba(2,6,23,.06)',
+        'card-hover': '0 8px 24px rgba(2,6,23,.12)',
+        elev: '0 8px 24px rgba(2,6,23,.10)',
+        pop: '0 12px 32px rgba(2,6,23,.16)',
+      },
+      borderRadius: {
+        xs: '6px',
+        sm: '10px',
+        md: '14px',
+        lg: '20px',
+        pill: '999px'
+      },
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial']
+      },
+      spacing: {
+        1: '4px',
+        2: '8px',
+        3: '12px',
+        4: '16px',
+        6: '24px',
+        8: '32px',
+        10: '40px',
+        12: '48px'
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',

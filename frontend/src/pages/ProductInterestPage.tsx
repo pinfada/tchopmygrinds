@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '../hooks/redux';
 import Layout from '../components/Layout';
-import { Modal } from '../components/ui/Modal';
+import { Modal } from '../components/ui';
 import { 
   ProductInterestForm, 
   ProductInterestList, 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Authentification</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Test Authentification TchopMyGrinds</h1>
+    
+    <div>
+        <h2>Test Login</h2>
+        <button onclick="testLogin()">Tester Login</button>
+        <div id="loginResult"></div>
+    </div>
+    
+    <div>
+        <h2>Test Register</h2>
+        <button onclick="testRegister()">Tester Register</button>
+        <div id="registerResult"></div>
+    </div>
+
+    <script>
+        // Configuration axios similaire au frontend
+        const api = axios.create({
+            baseURL: 'http://localhost:3000/api/v1',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            timeout: 10000,
+            withCredentials: false,
+        });
+
+        // Intercepteur pour capturer le token
+        api.interceptors.response.use(
+            (response) => {
+                console.log('Response headers:', response.headers);
+                const authHeader = response.headers.authorization || response.headers.Authorization;
+                if (authHeader) {
+                    console.log('Token trouvé:', authHeader);
+                    localStorage.setItem('test_token', authHeader);
+                } else {
+                    console.log('Aucun token dans les headers');
+                }
+                return response;
+            },
+            (error) => {
+                console.error('Erreur API:', error);
+                return Promise.reject(error);
+            }
+        );
+
+        async function testLogin() {
+            try {
+                const response = await api.post('/auth/login', {
+                    email: 'test@example.com',
+                    password: 'password123'
+                });
+                
+                document.getElementById('loginResult').innerHTML = 
+                    '<pre>' + JSON.stringify(response.data, null, 2) + '</pre>';
+                console.log('Login success:', response.data);
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = 
+                    '<div style="color: red">Erreur: ' + error.message + '</div>';
+                console.error('Login error:', error);
+            }
+        }
+
+        async function testRegister() {
+            try {
+                const response = await api.post('/auth/register', {
+                    user: {
+                        email: 'test2@example.com',
+                        password: 'password123',
+                        password_confirmation: 'password123',
+                        name: 'Test User 2',
+                        statut_type: 'others'
+                    }
+                });
+                
+                document.getElementById('registerResult').innerHTML = 
+                    '<pre>' + JSON.stringify(response.data, null, 2) + '</pre>';
+                console.log('Register success:', response.data);
+            } catch (error) {
+                document.getElementById('registerResult').innerHTML = 
+                    '<div style="color: red">Erreur: ' + error.message + '</div>';
+                console.error('Register error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
