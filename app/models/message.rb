@@ -18,6 +18,9 @@ class Message < ApplicationRecord
   validates :conversation_id, presence: true
   validates :sender_id, :receiver_id, presence: true
   validate :sender_and_receiver_are_different
+  
+  # Nettoyage de l'encodage avant validation
+  before_validation :clean_encoding
 
   # Scopes
   scope :unread, -> { where(read_at: nil) }
@@ -89,12 +92,28 @@ class Message < ApplicationRecord
 
   def sender_and_receiver_are_different
     if sender_id == receiver_id
-      errors.add(:receiver_id, "ne peut pas être identique à l'expéditeur")
+      errors.add(:receiver_id, "ne peut pas etre identique a l'expediteur")
     end
   end
 
   def send_notification
-    # Envoyer une notification par email au destinataire
-    MessageMailer.new_message_notification(self).deliver_later if receiver.present?
+    # Envoyer une notification par email au destinataire (avec gestion d'erreur d'encodage)
+    begin
+      MessageMailer.new_message_notification(self).deliver_later if receiver.present?
+    rescue Encoding::UndefinedConversionError => e
+      Rails.logger.error "Erreur d'encodage email: #{e.message}"
+      # Ne pas faire échouer la création du message pour un problème d'email
+    end
+  end
+
+  def clean_encoding
+    # Nettoyer l'encodage du contenu
+    if content.present?
+      self.content = content.force_encoding('UTF-8').scrub('?')
+    end
+    
+    if subject.present?
+      self.subject = subject.force_encoding('UTF-8').scrub('?')
+    end
   end
 end
