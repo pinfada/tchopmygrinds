@@ -72,6 +72,64 @@ module.controller('MainController', [
         ];
 
         // Définir le rayon de recherche
+        
+        $scope.sortOption = 'recommended';
+
+        $scope.computeRecommendationScore = function(item, context) {
+            var safeStock = Math.max(0, Number(item.stock) || 0);
+            var safeDistance = Math.max(0, Number(item.distance) || 0);
+            var safePrice = Math.max(0, Number(item.prix) || 0);
+
+            var maxDistance = (context && context.radius) || $scope.searchRadius || 25;
+            var maxPrice = (context && context.maxPrice) || safePrice || 1;
+
+            var stockRatio = Math.min(safeStock / 10, 1);
+            var distanceRatio = 1 - Math.min(safeDistance / Math.max(maxDistance, 1), 1);
+            var priceRatio = 1 - Math.min(safePrice / Math.max(maxPrice, 1), 1);
+
+            var score = (stockRatio * 45) + (distanceRatio * 35) + (priceRatio * 20);
+            return Math.max(0, Math.min(100, Math.round(score)));
+        };
+
+        $scope.enrichAndSortResults = function(results) {
+            var normalized = (results || []).map(function(item) {
+                return angular.extend({}, item, {
+                    stock: Math.max(0, Number(item.stock) || 0),
+                    distance: Math.max(0, Number(item.distance) || 0),
+                    prix: Math.max(0, Number(item.prix) || 0)
+                });
+            });
+
+            var maxPrice = normalized.reduce(function(max, item) {
+                return Math.max(max, item.prix || 0);
+            }, 0);
+
+            normalized.forEach(function(item) {
+                item.recommendationScore = $scope.computeRecommendationScore(item, {
+                    radius: $scope.searchRadius,
+                    maxPrice: maxPrice
+                });
+            });
+
+            return normalized.sort(function(a, b) {
+                return (b.recommendationScore || 0) - (a.recommendationScore || 0);
+            });
+        };
+
+        $scope.getSortedResults = function() {
+            var results = ($scope.searchResults || []).slice();
+            if ($scope.sortOption === 'price') {
+                return results.sort(function(a, b) { return (a.prix || 0) - (b.prix || 0); });
+            }
+            if ($scope.sortOption === 'distance') {
+                return results.sort(function(a, b) { return (a.distance || 0) - (b.distance || 0); });
+            }
+            if ($scope.sortOption === 'stock') {
+                return results.sort(function(a, b) { return (b.stock || 0) - (a.stock || 0); });
+            }
+            return results.sort(function(a, b) { return (b.recommendationScore || 0) - (a.recommendationScore || 0); });
+        };
+
         $scope.setSearchRadius = function(radius) {
             $scope.searchRadius = radius;
             // Relancer la recherche si une requête est active
@@ -121,10 +179,12 @@ module.controller('MainController', [
                                 longitude: item.longitude,
                                 productName: $scope.searchQuery,
                                 commerceId: item.commerceId,
-                                productId: item.productId
+                                productId: item.productId,
+                                recommendationScore: 0
                             };
                         });
-                        
+                        $scope.searchResults = $scope.enrichAndSortResults($scope.searchResults);
+
                         $scope.viewMode = 'list'; // Afficher la liste par défaut
                         $scope.updateMapWithResults();
                         
@@ -170,11 +230,15 @@ module.controller('MainController', [
         $scope.getCommercesForProducts = function(products) {
             var promises = [];
             
+            var commercesPromise = $http.get('/commerces').then(function(response) {
+                return response.data || [];
+            });
+
             products.forEach(function(product) {
-                var promise = $http.get('/commerces').then(function(response) {
+                var promise = commercesPromise.then(function(commerces) {
                     return {
                         product: product,
-                        commerces: response.data
+                        commerces: commerces
                     };
                 });
                 promises.push(promise);
@@ -194,7 +258,7 @@ module.controller('MainController', [
                             if (distance <= $scope.searchRadius) {
                                 searchResults.push({
                                     commerceName: commerce.nom,
-                                    commerceType: commerce.user?.statut_type || 'sedentary',
+                                    commerceType: (commerce.user && commerce.user.statut_type) ? commerce.user.statut_type : 'sedentary',
                                     ville: commerce.ville,
                                     distance: distance,
                                     prix: result.product.unitprice,
@@ -211,9 +275,7 @@ module.controller('MainController', [
                 });
                 
                 if (searchResults.length > 0) {
-                    $scope.searchResults = searchResults.sort(function(a, b) {
-                        return a.distance - b.distance;
-                    });
+                    $scope.searchResults = $scope.enrichAndSortResults(searchResults);
                     $scope.updateMapWithResults();
                 } else {
                     $scope.noResults = true;

@@ -4,6 +4,8 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === 'production' ? '/dist/' : '/',
+
   plugins: [
     react({
       // Configure le plugin React pour éviter les conflits
