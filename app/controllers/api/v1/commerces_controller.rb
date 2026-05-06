@@ -1,8 +1,10 @@
 class Api::V1::CommercesController < Api::V1::BaseController
   # Skip authentication pour les endpoints publics de consultation
-  skip_before_action :authenticate_user_from_token!, only: [:index, :nearby, :search, :show, :products]
-  before_action :set_commerce, only: [:show, :update, :destroy, :products]
+  skip_before_action :authenticate_user_from_token!, only: [:index, :nearby, :search, :show, :products, :location, :live]
+  before_action :set_commerce, only: [:show, :update, :destroy, :products, :location, :update_location]
   before_action :authenticate_user!, only: [:create, :update, :destroy]
+  before_action :authenticate_user!, only: [:update_my_location, :update_location]
+  before_action :disable_live_cache, only: [:live, :location, :update_location, :update_my_location]
   
   # GET /api/v1/commerces
   def index
@@ -51,6 +53,93 @@ class Api::V1::CommercesController < Api::V1::BaseController
       commerces: result[:data].map { |commerce| commerce_data_with_distance(commerce, [latitude, longitude]) },
       meta: result[:meta]
     })
+  end
+
+  # GET /api/v1/commerces/live
+  def live
+    commerces = Commerce.includes(:user)
+                        .joins(:user)
+                        .where(users: { statut_type: User.statut_types[:itinerant] })
+                        .where(is_online: true)
+
+    if location_params_present?
+      latitude = params[:latitude].to_f
+      longitude = params[:longitude].to_f
+      radius = params[:radius]&.to_f || 50
+      commerces = commerces.near([latitude, longitude], radius, order: :distance)
+
+      return render_success({
+        commerces: commerces.map { |commerce| commerce_data_with_distance(commerce, [latitude, longitude]) }
+      })
+    end
+
+    render_success({
+      commerces: commerces.map { |commerce| commerce_data(commerce) }
+    })
+  end
+
+  # GET /api/v1/commerces/:id/location
+  def location
+    render_success({ commerce: commerce_location_data(@commerce) })
+  end
+
+  # PATCH /api/v1/commerces/:id/update_location
+  def update_location
+    unless can_manage_commerce?(@commerce)
+      return render_error('Non autorisé à mettre à jour la position de ce commerce', :forbidden)
+    end
+
+    unless current_user.admin? || current_user.itinerant?
+      return render_error('Seuls les commerçants itinérants peuvent publier une position live', :forbidden)
+    end
+
+    latitude = params[:latitude]&.to_f
+    longitude = params[:longitude]&.to_f
+    is_online = params.key?(:is_online) ? ActiveModel::Type::Boolean.new.cast(params[:is_online]) : true
+
+    if latitude.blank? || longitude.blank?
+      return render_error('Latitude et longitude requises')
+    end
+
+    if @commerce.update(
+      latitude: latitude,
+      longitude: longitude,
+      is_online: is_online,
+      location_updated_at: Time.current
+    )
+      render_success({ commerce: commerce_location_data(@commerce) }, message: 'Position mise à jour')
+    else
+      render_error(@commerce.errors.full_messages.join(', '))
+    end
+  end
+
+  # PATCH /api/v1/commerces/update_my_location
+  def update_my_location
+    unless current_user.admin? || current_user.itinerant?
+      return render_error('Seuls les commerçants itinérants peuvent publier une position live', :forbidden)
+    end
+
+    commerce = current_user.commerces.order(updated_at: :desc).first
+    return render_not_found('Commerce') if commerce.nil?
+
+    latitude = params[:latitude]&.to_f
+    longitude = params[:longitude]&.to_f
+    is_online = params.key?(:is_online) ? ActiveModel::Type::Boolean.new.cast(params[:is_online]) : true
+
+    if latitude.blank? || longitude.blank?
+      return render_error('Latitude et longitude requises')
+    end
+
+    if commerce.update(
+      latitude: latitude,
+      longitude: longitude,
+      is_online: is_online,
+      location_updated_at: Time.current
+    )
+      render_success({ commerce: commerce_location_data(commerce) }, message: 'Position live publiée')
+    else
+      render_error(commerce.errors.full_messages.join(', '))
+    end
   end
   
   # GET /api/v1/commerces/search
@@ -205,8 +294,10 @@ class Api::V1::CommercesController < Api::V1::BaseController
       phone: commerce.phone,
       email: commerce.user&.email,
       category: commerce.category,
+      type: commerce.user&.statut_type == 'itinerant' ? 'itinerant' : 'sedentary',
       rating: commerce.rating || 0,
       isVerified: commerce.verified || false,
+      isOnline: commerce_online?(commerce),
       userId: commerce.user_id,
       createdAt: commerce.created_at.iso8601,
       updatedAt: commerce.updated_at.iso8601
@@ -250,5 +341,29 @@ class Api::V1::CommercesController < Api::V1::BaseController
         name: product.commerce&.name
       }
     }
+  end
+
+  def disable_live_cache
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+  end
+
+  def commerce_location_data(commerce)
+    {
+      id: commerce.id,
+      name: commerce.name,
+      latitude: commerce.latitude,
+      longitude: commerce.longitude,
+      is_online: commerce_online?(commerce),
+      last_update: commerce.location_updated_at&.iso8601
+    }
+  end
+
+  def commerce_online?(commerce)
+    return false unless commerce.is_online
+    return true if commerce.location_updated_at.blank?
+
+    commerce.location_updated_at >= 10.minutes.ago
   end
 end

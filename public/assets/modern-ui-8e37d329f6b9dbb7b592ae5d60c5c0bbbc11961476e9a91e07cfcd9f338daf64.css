@@ -1,0 +1,867 @@
+/**
+ * Modern UI Framework for TchopMyGrinds
+ * Mobile-first, accessible, modern design system
+ */
+/* line 7, app/assets/stylesheets/modern-ui.scss */
+:root {
+  --primary: #28a745;
+  --primary-light: #34d058;
+  --primary-dark: #1e7e34;
+  --secondary: #007AFF;
+  --secondary-light: #40a9ff;
+  --secondary-dark: #0056b3;
+  --accent: #FFB61C;
+  --accent-light: #ffc947;
+  --accent-dark: #e6a217;
+  --white: #ffffff;
+  --gray-50: #fafbfc;
+  --gray-100: #f1f3f4;
+  --gray-200: #e1e4e8;
+  --gray-300: #d1d5da;
+  --gray-400: #959da5;
+  --gray-500: #6a737d;
+  --gray-600: #586069;
+  --gray-700: #444d56;
+  --gray-800: #2f363d;
+  --gray-900: #24292e;
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --info: #17a2b8;
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --radius-sm: 0.375rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --transition: all 0.2s ease-in-out;
+  --transition-fast: all 0.1s ease-in-out;
+}
+
+/* line 81, app/assets/stylesheets/modern-ui.scss */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* line 87, app/assets/stylesheets/modern-ui.scss */
+html {
+  scroll-behavior: smooth;
+}
+
+/* line 91, app/assets/stylesheets/modern-ui.scss */
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.5;
+  color: var(--gray-900);
+  background-color: var(--gray-50);
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* line 104, app/assets/stylesheets/modern-ui.scss */
+img, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* line 110, app/assets/stylesheets/modern-ui.scss */
+.container-fluid {
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+/* line 116, app/assets/stylesheets/modern-ui.scss */
+.row.site {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* line 121, app/assets/stylesheets/modern-ui.scss */
+.row.site .general_menu {
+  flex: 0 0 72px;
+}
+
+/* line 125, app/assets/stylesheets/modern-ui.scss */
+.row.site .general_content_styles,
+.row.site .side-bar {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (max-width: 992px) {
+  /* line 132, app/assets/stylesheets/modern-ui.scss */
+  .row.site {
+    display: block;
+  }
+  /* line 133, app/assets/stylesheets/modern-ui.scss */
+  .row.site .general_menu {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    padding: var(--space-2) 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  /* line 142, app/assets/stylesheets/modern-ui.scss */
+  .row.site .general_menu ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin: 0;
+    padding: 0 var(--space-4);
+  }
+  /* line 149, app/assets/stylesheets/modern-ui.scss */
+  .row.site .general_content_styles,
+.row.site .side-bar {
+    width: 100%;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+  /* line 156, app/assets/stylesheets/modern-ui.scss */
+  .profile .col-md-7,
+.profile .col-md-5,
+.news_container .col-md-8,
+.news_container .col-md-4 {
+    width: 100% !important;
+    float: none !important;
+  }
+}
+
+/* Vertical Sidebar Navigation */
+/* line 166, app/assets/stylesheets/modern-ui.scss */
+.tm-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 80px;
+  background: var(--white);
+  border-right: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4) var(--space-2);
+  z-index: 1200;
+}
+
+/* line 182, app/assets/stylesheets/modern-ui.scss */
+.tm-sidebar .avatar img {
+  max-width: 48px;
+  border-radius: 50%;
+}
+
+/* line 184, app/assets/stylesheets/modern-ui.scss */
+.tm-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-4) 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* line 193, app/assets/stylesheets/modern-ui.scss */
+.tm-sidebar ul li a.gradientmenu {
+  display: inline-flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  color: var(--gray-700);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+/* line 205, app/assets/stylesheets/modern-ui.scss */
+.tm-sidebar ul li a.gradientmenu:hover,
+.tm-sidebar ul li a.gradientmenu.active {
+  background: var(--gray-100);
+  color: var(--primary);
+}
+
+/* Content shift when sidebar is present */
+/* line 212, app/assets/stylesheets/modern-ui.scss */
+.with-sidebar {
+  margin-left: 80px;
+}
+
+/* Mobile behavior */
+@media (max-width: 992px) {
+  /* line 218, app/assets/stylesheets/modern-ui.scss */
+  .tm-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    width: 72px;
+  }
+  /* line 223, app/assets/stylesheets/modern-ui.scss */
+  .tm-sidebar.is-open {
+    transform: translateX(0);
+  }
+  /* line 225, app/assets/stylesheets/modern-ui.scss */
+  .with-sidebar {
+    margin-left: 0;
+  }
+  /* line 227, app/assets/stylesheets/modern-ui.scss */
+  .sidebar-toggle {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 1300;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow);
+  }
+  /* line 243, app/assets/stylesheets/modern-ui.scss */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 1100;
+  }
+}
+
+/* line 252, app/assets/stylesheets/modern-ui.scss */
+.app-layout {
+  display: grid;
+  grid-template-areas: "header" "main";
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+/* line 261, app/assets/stylesheets/modern-ui.scss */
+.app-header {
+  grid-area: header;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* line 271, app/assets/stylesheets/modern-ui.scss */
+.app-main {
+  grid-area: main;
+  position: relative;
+  overflow: hidden;
+}
+
+/* line 278, app/assets/stylesheets/modern-ui.scss */
+.modern-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+}
+
+/* line 284, app/assets/stylesheets/modern-ui.scss */
+.modern-header .logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary);
+  text-decoration: none;
+}
+
+/* line 293, app/assets/stylesheets/modern-ui.scss */
+.modern-header .logo .logo-icon {
+  font-size: var(--font-size-2xl);
+}
+
+/* line 298, app/assets/stylesheets/modern-ui.scss */
+.modern-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* line 306, app/assets/stylesheets/modern-ui.scss */
+.search-container {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* line 312, app/assets/stylesheets/modern-ui.scss */
+.search-form {
+  display: flex;
+  gap: var(--space-3);
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-md);
+  margin: var(--space-6);
+}
+
+/* line 322, app/assets/stylesheets/modern-ui.scss */
+.search-input-group {
+  flex: 1;
+  position: relative;
+}
+
+/* line 327, app/assets/stylesheets/modern-ui.scss */
+.search-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  font-size: var(--font-size-base);
+  transition: var(--transition);
+}
+
+/* line 335, app/assets/stylesheets/modern-ui.scss */
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* line 341, app/assets/stylesheets/modern-ui.scss */
+.search-input::placeholder {
+  color: var(--gray-400);
+}
+
+/* line 346, app/assets/stylesheets/modern-ui.scss */
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* line 359, app/assets/stylesheets/modern-ui.scss */
+.search-suggestions .suggestion-item {
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+/* line 364, app/assets/stylesheets/modern-ui.scss */
+.search-suggestions .suggestion-item:hover {
+  background: var(--gray-50);
+}
+
+/* line 368, app/assets/stylesheets/modern-ui.scss */
+.search-suggestions .suggestion-item.active {
+  background: var(--primary);
+  color: var(--white);
+}
+
+/* line 376, app/assets/stylesheets/modern-ui.scss */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition);
+  min-height: 44px;
+}
+
+/* line 392, app/assets/stylesheets/modern-ui.scss */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* line 398, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+}
+
+/* line 402, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* line 409, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-secondary {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+/* line 413, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-secondary:hover:not(:disabled) {
+  background: var(--gray-200);
+}
+
+/* line 418, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-outline {
+  background: transparent;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+/* line 423, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-outline:hover:not(:disabled) {
+  background: var(--primary);
+  color: var(--white);
+}
+
+/* line 430, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-xs);
+  min-height: 36px;
+}
+
+/* line 436, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--font-size-lg);
+  min-height: 52px;
+}
+
+/* line 443, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-icon {
+  padding: var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+/* line 447, app/assets/stylesheets/modern-ui.scss */
+.btn.btn-icon.btn-sm {
+  padding: var(--space-2);
+}
+
+/* line 454, app/assets/stylesheets/modern-ui.scss */
+.card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+/* line 461, app/assets/stylesheets/modern-ui.scss */
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* line 466, app/assets/stylesheets/modern-ui.scss */
+.card .card-header {
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+/* line 470, app/assets/stylesheets/modern-ui.scss */
+.card .card-header .card-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* line 477, app/assets/stylesheets/modern-ui.scss */
+.card .card-body {
+  padding: var(--space-6);
+}
+
+/* line 481, app/assets/stylesheets/modern-ui.scss */
+.card .card-footer {
+  padding: var(--space-4) var(--space-6);
+  background: var(--gray-50);
+  border-top: 1px solid var(--gray-200);
+}
+
+/* line 490, app/assets/stylesheets/modern-ui.scss */
+.product-card .product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-3xl);
+}
+
+/* line 501, app/assets/stylesheets/modern-ui.scss */
+.product-card .product-info {
+  padding: var(--space-4);
+}
+
+/* line 504, app/assets/stylesheets/modern-ui.scss */
+.product-card .product-info .product-name {
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--space-2);
+}
+
+/* line 509, app/assets/stylesheets/modern-ui.scss */
+.product-card .product-info .product-price {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--primary);
+}
+
+/* line 515, app/assets/stylesheets/modern-ui.scss */
+.product-card .product-info .product-merchant {
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-2);
+}
+
+/* line 524, app/assets/stylesheets/modern-ui.scss */
+.form-group {
+  margin-bottom: var(--space-5);
+}
+
+/* line 527, app/assets/stylesheets/modern-ui.scss */
+.form-group label {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-2);
+  color: var(--gray-700);
+}
+
+/* line 534, app/assets/stylesheets/modern-ui.scss */
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius);
+  font-size: var(--font-size-base);
+  transition: var(--transition);
+}
+
+/* line 544, app/assets/stylesheets/modern-ui.scss */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+/* line 551, app/assets/stylesheets/modern-ui.scss */
+.form-group .form-help {
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
+  margin-top: var(--space-2);
+}
+
+/* line 558, app/assets/stylesheets/modern-ui.scss */
+.form-group.has-error input,
+.form-group.has-error select,
+.form-group.has-error textarea {
+  border-color: var(--danger);
+}
+
+/* line 564, app/assets/stylesheets/modern-ui.scss */
+.form-group.has-error .form-error {
+  color: var(--danger);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-2);
+}
+
+/* line 573, app/assets/stylesheets/modern-ui.scss */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
+}
+
+/* line 588, app/assets/stylesheets/modern-ui.scss */
+.modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* line 593, app/assets/stylesheets/modern-ui.scss */
+.modal .modal-content {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  transform: scale(0.9);
+  transition: var(--transition);
+}
+
+/* line 605, app/assets/stylesheets/modern-ui.scss */
+.modal.active .modal-content {
+  transform: scale(1);
+}
+
+/* line 609, app/assets/stylesheets/modern-ui.scss */
+.modal .modal-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* line 616, app/assets/stylesheets/modern-ui.scss */
+.modal .modal-header .modal-title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* line 622, app/assets/stylesheets/modern-ui.scss */
+.modal .modal-header .modal-close {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+}
+
+/* line 630, app/assets/stylesheets/modern-ui.scss */
+.modal .modal-header .modal-close:hover {
+  background: var(--gray-100);
+}
+
+/* line 636, app/assets/stylesheets/modern-ui.scss */
+.modal .modal-body {
+  padding: var(--space-6);
+}
+
+/* line 640, app/assets/stylesheets/modern-ui.scss */
+.modal .modal-footer {
+  padding: var(--space-6);
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+/* line 650, app/assets/stylesheets/modern-ui.scss */
+.grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+/* line 654, app/assets/stylesheets/modern-ui.scss */
+.grid.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* line 658, app/assets/stylesheets/modern-ui.scss */
+.grid.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* line 662, app/assets/stylesheets/modern-ui.scss */
+.grid.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 768px) {
+  /* line 669, app/assets/stylesheets/modern-ui.scss */
+  .search-form {
+    flex-direction: column;
+    margin: var(--space-4);
+    gap: var(--space-4);
+  }
+  /* line 676, app/assets/stylesheets/modern-ui.scss */
+  .grid.grid-2, .grid.grid-3, .grid.grid-4 {
+    grid-template-columns: 1fr;
+  }
+  /* line 683, app/assets/stylesheets/modern-ui.scss */
+  .modern-header {
+    padding: var(--space-3) var(--space-4);
+  }
+  /* line 686, app/assets/stylesheets/modern-ui.scss */
+  .modern-header .logo {
+    font-size: var(--font-size-lg);
+  }
+  /* line 691, app/assets/stylesheets/modern-ui.scss */
+  .btn {
+    min-height: 48px;
+  }
+  /* line 695, app/assets/stylesheets/modern-ui.scss */
+  .modal .modal-content {
+    width: 95%;
+    margin: var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* line 703, app/assets/stylesheets/modern-ui.scss */
+  *,
+*::before,
+*::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  /* line 714, app/assets/stylesheets/modern-ui.scss */
+  :root {
+    --primary: #000000;
+    --gray-200: #808080;
+    --gray-500: #606060;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  /* line 723, app/assets/stylesheets/modern-ui.scss */
+  :root {
+    --white: #1a1a1a;
+    --gray-50: #111111;
+    --gray-100: #1f1f1f;
+    --gray-200: #2d2d2d;
+    --gray-900: #ffffff;
+  }
+}
+
+/* line 733, app/assets/stylesheets/modern-ui.scss */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  z-index: 2000;
+}
+
+/* line 744, app/assets/stylesheets/modern-ui.scss */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--white);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* line 753, app/assets/stylesheets/modern-ui.scss */
+.loading-text {
+  margin-top: var(--space-4);
+  color: var(--white);
+  font-weight: var(--font-weight-medium);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* line 764, app/assets/stylesheets/modern-ui.scss */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* line 774, app/assets/stylesheets/modern-ui.scss */
+.toast {
+  min-width: 260px;
+  max-width: 420px;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  color: var(--white);
+  font-weight: var(--font-weight-medium);
+  background: var(--gray-800);
+}
+
+/* line 785, app/assets/stylesheets/modern-ui.scss */
+.toast-success {
+  background: var(--success);
+}
+
+/* line 786, app/assets/stylesheets/modern-ui.scss */
+.toast-error {
+  background: var(--danger);
+}
+
+/* line 787, app/assets/stylesheets/modern-ui.scss */
+.toast-info {
+  background: var(--secondary);
+}
+
+@media (max-width: 768px) {
+  /* line 790, app/assets/stylesheets/modern-ui.scss */
+  .toast-container {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+  }
+  /* line 791, app/assets/stylesheets/modern-ui.scss */
+  .toast {
+    width: 100%;
+    min-width: auto;
+  }
+}

@@ -1,18 +1,40 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
-import { getCurrentLocation } from '../../store/slices/locationSlice'
+import { getCurrentLocation, setCurrentLocation } from '../../store/slices/locationSlice'
 import { fetchNearbyCommerces } from '../../store/slices/commerceSlice'
+import { commerceAPI } from '../../services/api'
 import Sidebar from './Sidebar'
 import LeafletMap from '../Map/LeafletMap'
 import GeolocationButton from '../Map/GeolocationButton'
 import { Modal } from '../ui'
 import MapSettings from '../Map/MapSettings'
 import { mapSettingsService } from '../../services/mapSettings'
-import type { Commerce } from '../../types'
+import type { Commerce, Coordinates } from '../../types'
 
 interface MapLayoutProps {
   children?: React.ReactNode
+}
+
+const MIN_NEARBY_REFRESH_INTERVAL_MS = 10000
+const MIN_MOVEMENT_FOR_REFRESH_METERS = 120
+const MIN_LIVE_PUBLISH_INTERVAL_MS = 5000
+const MIN_MOVEMENT_FOR_LIVE_PUBLISH_METERS = 30
+
+function distanceInMeters(a: Coordinates, b: Coordinates): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180
+  const earthRadiusMeters = 6371000
+
+  const dLat = toRad(b.latitude - a.latitude)
+  const dLng = toRad(b.longitude - a.longitude)
+  const lat1 = toRad(a.latitude)
+  const lat2 = toRad(b.latitude)
+
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2
+
+  return 2 * earthRadiusMeters * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h))
 }
 
 const MapLayout = ({ children }: MapLayoutProps) => {
@@ -21,12 +43,18 @@ const MapLayout = ({ children }: MapLayoutProps) => {
   
   const { commerces, loading } = useAppSelector((state) => state.commerce)
   const { currentLocation, loading: locationLoading } = useAppSelector((state) => state.location)
+  const { user } = useAppSelector((state) => state.auth)
   
   const [selectedCommerce, setSelectedCommerce] = useState<Commerce | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [modalTitle, setModalTitle] = useState('')
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
   const [showSettings, setShowSettings] = useState(false)
+  const userWatchIdRef = useRef<number | null>(null)
+  const lastNearbyRefreshAtRef = useRef<number>(0)
+  const lastNearbyRefreshLocationRef = useRef<Coordinates | null>(null)
+  const lastLivePublishAtRef = useRef<number>(0)
+  const lastLivePublishLocationRef = useRef<Coordinates | null>(null)
 
   // Géolocalisation automatique au montage
   useEffect(() => {
@@ -34,6 +62,39 @@ const MapLayout = ({ children }: MapLayoutProps) => {
       dispatch(getCurrentLocation())
     }
   }, [dispatch, currentLocation, locationLoading])
+
+  // Suivi temps réel de la position utilisateur
+  useEffect(() => {
+    if (!navigator.geolocation || userWatchIdRef.current !== null) {
+      return
+    }
+
+    userWatchIdRef.current = navigator.geolocation.watchPosition(
+      (position) => {
+        dispatch(
+          setCurrentLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          })
+        )
+      },
+      (error) => {
+        console.warn('Suivi de position indisponible:', error.message)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 5000,
+      }
+    )
+
+    return () => {
+      if (userWatchIdRef.current !== null) {
+        navigator.geolocation.clearWatch(userWatchIdRef.current)
+        userWatchIdRef.current = null
+      }
+    }
+  }, [dispatch])
 
   // Fonction pour recharger les commerces
   const reloadCommerces = () => {
@@ -48,12 +109,79 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     }
   }
 
-  // Charger les commerces proches quand la position est disponible
+  // Rafraîchir les commerces quand l'utilisateur se déplace vraiment.
+  // On limite la fréquence pour éviter de surcharger l'API.
   useEffect(() => {
-    if (currentLocation && Array.isArray(commerces) && commerces.length === 0 && !loading) {
-      reloadCommerces()
+    if (!currentLocation) {
+      lastNearbyRefreshLocationRef.current = null
+      lastNearbyRefreshAtRef.current = 0
+      return
     }
-  }, [currentLocation, dispatch, commerces, loading])
+
+    const now = Date.now()
+    const previousLocation = lastNearbyRefreshLocationRef.current
+    const elapsed = now - lastNearbyRefreshAtRef.current
+    const movedMeters = previousLocation
+      ? distanceInMeters(previousLocation, currentLocation)
+      : Number.POSITIVE_INFINITY
+
+    if (
+      previousLocation &&
+      movedMeters < MIN_MOVEMENT_FOR_REFRESH_METERS &&
+      elapsed < MIN_NEARBY_REFRESH_INTERVAL_MS
+    ) {
+      return
+    }
+
+    if (elapsed < MIN_NEARBY_REFRESH_INTERVAL_MS) {
+      return
+    }
+
+    const settings = mapSettingsService.getSettings()
+    dispatch(fetchNearbyCommerces({
+      location: currentLocation,
+      radius: settings.searchRadius,
+    }))
+
+    lastNearbyRefreshLocationRef.current = currentLocation
+    lastNearbyRefreshAtRef.current = now
+    setLastRefresh(new Date())
+  }, [currentLocation, dispatch])
+
+  // Publier la position live des commerçants itinérants connectés
+  useEffect(() => {
+    if (!currentLocation || user?.role !== 'itinerant') {
+      return
+    }
+
+    const now = Date.now()
+    const previousLocation = lastLivePublishLocationRef.current
+    const elapsed = now - lastLivePublishAtRef.current
+    const movedMeters = previousLocation
+      ? distanceInMeters(previousLocation, currentLocation)
+      : Number.POSITIVE_INFINITY
+
+    if (
+      previousLocation &&
+      movedMeters < MIN_MOVEMENT_FOR_LIVE_PUBLISH_METERS &&
+      elapsed < MIN_LIVE_PUBLISH_INTERVAL_MS
+    ) {
+      return
+    }
+
+    if (elapsed < MIN_LIVE_PUBLISH_INTERVAL_MS) {
+      return
+    }
+
+    void commerceAPI.updateMyLocation({
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude,
+      is_online: true,
+    })
+
+    lastLivePublishLocationRef.current = currentLocation
+    lastLivePublishAtRef.current = now
+  }, [currentLocation, user?.role])
 
   // Écouter les événements de rafraîchissement automatique
   useEffect(() => {

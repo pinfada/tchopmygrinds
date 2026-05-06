@@ -15,10 +15,14 @@ Rails.application.routes.draw do
       resources :commerces do
         collection do
           get :nearby
+          get :live
           get :search
+          patch :update_my_location
         end
         member do
           get :products
+          get :location
+          patch :update_location
         end
       end
       

@@ -46,7 +46,7 @@ export default defineConfig({
   // Développement avec Rails sur port 3000
   define: {
     'process.env.RAILS_API_URL': JSON.stringify(
-      process.env.RAILS_API_URL || 'http://localhost:3000'
+      process.env.RAILS_API_URL || ''
     ),
   },
 })

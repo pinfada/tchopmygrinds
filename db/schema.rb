@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_16_204154) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_06_230500) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -56,7 +56,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_16_204154) do
     t.string "website"
     t.text "opening_hours"
     t.string "image_url"
+    t.boolean "is_online", default: false, null: false
+    t.datetime "location_updated_at"
     t.index ["category"], name: "index_commerces_on_category"
+    t.index ["is_online"], name: "index_commerces_on_is_online"
+    t.index ["location_updated_at"], name: "index_commerces_on_location_updated_at"
     t.index ["rating"], name: "index_commerces_on_rating"
     t.index ["user_id"], name: "index_commerces_on_user_id"
     t.index ["verified"], name: "index_commerces_on_verified"

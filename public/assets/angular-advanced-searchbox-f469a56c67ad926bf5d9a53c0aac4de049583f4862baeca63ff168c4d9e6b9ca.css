@@ -1,0 +1,124 @@
+/* line 1, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox {
+  display: block;
+  position: relative;
+  margin: 5px 0 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  min-height: 40px;
+  padding: 0 9px;
+  background-color: #fff;
+  cursor: text;
+  line-height: 38px;
+}
+
+/* line 16, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox.active {
+  border-color: #66afe9;
+}
+
+/* line 20, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-icon {
+  float: right;
+  padding: 10px 0 0 10px;
+}
+
+/* line 25, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .remove-all-icon {
+  float: right;
+  padding: 10px 0 0 10px;
+  cursor: pointer;
+}
+
+/* line 31, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter {
+  display: inline-block;
+  height: 24px;
+  margin: 0 7px 0 0;
+  background-color: #5bc0de;
+  padding: 0 5px;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  line-height: 24px;
+  cursor: default;
+  transition: box-shadow 100ms linear;
+}
+
+/* line 45, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter:hover {
+  box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* line 49, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter div {
+  float: left;
+  margin: 0 2px;
+}
+
+/* line 54, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter .remove {
+  color: #fff;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+/* line 60, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter .key {
+  color: #fff;
+}
+
+/* line 64, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter .value span {
+  color: #fff;
+}
+
+/* line 68, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter .value input {
+  height: 24px;
+}
+
+/* line 72, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter-input {
+  display: inline-block;
+  width: auto;
+  height: 24px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* line 81, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter-input:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* line 88, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter-suggestions {
+  cursor: auto;
+  display: block;
+}
+
+/* line 93, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter-suggestions .title {
+  display: block;
+  float: left;
+  height: 25px;
+  margin: 7px 7px 0 0;
+  background-color: transparent;
+  color: #888;
+  font-weight: bold;
+  padding: 0 5px;
+  font-size: 14px;
+  line-height: 25px;
+}
+
+/* line 106, app/assets/stylesheets/angular-advanced-searchbox.css.scss */
+.advancedSearchBox .search-parameter-suggestions .search-parameter {
+  cursor: pointer;
+  background-color: #bdbdbd;
+  color: #fff;
+}

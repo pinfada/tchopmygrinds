@@ -3,10 +3,10 @@ import { User, Commerce, Product, Order, ApiResponse, PaginatedResponse, Coordin
 import { secureStorage } from './secureStorage'
 
 // Configuration axios
-const API_BASE_URL = import.meta.env.VITE_RAILS_API_URL || 'http://localhost:3000'
+const API_BASE_URL = import.meta.env.VITE_RAILS_API_URL || ''
 
 const api = axios.create({
-  baseURL: `${API_BASE_URL}/api/v1`,
+  baseURL: API_BASE_URL ? `${API_BASE_URL}/api/v1` : '/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -168,6 +168,15 @@ export const commerceAPI = {
   
   delete: async (id: number): Promise<void> => {
     await api.delete(`/commerces/${id}`)
+  },
+
+  updateMyLocation: async (payload: {
+    latitude: number
+    longitude: number
+    is_online?: boolean
+  }): Promise<ApiResponse<{ commerce: Commerce }>> => {
+    const response = await api.patch('/commerces/update_my_location', payload)
+    return response.data
   },
 }
 

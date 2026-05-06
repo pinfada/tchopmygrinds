@@ -3,6 +3,7 @@
  */
 
 import { mapSettingsService } from './mapSettings'
+import { secureStorage } from './secureStorage'
 
 interface AmbulantCommerce {
   id: string
@@ -161,12 +162,12 @@ class LocationTrackingService {
    */
   private async fetchCommerceLocation(commerceId: string): Promise<AmbulantCommerce | null> {
     try {
-      // Simulation d'API call - remplacer par vraie API
+      const token = secureStorage.getToken()
       const response = await fetch(`/api/v1/commerces/${commerceId}/location`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
         },
         signal: AbortSignal.timeout(this.settings.timeout)
       })
@@ -175,7 +176,8 @@ class LocationTrackingService {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const data = await response.json()
+      const payload = await response.json()
+      const data = payload?.data?.commerce || payload?.commerce || payload
       
       return {
         id: data.id,
@@ -216,7 +218,7 @@ class LocationTrackingService {
     ]
     let movementIndex = 0
 
-    this.startTracking(commerceId, () => {}) // Start tracking avec callback vide
+    this.startTracking(commerceId, () => {})
 
     // Override avec simulation
     const interval = setInterval(() => {

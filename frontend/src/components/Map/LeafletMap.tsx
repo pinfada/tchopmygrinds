@@ -50,7 +50,7 @@ function MapEventHandlers({ commerces }: { commerces: Commerce[] }) {
 
     // Handler pour suivre un commerce ambulant
     (window as any).handleTrackClick = (commerceId: string) => {
-      const commerce = commerces.find(c => c.id === commerceId)
+      const commerce = commerces.find(c => String(c.id) === commerceId)
       if (commerce && commerce.type === 'itinerant') {
         locationTrackingService.startTracking(commerceId, (updatedCommerce) => {
           console.log('Position mise à jour:', updatedCommerce)
@@ -140,11 +140,12 @@ function CommerceMarkers({
     commerces
       .filter(commerce => commerce.type === 'itinerant' && commerce.isOnline)
       .forEach(commerce => {
-        if (!locationTrackingService.isTracking(commerce.id)) {
-          // Simuler le mouvement pour la démo
-          locationTrackingService.simulateMovement(commerce.id, {
-            latitude: commerce.latitude,
-            longitude: commerce.longitude
+        const commerceId = String(commerce.id)
+        if (!locationTrackingService.isTracking(commerceId)) {
+          locationTrackingService.startTracking(commerceId, (updatedCommerce) => {
+            window.dispatchEvent(new CustomEvent('commerce-location-update', {
+              detail: { commerceId, commerce: updatedCommerce }
+            }))
           })
         }
       })
@@ -161,7 +162,7 @@ function CommerceMarkers({
         if (!commerce.latitude || !commerce.longitude) return null
         
         // Vérifier si c'est un commerce suivi
-        const trackedCommerce = trackedCommerces.get(commerce.id)
+        const trackedCommerce = trackedCommerces.get(String(commerce.id))
         const position = trackedCommerce 
           ? [trackedCommerce.latitude, trackedCommerce.longitude] as [number, number]
           : [commerce.latitude, commerce.longitude] as [number, number]
