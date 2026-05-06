@@ -49,7 +49,28 @@ class PagesController < ApplicationController
 
   def react_app
     @titre = "TchopMyGrinds"
+    @vite_assets = react_vite_assets
     render 'react_app', layout: false
+  end
+
+  private
+
+  def react_vite_assets
+    index_path = Rails.root.join('public', 'dist', 'index.html')
+    unless File.exist?(index_path)
+      raise "React build not found at #{index_path}. Run `npm run build:react` before starting Rails in production."
+    end
+
+    index_html = File.read(index_path, mode: 'r:UTF-8')
+
+    {
+      stylesheets: index_html.scan(%r{<link[^>]+href=["'](?:/dist)?/assets/([^"']+\.css)["'][^>]*>}).flatten.map do |asset_name|
+        "/dist/assets/#{asset_name}"
+      end,
+      scripts: index_html.scan(%r{<script[^>]+src=["'](?:/dist)?/assets/([^"']+\.js)["'][^>]*>}).flatten.map do |asset_name|
+        "/dist/assets/#{asset_name}"
+      end
+    }
   end
 
 end

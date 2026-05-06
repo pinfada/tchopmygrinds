@@ -20,8 +20,9 @@ Rails.application.configure do
   # key such as config/credentials/production.key. This key is used to decrypt credentials (and other encrypted files).
   # config.require_master_key = true
 
-  # Disable serving static files from `public/`, relying on NGINX/Apache to do so instead.
-  # config.public_file_server.enabled = false
+  # Render runs Rails directly behind its router, so Rails must serve built files
+  # from `public/` (notably the Vite React bundle under `/dist/assets`).
+  config.public_file_server.enabled = ENV.fetch("RAILS_SERVE_STATIC_FILES", "true") == "true"
 
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass
