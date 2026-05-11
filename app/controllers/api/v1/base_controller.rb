@@ -2,19 +2,21 @@ class Api::V1::BaseController < ApplicationController
   # Configuration pour API REST moderne
   protect_from_forgery with: :null_session
   respond_to :json
-  
+
+  # Hard limits on geo proximity queries. Without these, a single unauthenticated
+  # caller can force a full-table Haversine scan with an unbounded radius.
+  GEO_DEFAULT_RADIUS_KM = 50
+  GEO_MAX_RADIUS_KM = 100
+
   before_action :authenticate_user_from_token!
-  before_action :set_cache_headers
-  
-  # CORS preflight check (must be public)
+  before_action :set_response_headers
+
+  # CORS preflight handler. CORS headers themselves are written by rack-cors;
+  # this action only needs to return a 200 with an empty body so the preflight
+  # request resolves. Manually emitting `Access-Control-Allow-Origin: *` would
+  # override the per-origin policy configured in config/initializers/cors.rb.
   def cors_preflight_check
-    if request.method == 'OPTIONS'
-      headers['Access-Control-Allow-Origin'] = '*'
-      headers['Access-Control-Allow-Methods'] = 'POST, GET, PUT, PATCH, DELETE, OPTIONS'
-      headers['Access-Control-Allow-Headers'] = 'Origin, Content-Type, Accept, Authorization, Token, X-Requested-With'
-      headers['Access-Control-Max-Age'] = '1728000'
-      render json: {}, status: 200
-    end
+    head :ok if request.method == 'OPTIONS'
   end
   
   private
@@ -35,9 +37,13 @@ class Api::V1::BaseController < ApplicationController
     !public_endpoints.include?(action_name)
   end
   
-  # Headers pour performance et cache
-  def set_cache_headers
-    response.headers['Cache-Control'] = 'public, max-age=300' # 5 minutes
+  # Default response headers for every authenticated API call.
+  # Cache-Control is private/no-store: API responses include user-scoped data
+  # (orders, profile, messages) and must never be cached by shared proxies/CDNs.
+  # Public, cacheable list endpoints should override these headers locally.
+  def set_response_headers
+    response.headers['Cache-Control'] = 'private, no-store'
+    response.headers['Pragma'] = 'no-cache'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'DENY'
     response.headers['X-XSS-Protection'] = '1; mode=block'
@@ -88,17 +94,53 @@ class Api::V1::BaseController < ApplicationController
     }
   end
   
-  # Filtrage géolocalisation
+  # Geo filter. Returns the collection untouched if coordinates are missing or
+  # invalid. The radius is always clamped to GEO_MAX_RADIUS_KM regardless of
+  # what the caller asks for, to prevent full-table distance scans.
   def apply_location_filter(collection, lat_param: :latitude, lng_param: :longitude, radius_param: :radius)
-    latitude = params[lat_param]&.to_f
-    longitude = params[lng_param]&.to_f
-    radius = params[radius_param]&.to_f || 50 # Défaut 50km
-    
-    if latitude && longitude
-      collection.near([latitude, longitude], radius)
-    else
-      collection
+    coords = parse_optional_coordinates(lat_param: lat_param, lng_param: lng_param, radius_param: radius_param)
+    return collection unless coords
+
+    lat, lng, radius = coords
+    collection.near([lat, lng], radius)
+  end
+
+  # Strict coordinate parser for endpoints where geo is mandatory.
+  # Renders 422 and returns nil on missing/invalid input. Callers should
+  # `return unless coords = parse_required_coordinates`.
+  def parse_required_coordinates(lat_param: :latitude, lng_param: :longitude, radius_param: :radius)
+    if params[lat_param].blank? || params[lng_param].blank?
+      render_error('Latitude et longitude requises')
+      return nil
     end
+    parse_coordinates(lat_param, lng_param, radius_param, render_errors: true)
+  end
+
+  # Lenient coordinate parser for endpoints where geo filtering is optional.
+  # Returns nil silently if the params are absent or malformed; the endpoint
+  # then falls back to a non-geo response. Callers needing a 422 on bad input
+  # must use parse_required_coordinates.
+  def parse_optional_coordinates(lat_param: :latitude, lng_param: :longitude, radius_param: :radius)
+    return nil if params[lat_param].blank? || params[lng_param].blank?
+
+    parse_coordinates(lat_param, lng_param, radius_param, render_errors: false)
+  end
+
+  def parse_coordinates(lat_param, lng_param, radius_param, render_errors:)
+    lat = Float(params[lat_param]) rescue nil
+    lng = Float(params[lng_param]) rescue nil
+
+    if lat.nil? || lng.nil? || lat.abs > 90 || lng.abs > 180
+      render_error('Coordonnées invalides : latitude doit être dans [-90, 90], longitude dans [-180, 180]') if render_errors
+      return nil
+    end
+
+    raw_radius = params[radius_param]
+    radius = raw_radius.present? ? (Float(raw_radius) rescue nil) : GEO_DEFAULT_RADIUS_KM
+    radius = GEO_DEFAULT_RADIUS_KM if radius.nil? || radius <= 0
+    radius = [radius, GEO_MAX_RADIUS_KM].min
+
+    [lat, lng, radius]
   end
   
   # Réponse succès standardisée

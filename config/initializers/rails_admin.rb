@@ -1,21 +1,20 @@
 RailsAdmin.config do |config|
   config.asset_source = :sprockets
 
-  #config.authorize_with do
-  ##  redirect_to main_app.root_path unless current_user.admin == true
-  #   redirect_to main_app.root_path unless current_user.try(:admin?)
-  #end
-
   ### Popular gems integration
 
   ## == Devise ==
-  # config.authenticate_with do
-  #   warden.authenticate! scope: :user
-  # end
+  # Force every /admin request through Warden. Anonymous visitors are sent to
+  # the Devise sign-in page instead of seeing the dashboard.
+  config.authenticate_with do
+    warden.authenticate! scope: :user
+  end
   config.current_user_method(&:current_user)
 
   ## == Cancan ==
-   config.authorize_with :cancancan, AdminAbility
+  # AdminAbility grants no rights to non-admins, so even an authenticated
+  # non-admin who reaches /admin is denied at the authorization layer.
+  config.authorize_with :cancancan, AdminAbility
    
   ## RailsAdmin is inheriting from ApplicationController
    config.parent_controller = 'ApplicationController'

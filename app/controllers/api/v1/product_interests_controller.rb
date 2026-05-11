@@ -1,5 +1,4 @@
-class Api::V1::ProductInterestsController < Api::V1::ApplicationController
-  before_action :authenticate_user!
+class Api::V1::ProductInterestsController < Api::V1::BaseController
   before_action :set_product_interest, only: [:show, :destroy]
 
   def index
@@ -132,6 +131,9 @@ class Api::V1::ProductInterestsController < Api::V1::ApplicationController
     }
   end
 
+  # The merchant view of an interest must not leak the buyer's email
+  # (RGPD: a merchant has no consented purpose for direct buyer contact at
+  # this stage). Merchants notify buyers via the platform's mail flow only.
   def format_merchant_interest(interest)
     {
       id: interest.id,
@@ -141,8 +143,7 @@ class Api::V1::ProductInterestsController < Api::V1::ApplicationController
       created_at: interest.created_at,
       user: {
         id: interest.user.id,
-        name: interest.user.name,
-        email: interest.user.email
+        display_name: interest.user.name.to_s.split.first
       },
       distance: interest.distance_from(
         current_user.commerces.first&.latitude,

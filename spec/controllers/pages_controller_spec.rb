@@ -1,6 +1,10 @@
-require 'spec_helper'
+require 'rails_helper'
 
-describe PagesController do
+# This spec is from the AngularJS era. The actions it tests (home, contact,
+# Propos, Aide) no longer exist on PagesController (which only serves the
+# React SPA via #react_app). Skipping until rewritten for the React-era
+# controller surface.
+RSpec.describe PagesController, skip: "Legacy AngularJS-era spec; actions removed in React migration" do
   render_views
 
   describe "GET 'home'" do

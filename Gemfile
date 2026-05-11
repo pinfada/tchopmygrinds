@@ -1,11 +1,15 @@
 source 'https://rubygems.org'
 
-ruby "3.4.1"
+ruby "3.3.10"
 gem 'rails', '~> 7.1.0'
 gem 'puma', '~> 6.4'
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'image_processing', '~> 1.2'
 gem 'rack'
 gem 'rack-cors'
+gem 'rack-attack', '~> 6.7'
 
 # Rails defaults
 gem 'sass-rails', '~> 6.0'
@@ -90,5 +94,7 @@ end
 group :test do
   gem 'minitest-spec-rails'
   # gem 'minitest-rails-capybara' # Obsolète pour Rails 7.1
+  gem 'rspec-rails', '~> 6.1'
+  gem 'factory_bot_rails', '~> 6.4'
 end
 gem 'sassc-rails'

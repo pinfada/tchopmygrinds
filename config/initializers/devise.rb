@@ -3,13 +3,11 @@
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
-  # The secret key used by Devise. Devise uses this key to generate
-  # random tokens. Changing this key will render invalid all existing
-  # confirmation, reset password and unlock tokens in the database.
-  # Devise will use the `secret_key_base` as its `secret_key`
-  # by default. You can change it below and use your own secret key.
-  # config.secret_key = '57ecbcdf02ee8c06d3e4362055efb49c25d40c4f350d364e1462e18ddefb8bb34fe68d080af50d26a8d417d5607a86c1bfba22b7ea01d8e1b9ed83b8154f343d'
-  config.secret_key = '7018679d2da98b4a8d6ceaf16df608883121e51f575f6d8790f71503889b9e59e42024261908778904b8c1d4902b13abfbeddc357b77ad03b1474f75325dac60'
+  # Devise uses Rails.application.secret_key_base as its `secret_key`
+  # by default. The previous hardcoded `config.secret_key` value was rotated
+  # because it had been committed to source control.
+  # If you need a Devise-specific signing key, set it via credentials/ENV only:
+  #   config.secret_key = Rails.application.credentials.devise_secret_key || ENV.fetch("DEVISE_SECRET_KEY")
 
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.

@@ -6,7 +6,12 @@ class Order < ApplicationRecord
 	belongs_to :delivery_address_obj, class_name: 'Address', foreign_key: 'delivery_address_id', optional: true
   has_many :orderdetails, dependent: :destroy
   has_many :products, -> { distinct }, through: :orderdetails
-  after_update :change_status
+
+  # Fires AFTER the surrounding transaction commits, so a SendGrid outage can
+  # no longer roll back an order update. Uses deliver_later to push the work
+  # off the request thread entirely.
+  after_commit :notify_status_change, on: :update, if: :saved_change_to_status?
+
   validates :user_id, presence: true
 
   # Méthode pour vérifier si une commande peut être évaluée pour un objet spécifique
@@ -25,12 +30,9 @@ class Order < ApplicationRecord
     end
   end
 
-	private
+  private
 
-  def change_status
-      if self.status_changed?
-      	@order_id = self.id
-        UserMailer.change_status_mail(user, self.status, @order_id).deliver_now
-      end
+  def notify_status_change
+    UserMailer.change_status_mail(user, status, id).deliver_later
   end
 end

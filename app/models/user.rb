@@ -20,7 +20,9 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :trackable, :validatable,
          :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
 
-  after_create :send_welcome_email
+  # after_commit (not after_create) so a SendGrid outage cannot roll back a
+  # successful sign-up. deliver_later pushes the mailer onto the job queue.
+  after_commit :send_welcome_email, on: :create
          
   def send_password_reset
     generate_token(:password_reset_token)
@@ -64,7 +66,7 @@ class User < ApplicationRecord
   private
 
   def send_welcome_email
-    UserMailer.welcome_message(self).deliver_now
+    UserMailer.welcome_message(self).deliver_later
   end
          
 end

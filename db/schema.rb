@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_06_230500) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_11_225827) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -177,6 +177,16 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_06_230500) do
     t.index ["commerce_id"], name: "index_products_on_commerce_id"
   end
 
+  create_table "rating_votes", force: :cascade do |t|
+    t.integer "rating_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["rating_id"], name: "index_rating_votes_on_rating_id"
+    t.index ["user_id", "rating_id"], name: "index_rating_votes_on_user_id_and_rating_id", unique: true
+    t.index ["user_id"], name: "index_rating_votes_on_user_id"
+  end
+
   create_table "ratings", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "rateable_type", null: false
@@ -241,6 +251,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_06_230500) do
   add_foreign_key "orders", "users"
   add_foreign_key "product_interests", "users"
   add_foreign_key "products", "commerces"
+  add_foreign_key "rating_votes", "ratings"
+  add_foreign_key "rating_votes", "users"
   add_foreign_key "ratings", "orders"
   add_foreign_key "ratings", "users"
 end

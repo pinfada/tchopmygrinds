@@ -7,8 +7,11 @@
 # Ignore bundler config
 /.bundle
 
-# Ignore the default SQLite database.
+# Ignore the default SQLite database (and the WAL/SHM sidecar files Rails 7.1 emits).
 /db/*.sqlite3
+/db/*.sqlite3-shm
+/db/*.sqlite3-wal
+/db/*.sqlite3-journal
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
@@ -23,4 +26,14 @@ app/assets/builds/
 
 # Personal Claude Code settings (per-developer, not team-wide)
 .claude/settings.local.json
+
+# Secrets and per-developer env files (never commit)
+.env
+.env.local
+.env.*.local
+/config/master.key
+/config/credentials/*.key
+
+# RSpec run state
+/spec/examples.txt
 

@@ -66,7 +66,10 @@ class Api::V1::AuthController < Api::V1::BaseController
   private
   
   def registration_params
-    params.require(:user).permit(:email, :password, :password_confirmation, :name, :statut_type, :phone)
+    # statut_type, buyer_role, seller_role and admin are intentionally excluded:
+    # they are NOT self-assignable through the public registration endpoint.
+    # Role elevation must go through an admin or a dedicated flow.
+    params.require(:user).permit(:email, :password, :password_confirmation, :name, :phone)
   end
   
   def profile_params

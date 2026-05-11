@@ -1,15 +1,14 @@
 # in models/admin_ability.rb
 class AdminAbility
   include CanCan::Ability
+
+  # Authorization rules for the RailsAdmin engine. Non-admins receive no
+  # abilities at all; combined with the `authenticate_with` guard in the
+  # RailsAdmin initializer, this denies any access to /admin for non-admins.
   def initialize(user)
-  	can :read, :all                 # allow everyone to read everything
-    return unless user && user.admin?
+    return unless user&.admin?
+
     can :access, :rails_admin
-    can :manage, :all       
+    can :manage, :all
   end
-    #if user.try(:admin?)
-    #  can :manage, :all               # allow superadmins to do anything
-    #else
-    #  can :read, :all
-    #end
 end

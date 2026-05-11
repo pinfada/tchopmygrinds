@@ -1,4 +1,8 @@
 class Api::V1::OrdersController < Api::V1::BaseController
+  # Raised when a product no longer has enough stock to satisfy an order line.
+  # Used to bubble out of the surrounding transaction with a 422 response.
+  class InsufficientStock < StandardError; end
+
   before_action :authenticate_user!
   before_action :set_order, only: [:show, :update, :cancel]
   
@@ -37,45 +41,43 @@ class Api::V1::OrdersController < Api::V1::BaseController
     begin
       ActiveRecord::Base.transaction do
         order.save!
-        
-        # Créer les détails de commande
+
         params[:items].each do |item_params|
           product = Product.find(item_params[:product_id])
-          
-          # Vérifier le stock
-          if product.unitsinstock < item_params[:quantity].to_i
-            raise ActiveRecord::Rollback, "Stock insuffisant pour #{product.name}"
-          end
-          
-          order_detail = order.orderdetails.build(
+          quantity = item_params[:quantity].to_i
+          raise InsufficientStock, "Quantité invalide pour #{product.name}" if quantity <= 0
+
+          # Atomic conditional decrement. The WHERE clause and UPDATE happen in
+          # a single SQL statement, so two concurrent requests cannot both pass
+          # the stock check and oversell. If another transaction already
+          # decremented below `quantity`, `update_all` affects 0 rows and we
+          # raise to roll back the whole order.
+          affected = Product.where(id: product.id)
+                            .where("unitsinstock >= ?", quantity)
+                            .update_all(["unitsinstock = unitsinstock - ?", quantity])
+
+          raise InsufficientStock, "Stock insuffisant pour #{product.name}" if affected.zero?
+
+          order.orderdetails.create!(
             product: product,
-            quantity: item_params[:quantity],
+            quantity: quantity,
             unitprice: product.unitprice,
             discount: 0
           )
-          order_detail.save!
-          
-          # Décrémenter le stock
-          product.update!(unitsinstock: product.unitsinstock - item_params[:quantity].to_i)
         end
-        
-        # Calculer le total
-        # Calculer le total manuellement 
-        total = order.orderdetails.sum { |d| d.unitprice * d.quantity * (1 - d.discount) }
+
+        total = order.orderdetails.sum { |d| d.unitprice.to_f * d.quantity * (1 - d.discount.to_f) }
         order.update!(total_amount: total)
       end
-      
-      # Envoyer notification email (si configuré)
-      # OrderMailer.order_created(order).deliver_later
-      
+
       render_success({
         order: order_data_detailed(order)
       }, message: 'Commande créée avec succès', status: :created)
-      
+
+    rescue InsufficientStock => e
+      render_error(e.message)
     rescue ActiveRecord::RecordInvalid => e
       render_error("Erreur lors de la création: #{e.message}")
-    rescue ActiveRecord::Rollback => e
-      render_error(e.message)
     rescue ActiveRecord::RecordNotFound
       render_error('Un ou plusieurs produits n\'existent pas')
     end

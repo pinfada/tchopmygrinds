@@ -1,62 +1,55 @@
-# Configuration CORS pour TchopMyGrinds React + Rails API
-# JWT Authentication - pas de cookies donc credentials: false
+# CORS configuration for TchopMyGrinds (React frontend + Rails API).
+# JWT auth means no cookies, so `credentials: false` everywhere.
+#
+# Wildcard origins are NOT used. Each environment whitelists its own origins.
+# Preflight (OPTIONS) is handled by rack-cors via the resource declarations
+# below — controllers must not emit Access-Control-Allow-Origin themselves.
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
-  allow do
-    # Origins autorisés pour le développement
-    origins 'http://localhost:3001', 'http://127.0.0.1:3001', 'localhost:3001'
-    
-    # Endpoints API publics (consultation sans auth)
-    resource '/api/v1/commerces*',
-      headers: :any,
-      methods: [:get, :options, :head],
-      credentials: false, # JWT ne nécessite pas de cookies
-      max_age: 86400
-      
-    resource '/api/v1/products*',
-      headers: :any,
-      methods: [:get, :options, :head],
-      credentials: false,
-      max_age: 86400
-    
-    # Endpoints API authentifiés
-    resource '/api/v1/auth*',
-      headers: ['Authorization', 'Content-Type', 'Accept', 'Origin'],
-      methods: [:get, :post, :patch, :delete, :options, :head],
-      credentials: false,
-      expose: ['Authorization'], # Important pour récupérer le JWT token
-      max_age: 86400
-      
-    # Autres endpoints API nécessitant auth
-    resource '/api/v1/*',
-      headers: ['Authorization', 'Content-Type', 'Accept', 'Origin'],
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: false,
-      expose: ['Authorization'],
-      max_age: 86400
-  end
-  
-  # Configuration production
   if Rails.env.production?
     allow do
-      origins ENV['FRONTEND_URL'] || 'https://tchopmygrinds.onrender.com'
-      
-      resource '/api/v1/*',
-        headers: :any,
-        methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      origins ENV.fetch("FRONTEND_URL", "https://tchopmygrinds.onrender.com")
+
+      resource "/api/v1/*",
+        headers: %w[Authorization Content-Type Accept Origin],
+        methods: %i[get post put patch delete options head],
         credentials: false,
-        expose: ['Authorization'],
-        max_age: 86400
+        expose: %w[Authorization],
+        max_age: 86_400
     end
-  end
-  
-  # Fallback pour tous les OPTIONS (préflight)
-  allow do
-    origins '*'
-    resource '*',
-      headers: :any,
-      methods: [:options],
-      credentials: false,
-      max_age: 1728000
+  else
+    allow do
+      # Development origins (Vite dev server)
+      origins "http://localhost:3001", "http://127.0.0.1:3001"
+
+      # Public consultation endpoints (no auth required)
+      resource "/api/v1/commerces*",
+        headers: :any,
+        methods: %i[get options head],
+        credentials: false,
+        max_age: 86_400
+
+      resource "/api/v1/products*",
+        headers: :any,
+        methods: %i[get options head],
+        credentials: false,
+        max_age: 86_400
+
+      # Auth endpoints — must expose the Authorization header so React reads JWT
+      resource "/api/v1/auth*",
+        headers: %w[Authorization Content-Type Accept Origin],
+        methods: %i[get post patch delete options head],
+        credentials: false,
+        expose: %w[Authorization],
+        max_age: 86_400
+
+      # All other authenticated API endpoints
+      resource "/api/v1/*",
+        headers: %w[Authorization Content-Type Accept Origin],
+        methods: %i[get post put patch delete options head],
+        credentials: false,
+        expose: %w[Authorization],
+        max_age: 86_400
+    end
   end
 end

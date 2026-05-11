@@ -90,7 +90,8 @@ class ProductInterestsController < ApplicationController
           search_radius: interest.search_radius,
           distance_from_commerce: distance.round(1),
           created_at: interest.created_at,
-          user_email: interest.user.email, # Pour contact (optionnel selon RGPD)
+          # RGPD: buyer email intentionally omitted. Merchants reach buyers
+          # via the platform's notify_availability flow, never directly.
           commerce_name: commerce.nom,
           commerce_id: commerce.id
         }

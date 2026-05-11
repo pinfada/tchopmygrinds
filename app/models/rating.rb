@@ -3,6 +3,7 @@ class Rating < ApplicationRecord
   belongs_to :rateable, polymorphic: true
   belongs_to :order, optional: true
   belongs_to :moderator, class_name: 'User', foreign_key: 'moderated_by', optional: true
+  has_many :rating_votes, dependent: :destroy
 
   # Enums pour le statut de modération
   enum status: { 

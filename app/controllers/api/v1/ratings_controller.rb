@@ -133,8 +133,10 @@ class Api::V1::RatingsController < Api::V1::BaseController
   end
 
   # POST /api/v1/ratings/1/helpful
+  # Idempotent: a given user can mark a rating helpful at most once. The
+  # `rating_votes` unique index is the source of truth; `helpful_count` is
+  # a derived cache column we keep in sync for fast reads.
   def mark_helpful
-    # Empêcher l'auto-vote
     if @rating.user == current_user
       return render json: {
         status: 'error',
@@ -142,14 +144,24 @@ class Api::V1::RatingsController < Api::V1::BaseController
       }, status: :forbidden
     end
 
-    @rating.increment!(:helpful_count)
-    
+    RatingVote.transaction do
+      vote = RatingVote.find_or_create_by(rating: @rating, user: current_user)
+      # find_or_create_by may have lost the race against another concurrent
+      # POST. The unique index would raise; in that case the record exists
+      # and we still want a 200 — the user's intent is satisfied.
+      @rating.update_column(:helpful_count, @rating.rating_votes.count) if vote.persisted?
+    end
+
     render json: {
       status: 'success',
       message: 'Merci pour votre feedback',
-      data: {
-        helpful_count: @rating.helpful_count
-      }
+      data: { helpful_count: @rating.reload.helpful_count }
+    }
+  rescue ActiveRecord::RecordNotUnique
+    render json: {
+      status: 'success',
+      message: 'Vote déjà enregistré',
+      data: { helpful_count: @rating.reload.helpful_count }
     }
   end
 

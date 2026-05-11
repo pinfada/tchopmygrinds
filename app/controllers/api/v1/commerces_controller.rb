@@ -31,14 +31,10 @@ class Api::V1::CommercesController < Api::V1::BaseController
   
   # GET /api/v1/commerces/nearby
   def nearby
-    latitude = params[:latitude]&.to_f
-    longitude = params[:longitude]&.to_f
-    radius = params[:radius]&.to_f || 50
-    
-    unless latitude && longitude
-      return render_error('Latitude et longitude requises')
-    end
-    
+    coords = parse_required_coordinates
+    return unless coords
+    latitude, longitude, radius = coords
+
     commerces = Commerce.includes(:user)
                         .near([latitude, longitude], radius, order: :distance)
     
@@ -62,10 +58,9 @@ class Api::V1::CommercesController < Api::V1::BaseController
                         .where(users: { statut_type: User.statut_types[:itinerant] })
                         .where(is_online: true)
 
-    if location_params_present?
-      latitude = params[:latitude].to_f
-      longitude = params[:longitude].to_f
-      radius = params[:radius]&.to_f || 50
+    coords = parse_optional_coordinates
+    if coords
+      latitude, longitude, radius = coords
       commerces = commerces.near([latitude, longitude], radius, order: :distance)
 
       return render_success({
@@ -93,13 +88,10 @@ class Api::V1::CommercesController < Api::V1::BaseController
       return render_error('Seuls les commerçants itinérants peuvent publier une position live', :forbidden)
     end
 
-    latitude = params[:latitude]&.to_f
-    longitude = params[:longitude]&.to_f
+    coords = parse_required_coordinates
+    return unless coords
+    latitude, longitude, _radius = coords
     is_online = params.key?(:is_online) ? ActiveModel::Type::Boolean.new.cast(params[:is_online]) : true
-
-    if latitude.blank? || longitude.blank?
-      return render_error('Latitude et longitude requises')
-    end
 
     if @commerce.update(
       latitude: latitude,
@@ -122,13 +114,10 @@ class Api::V1::CommercesController < Api::V1::BaseController
     commerce = current_user.commerces.order(updated_at: :desc).first
     return render_not_found('Commerce') if commerce.nil?
 
-    latitude = params[:latitude]&.to_f
-    longitude = params[:longitude]&.to_f
+    coords = parse_required_coordinates
+    return unless coords
+    latitude, longitude, _radius = coords
     is_online = params.key?(:is_online) ? ActiveModel::Type::Boolean.new.cast(params[:is_online]) : true
-
-    if latitude.blank? || longitude.blank?
-      return render_error('Latitude et longitude requises')
-    end
 
     if commerce.update(
       latitude: latitude,

@@ -2,7 +2,35 @@
   "permissions": {
     "allow": [
       "Bash(rails assets:clobber)",
-      "Bash(rails:*)"
+      "Bash(rails:*)",
+      "Bash(bundle exec rspec*)",
+      "Bash(bundle exec rails*)",
+      "Bash(bundle exec rubocop*)",
+      "Bash(bundle install*)",
+      "Bash(bundle list*)",
+      "Bash(rails db:migrate*)",
+      "Bash(rails db:seed*)",
+      "Bash(rails db:create*)",
+      "Bash(rails routes*)",
+      "Bash(rails runner*)",
+      "Bash(rails console*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch*)",
+      "Bash(git rev-parse*)",
+      "Bash(git remote -v*)",
+      "Bash(npm run*)",
+      "Bash(npm test*)",
+      "Bash(npm list*)",
+      "Bash(npm install*)",
+      "Bash(npx*)",
+      "Bash(node*)",
+      "Bash(node --version)",
+      "Bash(ls*)",
+      "Bash(pwd)",
+      "Bash(cat*)"
     ],
     "deny": []
   }

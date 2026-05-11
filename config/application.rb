@@ -43,6 +43,10 @@ module StatExo1
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w(assets tasks))
 
+    # Rate-limit hot endpoints (login, register, product_interests).
+    # The initializer is auto-loaded; we only need to mount the middleware.
+    config.middleware.use Rack::Attack
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

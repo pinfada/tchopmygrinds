@@ -1,60 +1,34 @@
 class Ability
   include CanCan::Ability
 
+  # Authorization rules consumed by the legacy (non-API) controllers via
+  # CanCan's `authorize_resource`. The API v1 controllers do not use CanCan,
+  # they scope every query through `current_user.<association>`.
+  #
+  # SCOPE RULES: every non-admin grant carries a condition hash that restricts
+  # the rule to records the current user owns. Without the hash, CanCan would
+  # let any seller manage any other seller's resources.
   def initialize(user)
-    #user ||= User.new # guest user (not logged in)
-    if user.try(:admin?)
-      can :manage, :all               # allow superadmins to do anything
-    else
-        if user.seller_role
-            can :manage, Commerce
-            can :manage, Product
-            can :manage, Address
-            can :manage, Order
-        end
-        if user.buyer_role
-            can :manage, Commerce
-            can :manage, Address
-            can :manage, Product
-            can :manage, Order
-        end
-        can :read, :all
+    return if user.nil? # guests have no abilities
+
+    if user.admin?
+      can :manage, :all
+      return
     end
-    
-    #if user.try(:seller_role?)
-    ##  can :read, :all                 # allow everyone to read everything
-    #  can :manage, Commerce
-    #end
-    
-    #if user.try(:buyer_role?)
-    ##  can :read, :all                 # allow everyone to read everything
-    #  can :search, Commerce
-    #end
-    # Define abilities for the passed in user here. For example:
-    #
-    #   user ||= User.new # guest user (not logged in)
-    #   if user.admin?
-    #     can :manage, :all
-    #   else
-    #     can :read, :all
-    #   end
-    #
-    # The first argument to `can` is the action you are giving the user
-    # permission to do.
-    # If you pass :manage it will apply to every action. Other common actions
-    # here are :read, :create, :update and :destroy.
-    #
-    # The second argument is the resource the user can perform the action on.
-    # If you pass :all it will apply to every resource. Otherwise pass a Ruby
-    # class of the resource.
-    #
-    # The third argument is an optional hash of conditions to further filter the
-    # objects.
-    # For example, here the user can only update published articles.
-    #
-    #   can :update, Article, :published => true
-    #
-    # See the wiki for details:
-    # https://github.com/CanCanCommunity/cancancan/wiki/Defining-Abilities
+
+    # Everyone authenticated can read public catalog data.
+    can :read, Commerce
+    can :read, Product
+
+    if user.seller_role
+      # A seller can manage commerces they own, and products belonging to those commerces.
+      can :manage, Commerce, user_id: user.id
+      can :manage, Product, commerce: { user_id: user.id }
+    end
+
+    # Both roles own their personal records.
+    can :manage, Address, user_id: user.id
+    can :manage, Order,   user_id: user.id
+    can :manage, ProductInterest, user_id: user.id
   end
 end
