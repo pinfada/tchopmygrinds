@@ -20,3 +20,7 @@ sendgrid.env
 node_modules/
 app/assets/builds/
 !app/assets/builds/.keep
+
+# Personal Claude Code settings (per-developer, not team-wide)
+.claude/settings.local.json
+

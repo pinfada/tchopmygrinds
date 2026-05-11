@@ -1,6 +1,60 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git branch)",
+      "Bash(git rev-parse*)",
+      "Bash(ls*)",
+      "Bash(pwd)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/*)",
+      "Bash(rm -rf $HOME)",
+      "Bash(rm -rf $HOME/*)",
+      "Bash(rm -rf .git)",
+      "Bash(rm -rf .git/*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(rails db:drop*)",
+      "Bash(rails db:reset*)",
+      "Bash(rails db:purge*)",
+      "Bash(bundle exec rails db:drop*)",
+      "Bash(bundle exec rails db:reset*)",
+      "Bash(bundle exec rails db:purge*)"
+    ]
+  },
   "hooks": {
-    "PreToolUse": []
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/scripts/block-secrets.js",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/scripts/block-dangerous-bash.js",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   }
 }
