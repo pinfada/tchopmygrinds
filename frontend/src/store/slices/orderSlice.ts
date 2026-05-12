@@ -12,17 +12,28 @@ const initialState: OrderState = {
 // Actions asynchrones
 export const createOrder = createAsyncThunk(
   'order/create',
-  async (orderData: OrderFormData & {
-    items: Array<{
-      productId: number
-      quantity: number
-      unitPrice: number
-    }>
-    totalPrice: number
-    grandTotal: number
-  }) => {
-    const response = await orderAPI.create(orderData)
-    return response.data
+  async (
+    orderData: OrderFormData & {
+      items: Array<{
+        productId: number
+        quantity: number
+        unitPrice: number
+      }>
+      totalPrice: number
+      grandTotal: number
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await orderAPI.create(orderData)
+      return response.data
+    } catch (e: unknown) {
+      // Surface the backend's exact message — typically "Stock insuffisant pour <Product>"
+      // from orders_controller.create. Fall back to a generic message otherwise.
+      const backendMsg =
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message
+      return rejectWithValue(backendMsg || (e as Error)?.message || 'Erreur lors de la création de la commande')
+    }
   }
 )
 
@@ -87,7 +98,10 @@ const orderSlice = createSlice({
       })
       .addCase(createOrder.rejected, (state, action) => {
         state.loading = false
-        state.error = action.error.message || 'Erreur lors de la création de la commande'
+        state.error =
+          (typeof action.payload === 'string' && action.payload) ||
+          action.error.message ||
+          'Erreur lors de la création de la commande'
       })
       
       // Fetch user orders

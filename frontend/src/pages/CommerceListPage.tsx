@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNearbyCommerces, searchCommerces } from '../store/slices/commerceSlice'
 import { getCurrentLocation } from '../store/slices/locationSlice'
+import { useMapHover } from '../contexts/MapHoverContext'
 import type { Commerce } from '../types'
 
 const CommerceListPage = () => {
@@ -14,6 +15,17 @@ const CommerceListPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [minRating, setMinRating] = useState(0)
   const [verifiedOnly, setVerifiedOnly] = useState(false)
+  const { hoveredCommerceId, hoverSource, setHover, clearHover } = useMapHover()
+  const cardRefs = useRef<Map<number, HTMLAnchorElement>>(new Map())
+
+  // Auto-scroll la card highlightée quand le hover vient de la carte
+  useEffect(() => {
+    if (hoverSource !== 'map' || hoveredCommerceId == null) return
+    const el = cardRefs.current.get(hoveredCommerceId)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [hoveredCommerceId, hoverSource])
 
   const categories = [
     'Tous',
@@ -231,11 +243,23 @@ const CommerceListPage = () => {
           </div>
         ) : filteredCommerces.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCommerces.map((commerce) => (
-              <Link 
-                key={commerce.id} 
+            {filteredCommerces.map((commerce) => {
+              const isHovered = hoveredCommerceId === commerce.id
+              return (
+              <Link
+                key={commerce.id}
                 to={`/commerces/${commerce.id}`}
-                className="card hover:shadow-xl transition-shadow duration-300"
+                ref={(el) => {
+                  if (el) cardRefs.current.set(commerce.id, el)
+                  else cardRefs.current.delete(commerce.id)
+                }}
+                onMouseEnter={() => setHover(commerce.id, 'list')}
+                onMouseLeave={() => clearHover()}
+                className={`card transition-all duration-200 ${
+                  isHovered
+                    ? 'ring-2 ring-emerald-500 shadow-2xl -translate-y-0.5'
+                    : 'hover:shadow-xl'
+                }`}
               >
                 <div className="h-48 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-t-xl flex items-center justify-center relative">
                   <svg className="w-16 h-16 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,7 +323,8 @@ const CommerceListPage = () => {
                   </div>
                 </div>
               </Link>
-            ))}
+              )
+            })}
           </div>
         ) : (
           <div className="text-center py-12">

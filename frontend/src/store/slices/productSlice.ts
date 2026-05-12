@@ -55,9 +55,32 @@ export const searchProducts = createAsyncThunk(
 
 export const createProduct = createAsyncThunk(
   'product/create',
-  async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const response = await productAPI.create(productData)
-    return response.data
+  async (
+    payload: {
+      commerceId: number
+      input: {
+        name: string
+        description?: string
+        price: number
+        unit: string
+        category: string
+        stock: number
+        isAvailable?: boolean
+        imageUrl?: string
+      }
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await productAPI.create(payload.commerceId, payload.input)
+      return response.data.product
+    } catch (e: unknown) {
+      const msg =
+        (e as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        (e as Error)?.message ||
+        'Erreur lors de la création du produit'
+      return rejectWithValue(msg)
+    }
   }
 )
 

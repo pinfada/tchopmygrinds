@@ -15,7 +15,15 @@ class Api::V1::ProductsController < Api::V1::BaseController
     products = products.where(category: params[:category]) if params[:category].present?
     products = products.where('price >= ?', params[:min_price]) if params[:min_price].present?
     products = products.where('price <= ?', params[:max_price]) if params[:max_price].present?
-    products = products.where(commerce_id: params[:commerce_id]) if params[:commerce_id].present?
+    # Products↔Commerce is a has_many :through :categorizations relation in this
+    # codebase (the direct products.commerce_id column is null on seed data),
+    # so filter through the join table — `where(commerce_id: …)` would always
+    # return 0 rows.
+    if params[:commerce_id].present?
+      products = products.joins(:categorizations)
+                         .where(categorizations: { commerce_id: params[:commerce_id] })
+                         .distinct
+    end
     products = products.where(available: true) if params[:available] == 'true'
     products = products.where('stock > 0') if params[:in_stock] == 'true'
     
@@ -80,9 +88,11 @@ class Api::V1::ProductsController < Api::V1::BaseController
   # POST /api/v1/products
   def create
     commerce = current_user.commerces.find(params[:commerce_id])
-    product = commerce.products.build(product_params)
-    
-    if product.save
+    # Use create (not build + save) so the has_many :through categorization is
+    # persisted alongside the product — matching the seed pattern.
+    product = commerce.products.create(product_params)
+
+    if product.persisted?
       render_success({
         product: product_data_detailed(product)
       }, message: 'Produit créé avec succès', status: :created)
@@ -139,9 +149,23 @@ class Api::V1::ProductsController < Api::V1::BaseController
     render_not_found('Produit')
   end
   
+  # Public API uses price/unit/stock; DB columns are unitprice/quantityperunit/unitsinstock.
+  # Keep the API contract and map here so callers don't need to know the schema.
+  PUBLIC_TO_DB_ATTR_MAP = {
+    price: :unitprice,
+    unit: :quantityperunit,
+    stock: :unitsinstock
+  }.freeze
+
   def product_params
-    params.require(:product).permit(:name, :description, :price, :unit, :category, 
-                                  :image_url, :stock, :available)
+    permitted = params.require(:product).permit(:name, :description, :price, :unit, :category,
+                                                :image_url, :stock, :available)
+    PUBLIC_TO_DB_ATTR_MAP.each do |public_key, db_key|
+      permitted[db_key] = permitted.delete(public_key) if permitted.key?(public_key)
+    end
+    # unitsonorder is NOT NULL with no DB default — initialise to 0 on create.
+    permitted[:unitsonorder] = 0 if action_name == 'create' && permitted[:unitsonorder].blank?
+    permitted
   end
   
   def location_params_present?
@@ -176,7 +200,8 @@ class Api::V1::ProductsController < Api::V1::BaseController
       id: product.id,
       name: product.name,
       description: product.description || "",
-      price: product.unitprice,
+      # unitprice is BigDecimal — cast so the UI can call Number#toFixed safely.
+      price: (product.unitprice || 0).to_f,
       unit: product.quantityperunit,
       category: product.category,
       imageUrl: product.image_url,
@@ -195,7 +220,7 @@ class Api::V1::ProductsController < Api::V1::BaseController
         id: product.commerce.id,
         name: product.commerce.name,
         address: product.commerce.address,
-        rating: product.commerce.rating || 0,
+        rating: (product.commerce.rating || 0).to_f,
         distance: product.commerce.respond_to?(:distance) ? product.commerce.distance&.round(2) : nil
       }
     end

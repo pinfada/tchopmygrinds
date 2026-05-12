@@ -186,7 +186,7 @@ const VendorStats: React.FC<VendorStatsProps> = ({ products, orders, commerce })
                       ))}
                     </div>
                     <span className="text-sm text-gray-600">
-                      {commerce.rating.toFixed(1)}/5
+                      {Number(commerce.rating ?? 0).toFixed(1)}/5
                     </span>
                   </div>
                 </div>

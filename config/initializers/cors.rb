@@ -19,8 +19,9 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     end
   else
     allow do
-      # Development origins (Vite dev server)
-      origins "http://localhost:3001", "http://127.0.0.1:3001"
+      # Development origins (Vite dev server) — 3002 is a fallback when 3001 is taken
+      origins "http://localhost:3001", "http://127.0.0.1:3001",
+              "http://localhost:3002", "http://127.0.0.1:3002"
 
       # Public consultation endpoints (no auth required)
       resource "/api/v1/commerces*",
@@ -29,10 +30,14 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
         credentials: false,
         max_age: 86_400
 
+      # Products: index/show are public, but create/update/destroy need auth.
+      # rack-cors picks the FIRST matching resource, so we declare the full
+      # method set here (per-action auth is still enforced in the controller).
       resource "/api/v1/products*",
-        headers: :any,
-        methods: %i[get options head],
+        headers: %w[Authorization Content-Type Accept Origin],
+        methods: %i[get post put patch delete options head],
         credentials: false,
+        expose: %w[Authorization],
         max_age: 86_400
 
       # Auth endpoints — must expose the Authorization header so React reads JWT

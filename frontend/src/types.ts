@@ -5,6 +5,11 @@ export interface Coordinates {
   longitude: number
 }
 
+export interface UserCommerceRef {
+  id: number
+  name: string
+}
+
 export interface User {
   id: string
   email: string
@@ -14,6 +19,9 @@ export interface User {
   statut_type?: string
   phone?: string
   addresses?: Address[]
+  // Populated for merchants by /api/v1/auth/login and /api/v1/auth/me.
+  // Empty array for buyers.
+  commerces?: UserCommerceRef[]
   created_at: string
   updated_at: string
 }
@@ -198,6 +206,14 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   }
 }
 
+// Types pour les évaluations (ratings)
+export interface RatingStats {
+  averageRating: number
+  totalRatings: number
+  verifiedRatings: number
+  distribution: Record<string, number>
+}
+
 // Types pour l'authentification
 export interface AuthTokens {
   access_token: string
@@ -258,6 +274,9 @@ export interface CartState {
   totalPrice: number
   isOpen: boolean
   loading: boolean
+  // Set by the cart reducer when a stock guard refuses or clamps an add/update.
+  // The UI reads this to surface a non-blocking message ("Stock limité à N").
+  lastError?: string | null
 }
 
 export interface OrderState {

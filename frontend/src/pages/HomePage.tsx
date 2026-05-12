@@ -178,9 +178,9 @@ const HomePage = () => {
                       <Badge variant="secondary">
                         {commerce.category}
                       </Badge>
-                      {commerce.distance && (
+                      {typeof commerce.distance === 'number' && (
                         <span className="text-brand-600 font-medium">
-                          {commerce.distance.toFixed(1)} km
+                          {Number(commerce.distance).toFixed(1)} km
                         </span>
                       )}
                     </div>

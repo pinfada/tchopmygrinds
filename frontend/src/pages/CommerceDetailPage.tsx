@@ -3,10 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchCommerceById } from '../store/slices/commerceSlice'
 import { fetchProductsByCommerce } from '../store/slices/productSlice'
-import { addToCart } from '../store/slices/cartSlice'
+import { useAddToCart } from '../hooks/useAddToCart'
 import LeafletMap from '../components/Map/LeafletMap'
 import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
-import { Modal } from '../components/ui'
 import type { Product } from '../types'
 
 const CommerceDetailPage = () => {
@@ -17,6 +16,7 @@ const CommerceDetailPage = () => {
   const { products, loading: productsLoading } = useAppSelector((state) => state.product)
   const { currentLocation } = useAppSelector((state) => state.location)
   const { user } = useAppSelector((state) => state.auth)
+  const { currentRatingStats } = useAppSelector((state) => state.rating)
   
   const [selectedCategory, setSelectedCategory] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock'>('name')
@@ -29,8 +29,9 @@ const CommerceDetailPage = () => {
     }
   }, [id, dispatch])
 
+  const addToCartWithGuard = useAddToCart()
   const handleAddToCart = (product: Product) => {
-    dispatch(addToCart({ product, quantity: 1 }))
+    addToCartWithGuard(product, 1)
   }
 
   const availableProducts = Array.isArray(products) ? products.filter(p => p.isAvailable && p.stock > 0) : []
@@ -184,12 +185,12 @@ const CommerceDetailPage = () => {
                   </div>
                 )}
                 
-                {currentCommerce.distance && (
+                {typeof currentCommerce.distance === 'number' && (
                   <div className="flex items-center text-emerald-600 font-medium">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
-                    {currentCommerce.distance.toFixed(1)} km
+                    {Number(currentCommerce.distance).toFixed(1)} km
                   </div>
                 )}
               </div>
@@ -310,7 +311,7 @@ const CommerceDetailPage = () => {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="text-2xl font-bold text-gray-900">
-                          {product.price.toFixed(2)}€
+                          {Number(product.price ?? 0).toFixed(2)}€
                         </div>
                         <div className="text-sm text-gray-500">
                           par {product.unit}
@@ -352,18 +353,18 @@ const CommerceDetailPage = () => {
             <div className="lg:col-span-1">
               <div className="sticky top-8">
                 <h3 className="text-xl font-bold text-gray-900 mb-6">Avis clients</h3>
-                <RatingSummary 
-                  entityId={currentCommerce.id}
-                  entityType="commerce"
+                <RatingSummary
+                  stats={currentRatingStats}
                 />
               </div>
             </div>
 
             {/* Liste des évaluations */}
             <div className="lg:col-span-2">
-              <RatingsList 
-                entityId={currentCommerce.id}
-                entityType="commerce"
+              <RatingsList
+                rateableType="Commerce"
+                rateableId={currentCommerce.id}
+                rateableName={currentCommerce.name}
               />
             </div>
           </div>
@@ -371,19 +372,13 @@ const CommerceDetailPage = () => {
       </div>
 
       {/* Modal pour évaluation */}
-      <Modal
+      <RatingForm
         isOpen={showRatingModal}
         onClose={() => setShowRatingModal(false)}
-        title="Laisser un avis sur ce commerce"
-        size="md"
-      >
-        <RatingForm
-          entityId={currentCommerce.id}
-          entityType="commerce"
-          onSuccess={() => setShowRatingModal(false)}
-          onCancel={() => setShowRatingModal(false)}
-        />
-      </Modal>
+        rateableType="Commerce"
+        rateableId={currentCommerce.id}
+        rateableName={currentCommerce.name}
+      />
     </div>
   )
 }

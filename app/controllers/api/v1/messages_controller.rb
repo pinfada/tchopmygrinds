@@ -128,8 +128,17 @@ class Api::V1::MessagesController < Api::V1::BaseController
 
   # POST /api/v1/messages/start_conversation
   def start_conversation
-    receiver = User.find(params[:receiver_id])
-    
+    if params[:receiver_id].blank?
+      render_error('receiver_id requis', :unprocessable_entity)
+      return
+    end
+
+    receiver = User.find_by(id: params[:receiver_id])
+    unless receiver
+      render_not_found('Utilisateur destinataire')
+      return
+    end
+
     unless current_user.can_message?(receiver)
       render_error('Impossible de démarrer une conversation avec cet utilisateur', :forbidden)
       return

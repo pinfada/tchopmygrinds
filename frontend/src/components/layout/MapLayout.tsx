@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { getCurrentLocation, setCurrentLocation } from '../../store/slices/locationSlice'
@@ -7,9 +7,12 @@ import { commerceAPI } from '../../services/api'
 import Sidebar from './Sidebar'
 import LeafletMap from '../Map/LeafletMap'
 import GeolocationButton from '../Map/GeolocationButton'
+import AroundMeControl from '../Map/AroundMeControl'
+import PlaceSearch from '../Map/PlaceSearch'
 import { Modal } from '../ui'
 import MapSettings from '../Map/MapSettings'
 import { mapSettingsService } from '../../services/mapSettings'
+import { MapHoverProvider } from '../../contexts/MapHoverContext'
 import type { Commerce, Coordinates } from '../../types'
 
 interface MapLayoutProps {
@@ -50,6 +53,10 @@ const MapLayout = ({ children }: MapLayoutProps) => {
   const [modalTitle, setModalTitle] = useState('')
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
   const [showSettings, setShowSettings] = useState(false)
+  const [radiusKm, setRadiusKm] = useState<number>(() => mapSettingsService.getSettings().searchRadius)
+  const [showRadiusCircle, setShowRadiusCircle] = useState(false)
+  const [viewCenter, setViewCenter] = useState<Coordinates | null>(null)
+  const [searchLabel, setSearchLabel] = useState<string | null>(null)
   const userWatchIdRef = useRef<number | null>(null)
   const lastNearbyRefreshAtRef = useRef<number>(0)
   const lastNearbyRefreshLocationRef = useRef<Coordinates | null>(null)
@@ -96,23 +103,53 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     }
   }, [dispatch])
 
+  // Centre actif (priorité : sélection de recherche > position GPS)
+  const activeCenter = viewCenter ?? currentLocation
+
   // Fonction pour recharger les commerces
-  const reloadCommerces = () => {
-    if (currentLocation) {
-      const settings = mapSettingsService.getSettings()
-      dispatch(fetchNearbyCommerces({ 
-        location: currentLocation, 
-        radius: settings.searchRadius 
+  const reloadCommerces = (overrideRadius?: number, overrideCenter?: Coordinates) => {
+    const center = overrideCenter ?? activeCenter
+    if (center) {
+      const radius = overrideRadius ?? radiusKm
+      dispatch(fetchNearbyCommerces({
+        location: center,
+        radius,
       }))
       setLastRefresh(new Date())
-      console.log(`🔄 Rafraîchissement des commerces (rayon: ${settings.searchRadius}km)`)
     }
   }
 
-  // Rafraîchir les commerces quand l'utilisateur se déplace vraiment.
+  const handleRadiusChange = (km: number) => {
+    setRadiusKm(km)
+    setShowRadiusCircle(true)
+    mapSettingsService.updateSettings({ searchRadius: km })
+    reloadCommerces(km)
+  }
+
+  const handleLocateMe = () => {
+    setShowRadiusCircle(true)
+    setViewCenter(null)
+    setSearchLabel(null)
+    if (currentLocation) {
+      reloadCommerces(undefined, currentLocation)
+    } else {
+      dispatch(getCurrentLocation())
+    }
+  }
+
+  const handlePlaceSelected = (result: { latitude: number; longitude: number; shortName: string }) => {
+    const coords: Coordinates = { latitude: result.latitude, longitude: result.longitude }
+    setViewCenter(coords)
+    setSearchLabel(result.shortName)
+    setShowRadiusCircle(true)
+    dispatch(fetchNearbyCommerces({ location: coords, radius: radiusKm }))
+    setLastRefresh(new Date())
+  }
+
+  // Rafraîchir les commerces quand le centre actif change vraiment (GPS ou recherche).
   // On limite la fréquence pour éviter de surcharger l'API.
   useEffect(() => {
-    if (!currentLocation) {
+    if (!activeCenter) {
       lastNearbyRefreshLocationRef.current = null
       lastNearbyRefreshAtRef.current = 0
       return
@@ -122,7 +159,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     const previousLocation = lastNearbyRefreshLocationRef.current
     const elapsed = now - lastNearbyRefreshAtRef.current
     const movedMeters = previousLocation
-      ? distanceInMeters(previousLocation, currentLocation)
+      ? distanceInMeters(previousLocation, activeCenter)
       : Number.POSITIVE_INFINITY
 
     if (
@@ -137,16 +174,15 @@ const MapLayout = ({ children }: MapLayoutProps) => {
       return
     }
 
-    const settings = mapSettingsService.getSettings()
     dispatch(fetchNearbyCommerces({
-      location: currentLocation,
-      radius: settings.searchRadius,
+      location: activeCenter,
+      radius: radiusKm,
     }))
 
-    lastNearbyRefreshLocationRef.current = currentLocation
+    lastNearbyRefreshLocationRef.current = activeCenter
     lastNearbyRefreshAtRef.current = now
     setLastRefresh(new Date())
-  }, [currentLocation, dispatch])
+  }, [activeCenter?.latitude, activeCenter?.longitude, radiusKm, dispatch])
 
   // Publier la position live des commerçants itinérants connectés
   useEffect(() => {
@@ -207,12 +243,12 @@ const MapLayout = ({ children }: MapLayoutProps) => {
   // Gérer l'affichage des modals selon la route
   useEffect(() => {
     const path = location.pathname
-    
+
     if (path === '/') {
       setShowModal(false)
     } else if (path === '/commerces') {
-      setModalTitle('Commerces locaux')
-      setShowModal(true)
+      // /commerces utilise le side-panel, pas la modal (sync hover liste<->carte)
+      setShowModal(false)
     } else if (path === '/products') {
       setModalTitle('Catalogue produits')
       setShowModal(true)
@@ -246,6 +282,9 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     } else if (path.startsWith('/products/')) {
       setModalTitle('Détails du produit')
       setShowModal(true)
+    } else if (path.startsWith('/orders/')) {
+      setModalTitle('Détails de la commande')
+      setShowModal(true)
     } else {
       setShowModal(false)
     }
@@ -261,8 +300,19 @@ const MapLayout = ({ children }: MapLayoutProps) => {
   }
 
   const filteredCommerces = Array.isArray(commerces) ? commerces : []
+  const isCommerceListRoute = location.pathname === '/commerces'
+
+  const headerSubtitle = useMemo(() => {
+    if (!activeCenter) {
+      return 'Activez la géolocalisation ou recherchez un lieu pour découvrir les commerces'
+    }
+    const count = filteredCommerces.length
+    const where = searchLabel ? ` autour de ${searchLabel}` : ''
+    return `${count} commerce${count !== 1 ? 's' : ''} dans un rayon de ${radiusKm} km${where}`
+  }, [activeCenter, filteredCommerces.length, radiusKm, searchLabel])
 
   return (
+    <MapHoverProvider>
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <Sidebar />
@@ -271,15 +321,15 @@ const MapLayout = ({ children }: MapLayoutProps) => {
       <div className="flex-1 transition-all duration-300 relative" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
         {/* Header de la carte */}
         <div className="absolute top-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Marketplace Géolocalisé</h1>
-              <p className="text-sm text-gray-600">
-                {currentLocation 
-                  ? `${filteredCommerces.length} commerce${filteredCommerces.length !== 1 ? 's' : ''} dans un rayon de 50km`
-                  : 'Activez la géolocalisation pour découvrir les commerces près de vous'
-                }
-              </p>
+          <div className="flex items-center gap-4 px-6 py-4">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-gray-900 truncate">Marketplace Géolocalisé</h1>
+              <p className="text-sm text-gray-600 truncate">{headerSubtitle}</p>
+            </div>
+
+            {/* Barre de recherche d'adresses (Nominatim) */}
+            <div className="flex-1 max-w-xl">
+              <PlaceSearch onSelect={handlePlaceSelected} />
             </div>
 
             {/* Actions rapides */}
@@ -287,9 +337,9 @@ const MapLayout = ({ children }: MapLayoutProps) => {
               {!currentLocation && (
                 <GeolocationButton
                   onLocationFound={(coords) => {
-                    dispatch(fetchNearbyCommerces({ 
-                      location: coords, 
-                      radius: 50 
+                    dispatch(fetchNearbyCommerces({
+                      location: coords,
+                      radius: radiusKm,
                     }))
                   }}
                   className="btn-primary"
@@ -297,7 +347,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
                   📍 Géolocalisation
                 </GeolocationButton>
               )}
-              
+
               {currentLocation && (
                 <div className="flex items-center space-x-2 text-sm text-emerald-600">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -306,7 +356,8 @@ const MapLayout = ({ children }: MapLayoutProps) => {
                   <span>Position active</span>
                 </div>
               )}
-              
+
+
               {/* Bouton paramètres */}
               <button
                 onClick={() => setShowSettings(true)}
@@ -322,19 +373,42 @@ const MapLayout = ({ children }: MapLayoutProps) => {
           </div>
         </div>
 
-        {/* Carte principale */}
-        <div className="h-full pt-20">
-          <LeafletMap
-            userLocation={currentLocation}
-            commerces={filteredCommerces}
-            onCommerceClick={handleCommerceClick}
-            height="100%"
-            zoom={currentLocation ? 12 : 6}
-            center={currentLocation 
-              ? [currentLocation.latitude, currentLocation.longitude] 
-              : [4.0511, 9.7679] // Douala, Cameroun
-            }
-          />
+        {/* Layout carte (+ side-panel sur /commerces) */}
+        <div className="h-full pt-20 flex">
+          {isCommerceListRoute && (
+            <aside
+              className="w-[420px] max-w-[40%] h-full overflow-y-auto bg-white border-r border-gray-200 shadow-lg"
+              aria-label="Liste des commerces"
+            >
+              {children}
+            </aside>
+          )}
+
+          <div className="flex-1 relative">
+            <LeafletMap
+              userLocation={currentLocation}
+              viewCenter={viewCenter}
+              commerces={filteredCommerces}
+              onCommerceClick={handleCommerceClick}
+              height="100%"
+              zoom={activeCenter ? 12 : 6}
+              center={activeCenter
+                ? [activeCenter.latitude, activeCenter.longitude]
+                : [4.0511, 9.7679] // Douala, Cameroun
+              }
+              radiusKm={radiusKm}
+              showRadiusCircle={showRadiusCircle && !!activeCenter}
+              selectedCommerce={selectedCommerce}
+            />
+
+            <AroundMeControl
+              radiusKm={radiusKm}
+              onRadiusChange={handleRadiusChange}
+              onLocateMe={handleLocateMe}
+              hasLocation={!!currentLocation}
+              loading={locationLoading || loading}
+            />
+          </div>
         </div>
 
         {/* Informations géolocalisation (overlay) */}
@@ -363,7 +437,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
               <div>
                 <p className="font-medium text-gray-900">Statistiques</p>
                 <p className="text-gray-600">{filteredCommerces.length} commerces</p>
-                <p className="text-gray-600">Rayon: {mapSettingsService.getSettings().searchRadius}km</p>
+                <p className="text-gray-600">Rayon: {radiusKm} km</p>
               </div>
               
               <div className="border-t border-gray-200 pt-2">
@@ -403,6 +477,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
         onClose={() => setShowSettings(false)}
       />
     </div>
+    </MapHoverProvider>
   )
 }
 

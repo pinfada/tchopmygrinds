@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
+import { useAddToCart } from '../hooks/useAddToCart'
 import { fetchProducts, searchProducts, setSortBy } from '../store/slices/productSlice'
-import { addToCart } from '../store/slices/cartSlice'
 import { getCurrentLocation } from '../store/slices/locationSlice'
 
 const ProductsPage = () => {
@@ -24,14 +25,18 @@ const ProductsPage = () => {
     'Tubercules'
   ]
 
+  const [searchParams] = useSearchParams()
+  // /products?commerce=N filters the catalog by a specific shop. The query
+  // param is the commerce id; the API client maps it to commerce_id.
+  const commerceIdParam = searchParams.get('commerce')
+  const commerceIdFilter = commerceIdParam ? Number(commerceIdParam) : undefined
+
   useEffect(() => {
-    // Charger les produits au montage
-    if (currentLocation) {
-      dispatch(fetchProducts({ location: currentLocation || undefined }))
-    } else {
-      dispatch(fetchProducts())
-    }
-  }, [currentLocation, dispatch])
+    dispatch(fetchProducts({
+      commerceId: Number.isFinite(commerceIdFilter) ? commerceIdFilter : undefined,
+      location: currentLocation || undefined,
+    }))
+  }, [currentLocation, dispatch, commerceIdFilter])
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -49,16 +54,9 @@ const ProductsPage = () => {
     }
   }
 
+  const addToCartWithGuard = useAddToCart()
   const handleAddToCart = (product: any) => {
-    dispatch(addToCart({ product, quantity: 1 }))
-    // Notification via système global
-    if ((window as any).addNotification) {
-      (window as any).addNotification({
-        type: 'success',
-        title: 'Produit ajouté',
-        message: `${product.name} a été ajouté au panier`
-      })
-    }
+    addToCartWithGuard(product, 1)
   }
 
   const handleLocationRequest = () => {

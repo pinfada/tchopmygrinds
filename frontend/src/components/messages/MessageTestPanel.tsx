@@ -13,6 +13,10 @@ const MessageTestPanel: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { unreadCount, loading, error } = useSelector((state: RootState) => state.message);
   const [testResult, setTestResult] = useState<string>('');
+  const [receiverIdInput, setReceiverIdInput] = useState<string>('');
+
+  const parsedReceiverId = Number(receiverIdInput)
+  const receiverIdValid = Number.isInteger(parsedReceiverId) && parsedReceiverId > 0 && parsedReceiverId !== user?.id
 
   const runTest = async (testName: string, testFn: () => Promise<any>) => {
     setTestResult(`⏳ Exécution de ${testName}...`);
@@ -53,26 +57,49 @@ const MessageTestPanel: React.FC = () => {
         </button>
         
         <button
-          onClick={() => runTest('Démarrer conversation', () => 
-            dispatch(startConversation({ receiver_id: 16 })).unwrap()
+          onClick={() => runTest('Démarrer conversation', () =>
+            dispatch(startConversation({ receiver_id: parsedReceiverId })).unwrap()
           )}
-          className="px-3 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700"
+          disabled={!receiverIdValid}
+          className="px-3 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Démarrer conversation
         </button>
-        
+
         <button
-          onClick={() => runTest('Envoyer message test', () => 
+          onClick={() => runTest('Envoyer message test', () =>
             dispatch(sendMessage({
               content: `Test automatique - ${new Date().toLocaleTimeString()}`,
-              receiver_id: 16,
+              receiver_id: parsedReceiverId,
               message_type: 'general'
             })).unwrap()
           )}
-          className="px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+          disabled={!receiverIdValid}
+          className="px-3 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Envoyer message
         </button>
+      </div>
+
+      <div className="mb-4 flex items-center gap-2">
+        <label htmlFor="test-receiver-id" className="text-sm font-medium text-gray-700">
+          ID destinataire :
+        </label>
+        <input
+          id="test-receiver-id"
+          type="number"
+          min={1}
+          inputMode="numeric"
+          value={receiverIdInput}
+          onChange={(e) => setReceiverIdInput(e.target.value)}
+          placeholder="ex: 7"
+          className="px-2 py-1 border border-gray-300 rounded text-sm w-24"
+        />
+        {receiverIdInput && !receiverIdValid && (
+          <span className="text-xs text-red-600">
+            {parsedReceiverId === user?.id ? "C'est ton propre ID" : 'ID invalide'}
+          </span>
+        )}
       </div>
 
       <div className="text-sm space-y-2">

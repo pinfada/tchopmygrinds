@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_11_225827) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_12_231244) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -133,6 +133,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_11_225827) do
     t.string "delivery_address"
     t.string "phone"
     t.text "notes"
+    t.string "payment_method"
+    t.decimal "delivery_fee", precision: 10, scale: 2, default: "0.0", null: false
     t.index ["total_amount"], name: "index_orders_on_total_amount"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end

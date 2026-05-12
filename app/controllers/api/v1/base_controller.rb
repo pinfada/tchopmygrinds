@@ -21,11 +21,15 @@ class Api::V1::BaseController < ApplicationController
   
   private
   
-  # Authentification JWT avec devise-jwt
+  # JWT auth. devise-jwt populates current_user when a valid Bearer token is
+  # present; if absent, we MUST render JSON 401 here rather than letting Devise's
+  # FailureApp redirect to /users/sign_in (which it does when the request's
+  # Accept header is `*/*` — the default for browser XHR/fetch). That HTML 302
+  # is what surfaces as a CORS error in the frontend console.
   def authenticate_user_from_token!
-    # devise-jwt gère automatiquement l'authentification via Warden
-    # On utilise les méthodes Devise standards
-    authenticate_user! if jwt_required_for_action?
+    return unless jwt_required_for_action?
+    return if current_user
+    render_unauthorized
   rescue JWT::DecodeError, JWT::ExpiredSignature
     render_unauthorized
   end

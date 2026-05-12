@@ -24,11 +24,13 @@ const VendorDashboardPage: React.FC = () => {
 
   useEffect(() => {
     if (user && isVendor) {
-      // Charger les données du vendeur
       dispatch(fetchUserOrders())
-      if (user.id) {
-        // Chercher le commerce de l'utilisateur (supposons qu'il n'en a qu'un)
-        dispatch(fetchCommerceById(user.id))
+      // Auth payload now ships the merchant's commerces; use the first one's id
+      // (previously this dispatched fetchCommerceById(user.id) which 404'd because
+      // user.id is not a commerce id).
+      const merchantCommerceId = user.commerces?.[0]?.id
+      if (merchantCommerceId) {
+        dispatch(fetchCommerceById(merchantCommerceId))
       }
     }
   }, [user, isVendor, dispatch])

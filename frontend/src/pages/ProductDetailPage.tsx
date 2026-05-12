@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchProductById } from '../store/slices/productSlice'
-import { addToCart } from '../store/slices/cartSlice'
+import { useAddToCart } from '../hooks/useAddToCart'
 import { ProductInterestForm } from '../components/ProductInterest'
 import { Modal } from '../components/ui'
 import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
@@ -14,6 +14,7 @@ const ProductDetailPage = () => {
   
   const { currentProduct: product, loading, error } = useAppSelector((state) => state.product)
   const { user } = useAppSelector((state) => state.auth)
+  const { currentRatingStats } = useAppSelector((state) => state.rating)
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
   const [showInterestModal, setShowInterestModal] = useState(false)
@@ -25,10 +26,10 @@ const ProductDetailPage = () => {
     }
   }, [id, dispatch])
 
+  const addToCartWithGuard = useAddToCart()
   const handleAddToCart = () => {
     if (product) {
-      dispatch(addToCart({ product, quantity }))
-      // Optionnel: afficher une notification de succès
+      addToCartWithGuard(product, quantity)
     }
   }
 
@@ -372,9 +373,8 @@ const ProductDetailPage = () => {
           {/* Résumé des évaluations */}
           <div className="lg:col-span-1">
             <div className="sticky top-8">
-              <RatingSummary 
-                entityId={product.id}
-                entityType="product"
+              <RatingSummary
+                stats={currentRatingStats}
               />
               {user && (
                 <div className="mt-6">
@@ -391,9 +391,10 @@ const ProductDetailPage = () => {
 
           {/* Liste des évaluations */}
           <div className="lg:col-span-2">
-            <RatingsList 
-              entityId={product.id}
-              entityType="product"
+            <RatingsList
+              rateableType="Product"
+              rateableId={product.id}
+              rateableName={product.name}
             />
           </div>
         </div>
@@ -414,19 +415,13 @@ const ProductDetailPage = () => {
       </Modal>
 
       {/* Modal pour évaluation */}
-      <Modal
+      <RatingForm
         isOpen={showRatingModal}
         onClose={() => setShowRatingModal(false)}
-        title="Laisser un avis"
-        size="md"
-      >
-        <RatingForm
-          entityId={product.id}
-          entityType="product"
-          onSuccess={() => setShowRatingModal(false)}
-          onCancel={() => setShowRatingModal(false)}
-        />
-      </Modal>
+        rateableType="Product"
+        rateableId={product.id}
+        rateableName={product.name}
+      />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAppDispatch } from '../../hooks/redux'
 import { Product, Commerce } from '../../types'
 import { Modal } from '../ui'
+import { createProduct, fetchProductsByCommerce } from '../../store/slices/productSlice'
 
 interface VendorProductsProps {
   commerce: Commerce | null
@@ -60,21 +61,51 @@ const VendorProducts: React.FC<VendorProductsProps> = ({ commerce, products }) =
     }))
   }
 
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError(null)
+    if (!commerce) {
+      setSubmitError("Aucun commerce associé à ce compte — impossible de créer un produit.")
+      return
+    }
+    setSubmitting(true)
     try {
       if (selectedProduct) {
-        // Mise à jour
+        // TODO: update action — backend update endpoint also needs the same
+        // name-mapping fix as create; intentionally not wired in this change.
         console.log('Updating product:', selectedProduct.id, formData)
-        // TODO: Dispatch update action
       } else {
-        // Création
-        console.log('Creating product:', formData)
-        // TODO: Dispatch create action
+        const action = await dispatch(createProduct({
+          commerceId: commerce.id,
+          input: {
+            name: formData.name,
+            description: formData.description,
+            price: formData.price,
+            unit: formData.unit,
+            category: formData.category,
+            stock: formData.stock,
+            isAvailable: formData.isAvailable,
+          },
+        }))
+        if (createProduct.rejected.match(action)) {
+          setSubmitError(
+            typeof action.payload === 'string'
+              ? action.payload
+              : 'Erreur lors de la création du produit'
+          )
+          return
+        }
+        // Refresh the merchant's product list from the server (covers ordering + canonical fields).
+        dispatch(fetchProductsByCommerce(commerce.id))
       }
       resetForm()
     } catch (error) {
-      console.error('Error saving product:', error)
+      setSubmitError((error as Error)?.message || 'Erreur lors de la sauvegarde du produit')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -258,19 +289,33 @@ const VendorProducts: React.FC<VendorProductsProps> = ({ commerce, products }) =
         </label>
       </div>
 
+      {submitError && (
+        <div
+          role="alert"
+          data-testid="product-form-error"
+          className="rounded-lg border border-red-200 bg-red-50 text-red-700 px-3 py-2 text-sm"
+        >
+          {submitError}
+        </div>
+      )}
+
       <div className="flex justify-end space-x-3 pt-6 border-t">
         <button
           type="button"
           onClick={resetForm}
-          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          disabled={submitting}
+          className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
         >
           Annuler
         </button>
         <button
           type="submit"
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          disabled={submitting || !commerce}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
         >
-          {selectedProduct ? 'Mettre à jour' : 'Créer le produit'}
+          {submitting
+            ? (selectedProduct ? 'Mise à jour…' : 'Création…')
+            : (selectedProduct ? 'Mettre à jour' : 'Créer le produit')}
         </button>
       </div>
     </form>
@@ -402,7 +447,7 @@ const VendorProducts: React.FC<VendorProductsProps> = ({ commerce, products }) =
                     
                     <div className="flex items-center space-x-6 text-sm text-gray-600">
                       <span className="font-semibold text-gray-900">
-                        {product.price.toFixed(2)}€ / {product.unit}
+                        {Number(product.price ?? 0).toFixed(2)}€ / {product.unit}
                       </span>
                       <span>Stock: {product.stock}</span>
                       <span>Ajouté le {new Date(product.createdAt).toLocaleDateString('fr-FR')}</span>

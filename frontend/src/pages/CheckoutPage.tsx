@@ -10,7 +10,7 @@ const CheckoutPage = () => {
   const dispatch = useAppDispatch()
   const { items, totalPrice, deliveryFee } = useAppSelector((state) => state.cart)
   const { user, isAuthenticated } = useAppSelector((state) => state.auth)
-  const { loading: orderLoading } = useAppSelector((state) => state.order)
+  const { loading: orderLoading, error: orderError } = useAppSelector((state) => state.order)
 
   const [formData, setFormData] = useState<OrderFormData>({
     deliveryAddress: {
@@ -118,7 +118,15 @@ const CheckoutPage = () => {
         })
       }
     } catch (error) {
+      // The thunk already stored a user-friendly message in state.order.error
+      // via rejectWithValue (typically "Stock insuffisant pour <Product>"). We
+      // also surface a toast so the user sees it without scrolling.
+      const msg = (error as Error)?.message || 'Erreur lors de la commande'
       console.error('Erreur lors de la commande:', error)
+      const w = window as unknown as { addNotification?: (n: { type: string; title: string; message: string }) => void }
+      if (typeof w.addNotification === 'function') {
+        w.addNotification({ type: 'error', title: 'Commande refusée', message: msg })
+      }
     }
   }
 
@@ -136,6 +144,18 @@ const CheckoutPage = () => {
           Vérifiez vos informations de livraison et finalisez votre commande
         </p>
       </div>
+
+      {/* Erreur backend (ex. "Stock insuffisant pour Bananes plantain") */}
+      {orderError && (
+        <div
+          role="alert"
+          data-testid="checkout-order-error"
+          className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+        >
+          <p className="font-medium">Impossible de valider la commande</p>
+          <p>{orderError}</p>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Formulaire de commande */}

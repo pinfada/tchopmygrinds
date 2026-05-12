@@ -284,7 +284,9 @@ class Api::V1::CommercesController < Api::V1::BaseController
       email: commerce.user&.email,
       category: commerce.category,
       type: commerce.user&.statut_type == 'itinerant' ? 'itinerant' : 'sedentary',
-      rating: commerce.rating || 0,
+      # rating is a BigDecimal in the DB; JSON would emit "4.8" (string) — cast
+      # so the React UI can call Number#toFixed without crashing.
+      rating: (commerce.rating || 0).to_f,
       isVerified: commerce.verified || false,
       isOnline: commerce_online?(commerce),
       userId: commerce.user_id,
@@ -313,21 +315,26 @@ class Api::V1::CommercesController < Api::V1::BaseController
   end
 
   def product_data(product)
+    # Shape aligned with Api::V1::ProductsController#product_data so the React
+    # `Product` type works against both endpoints. BigDecimal columns are cast
+    # to Float so the UI can call Number#toFixed safely.
+    commerce = product.commerce || product.commerces_through_categorizations.first
     {
       id: product.id,
       name: product.name,
       description: product.description || "",
-      unitPrice: product.unitprice,
-      quantityPerUnit: product.quantityperunit,
-      unitsInStock: product.unitsinstock,
-      unitsOnOrder: product.unitsonorder || 0,
+      price: (product.unitprice || 0).to_f,
+      unit: product.quantityperunit,
+      stock: product.unitsinstock || 0,
       category: product.category,
-      available: (product.unitsinstock || 0) > 0,
+      imageUrl: product.image_url,
+      isAvailable: (product.unitsinstock || 0) > 0,
+      commerceId: commerce&.id,
       createdAt: product.created_at.iso8601,
       updatedAt: product.updated_at.iso8601,
-      commerce: {
-        id: product.commerce&.id,
-        name: product.commerce&.name
+      commerce: commerce && {
+        id: commerce.id,
+        name: commerce.name
       }
     }
   end

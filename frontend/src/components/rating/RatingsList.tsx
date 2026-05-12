@@ -94,7 +94,7 @@ const RatingsList: React.FC<RatingsListProps> = ({
   return (
     <div className="space-y-6">
       {/* Header avec statistiques */}
-      {currentRatingStats && (
+      {currentRatingStats && typeof currentRatingStats.averageRating === 'number' && typeof currentRatingStats.totalRatings === 'number' && (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
             <div>

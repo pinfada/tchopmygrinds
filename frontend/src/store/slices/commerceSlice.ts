@@ -1,6 +1,17 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 import { CommerceState, Commerce, Coordinates } from '../../types'
 import { commerceAPI } from '../../services/api'
+import { commerceCache } from '../../services/commerceCache'
+
+function normalizeCommerceList(payload: unknown): Commerce[] {
+  if (Array.isArray(payload)) return payload as Commerce[]
+  if (payload && typeof payload === 'object') {
+    const obj = payload as { commerces?: unknown; data?: unknown }
+    if (Array.isArray(obj.commerces)) return obj.commerces as Commerce[]
+    if (Array.isArray(obj.data)) return obj.data as Commerce[]
+  }
+  return []
+}
 
 const initialState: CommerceState = {
   commerces: [],
@@ -14,13 +25,24 @@ const initialState: CommerceState = {
 // Actions asynchrones
 export const fetchNearbyCommerces = createAsyncThunk(
   'commerce/fetchNearby',
-  async (params: { location: Coordinates; radius?: number }) => {
-    const response = await commerceAPI.getNearby(
-      params.location.latitude,
-      params.location.longitude,
-      params.radius || 50
-    )
-    return response.data
+  async (params: { location: Coordinates; radius?: number; force?: boolean }) => {
+    const radius = params.radius ?? 50
+    const { latitude, longitude } = params.location
+
+    if (!params.force) {
+      const cached = commerceCache.getFresh(latitude, longitude, radius)
+      if (cached) {
+        return { commerces: cached, fromCache: true as const }
+      }
+    }
+
+    const response = await commerceAPI.getNearby(latitude, longitude, radius)
+    const commerces = normalizeCommerceList(response.data ?? response)
+
+    commerceCache.bulkSet(commerces)
+    commerceCache.recordFetch(latitude, longitude, radius)
+
+    return { commerces, fromCache: false as const }
   }
 )
 
@@ -93,16 +115,7 @@ const commerceSlice = createSlice({
       })
       .addCase(fetchNearbyCommerces.fulfilled, (state, action) => {
         state.loading = false
-        // Gérer différents formats de réponse API
-        if (Array.isArray(action.payload)) {
-          state.commerces = action.payload
-        } else if (action.payload && Array.isArray(action.payload.commerces)) {
-          state.commerces = action.payload.commerces
-        } else if (action.payload && Array.isArray(action.payload.data)) {
-          state.commerces = action.payload.data
-        } else {
-          state.commerces = []
-        }
+        state.commerces = action.payload.commerces
       })
       .addCase(fetchNearbyCommerces.rejected, (state, action) => {
         state.loading = false

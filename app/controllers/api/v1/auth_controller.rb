@@ -88,6 +88,9 @@ class Api::V1::AuthController < Api::V1::BaseController
       admin: user.admin,
       avatar: user.avatar_url,
       isVerified: true, # Pour simplifier, pas de confirmation pour l'instant
+      # Merchants need their commerce id client-side to POST products etc.
+      # Buyers get an empty array — they have no shops.
+      commerces: user.commerces.map { |c| { id: c.id, name: c.name } },
       createdAt: user.created_at.iso8601,
       updatedAt: user.updated_at.iso8601
     }

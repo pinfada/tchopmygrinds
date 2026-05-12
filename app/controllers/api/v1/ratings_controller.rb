@@ -43,10 +43,11 @@ class Api::V1::RatingsController < Api::V1::BaseController
 
   # POST /api/v1/ratings
   def create
-    # Vérifier si l'utilisateur peut évaluer cet élément
+    # Vérifier si l'utilisateur peut évaluer cet élément. Same dual-shape
+    # support as set_rateable — accept top-level OR nested under :rating.
     existing_rating = current_user.ratings.find_by(
-      rateable_type: params[:rateable_type],
-      rateable_id: params[:rateable_id]
+      rateable_type: params[:rateable_type] || params.dig(:rating, :rateable_type),
+      rateable_id: params[:rateable_id] || params.dig(:rating, :rateable_id)
     )
 
     if existing_rating
@@ -191,8 +192,10 @@ class Api::V1::RatingsController < Api::V1::BaseController
   private
 
   def set_rateable
-    rateable_type = params[:rateable_type]
-    rateable_id = params[:rateable_id]
+    # Frontend nests these under `rating: { rateable_type, rateable_id, … }`;
+    # legacy callers pass them at top level. Accept both.
+    rateable_type = params[:rateable_type] || params.dig(:rating, :rateable_type)
+    rateable_id = params[:rateable_id] || params.dig(:rating, :rateable_id)
 
     unless %w[Commerce Product].include?(rateable_type)
       return render json: {
@@ -202,7 +205,7 @@ class Api::V1::RatingsController < Api::V1::BaseController
     end
 
     @rateable = rateable_type.constantize.find_by(id: rateable_id)
-    
+
     unless @rateable
       return render json: {
         status: 'error',

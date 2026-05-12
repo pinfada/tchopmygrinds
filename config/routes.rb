@@ -124,12 +124,16 @@ Rails.application.routes.draw do
     # React app routes (SPA)
     get '/map', to: 'pages#react_app'
     get '/commerces', to: 'pages#react_app'
+    get '/commerces/:id', to: 'pages#react_app', constraints: { id: /\d+/ }
     get '/products', to: 'pages#react_app'
+    get '/products/:id', to: 'pages#react_app', constraints: { id: /\d+/ }
     get '/cart', to: 'pages#react_app'
     get '/checkout', to: 'pages#react_app'
     get '/orders', to: 'pages#react_app'
+    get '/orders/:id', to: 'pages#react_app', constraints: { id: /\d+/ }
     get '/interests', to: 'pages#react_app'
     get '/profile', to: 'pages#react_app'
+    get '/dashboard', to: 'pages#react_app'
     get '/auth', to: 'pages#react_app'
     get '/messages', to: 'pages#react_app'
     get '/messages/:id', to: 'pages#react_app'

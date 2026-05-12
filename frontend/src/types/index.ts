@@ -1,4 +1,9 @@
 // Types pour l'authentification
+export interface UserCommerceRef {
+  id: number
+  name: string
+}
+
 export interface User {
   id: number
   email: string
@@ -7,6 +12,9 @@ export interface User {
   phone?: string
   avatar?: string
   isVerified?: boolean
+  // Populated for merchants by /api/v1/auth/login and /api/v1/auth/me.
+  // Empty array for buyers.
+  commerces?: UserCommerceRef[]
 }
 
 export interface AuthState {
@@ -128,20 +136,52 @@ export interface Address {
 }
 
 // Types pour les commandes
+export type OrderStatus =
+  | 'Waiting'
+  | 'Accepted'
+  | 'In_Progress'
+  | 'Shipped'
+  | 'Delivered'
+  | 'Completed'
+  | 'Cancelled'
+
+export interface OrderItem {
+  id: number
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+  product?: {
+    id: number
+    name: string
+    description?: string
+    imageUrl?: string | null
+    unit?: string | null
+    category?: string | null
+    commerce?: {
+      id: number
+      name: string
+      address?: string | null
+    } | null
+  } | null
+}
+
+export type PaymentMethod = 'cash' | 'card'
+
 export interface Order {
   id: number
-  userId: number
-  items: CartItem[]
+  status: OrderStatus
   totalAmount: number
   deliveryFee: number
   grandTotal: number
-  status: 'pending' | 'confirmed' | 'preparing' | 'delivered' | 'cancelled'
-  deliveryAddress: Address
-  phone: string
-  notes?: string
-  paymentMethod: 'card' | 'cash'
+  paymentMethod: PaymentMethod | null
+  deliveryAddress: string | null
+  phone: string | null
+  notes: string | null
+  itemsCount: number
   createdAt: string
   updatedAt: string
+  cancelledAt?: string | null
+  items?: OrderItem[]
 }
 
 export interface OrderState {

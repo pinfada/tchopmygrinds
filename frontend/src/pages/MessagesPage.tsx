@@ -123,7 +123,7 @@ const MessagesPage: React.FC = () => {
               ← Retour
             </button>
           </div>
-          <MessageTestPanel />
+          {import.meta.env.DEV && <MessageTestPanel />}
         </div>
 
         <div className="flex h-[calc(100vh-120px)]">

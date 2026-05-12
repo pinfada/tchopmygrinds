@@ -182,11 +182,19 @@ export const commerceAPI = {
 
 // API Product
 export const productAPI = {
-  getAll: async (params?: { 
-    commerceId?: number; 
-    location?: Coordinates 
+  getAll: async (params?: {
+    commerceId?: number;
+    location?: Coordinates
   }): Promise<ApiResponse<Product[]>> => {
-    const response = await api.get('/products', { params })
+    // Map the TS-friendly shape to the snake_case query params the Rails
+    // controller actually reads (commerce_id, latitude, longitude).
+    const queryParams: Record<string, number> = {}
+    if (typeof params?.commerceId === 'number') queryParams.commerce_id = params.commerceId
+    if (params?.location) {
+      queryParams.latitude = params.location.latitude
+      queryParams.longitude = params.location.longitude
+    }
+    const response = await api.get('/products', { params: queryParams })
     return response.data
   },
   
@@ -214,11 +222,36 @@ export const productAPI = {
     return response.data
   },
   
-  create: async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResponse<Product>> => {
-    const response = await api.post('/products', productData)
+  create: async (
+    commerceId: number,
+    input: {
+      name: string
+      description?: string
+      price: number
+      unit: string
+      category: string
+      stock: number
+      isAvailable?: boolean
+      imageUrl?: string
+    }
+  ): Promise<ApiResponse<{ product: Product }>> => {
+    // Backend contract: { commerce_id, product: { …, available, image_url } }
+    const response = await api.post('/products', {
+      commerce_id: commerceId,
+      product: {
+        name: input.name,
+        description: input.description,
+        price: input.price,
+        unit: input.unit,
+        category: input.category,
+        stock: input.stock,
+        available: input.isAvailable ?? true,
+        image_url: input.imageUrl,
+      },
+    })
     return response.data
   },
-  
+
   update: async (id: number, data: Partial<Product>): Promise<ApiResponse<Product>> => {
     const response = await api.patch(`/products/${id}`, data)
     return response.data
