@@ -27,6 +27,14 @@ Rails.application.configure do
   # Compress CSS using a preprocessor.
   # config.assets.css_compressor = :sass
 
+  # Disable terser for Sprockets: rails_admin ships vendor JS (popper.js,
+  # bootstrap.js) with UTF-8 multi-byte bytes (e.g. \xC2\xA0). Sprockets tags
+  # the string as ASCII-8BIT at some point and terser/ExecJS then crashes on
+  # `ASCII-8BIT → UTF-8 → UTF-32LE` during precompile. The user-facing JS is
+  # built by Vite (already minified), so Sprockets only ever compresses the
+  # rails_admin UI — not worth crashing the build over.
+  config.assets.js_compressor = nil
+
   # Do not fall back to assets pipeline if a precompiled asset is missed.
   config.assets.compile = false
 
