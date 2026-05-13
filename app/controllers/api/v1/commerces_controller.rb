@@ -136,8 +136,9 @@ class Api::V1::CommercesController < Api::V1::BaseController
     query = params[:query]
     return render_error('Paramètre query requis') if query.blank?
     
+    # `description` is exposed by the API but the underlying DB column is `details`.
     commerces = Commerce.includes(:user)
-                        .where('name ILIKE ? OR description ILIKE ? OR category ILIKE ?', 
+                        .where('name ILIKE ? OR details ILIKE ? OR category ILIKE ?',
                                "%#{query}%", "%#{query}%", "%#{query}%")
     
     # Géolocalisation optionnelle
@@ -246,9 +247,24 @@ class Api::V1::CommercesController < Api::V1::BaseController
     render_not_found('Commerce')
   end
   
+  # Public API exposes `description` / `address`; DB columns are `details` /
+  # `adress1`. Keep the API contract stable and translate here so callers don't
+  # need to know the schema (mirrors the pattern in Api::V1::ProductsController).
+  COMMERCE_PUBLIC_TO_DB_ATTR_MAP = {
+    description: :details,
+    address: :adress1
+  }.freeze
+
   def commerce_params
-    params.require(:commerce).permit(:name, :description, :address, :latitude, :longitude, 
-                                   :phone, :email, :category, :verified)
+    permitted = params.require(:commerce).permit(
+      :name, :description, :address, :adress2, :postal, :city, :country,
+      :latitude, :longitude, :phone, :website, :opening_hours, :image_url,
+      :category, :verified
+    )
+    COMMERCE_PUBLIC_TO_DB_ATTR_MAP.each do |public_key, db_key|
+      permitted[db_key] = permitted.delete(public_key) if permitted.key?(public_key)
+    end
+    permitted
   end
   
   def location_params_present?
@@ -281,6 +297,9 @@ class Api::V1::CommercesController < Api::V1::BaseController
       latitude: commerce.latitude,
       longitude: commerce.longitude,
       phone: commerce.phone,
+      website: commerce.website,
+      openingHours: commerce.opening_hours,
+      imageUrl: commerce.image_url,
       email: commerce.user&.email,
       category: commerce.category,
       type: commerce.user&.statut_type == 'itinerant' ? 'itinerant' : 'sedentary',

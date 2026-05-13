@@ -13,8 +13,8 @@ class Api::V1::ProductsController < Api::V1::BaseController
     products = apply_location_filter(products, lat_param: :latitude, lng_param: :longitude) if location_params_present?
     products = products.where('products.name ILIKE ? OR products.description ILIKE ?', "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
     products = products.where(category: params[:category]) if params[:category].present?
-    products = products.where('price >= ?', params[:min_price]) if params[:min_price].present?
-    products = products.where('price <= ?', params[:max_price]) if params[:max_price].present?
+    products = products.where('unitprice >= ?', params[:min_price]) if params[:min_price].present?
+    products = products.where('unitprice <= ?', params[:max_price]) if params[:max_price].present?
     # Products↔Commerce is a has_many :through :categorizations relation in this
     # codebase (the direct products.commerce_id column is null on seed data),
     # so filter through the join table — `where(commerce_id: …)` would always
@@ -25,7 +25,7 @@ class Api::V1::ProductsController < Api::V1::BaseController
                          .distinct
     end
     products = products.where(available: true) if params[:available] == 'true'
-    products = products.where('stock > 0') if params[:in_stock] == 'true'
+    products = products.where('unitsinstock > 0') if params[:in_stock] == 'true'
     
     # Tri
     products = apply_product_sorting(products)
@@ -56,8 +56,8 @@ class Api::V1::ProductsController < Api::V1::BaseController
     
     # Autres filtres
     products = products.where(category: params[:category]) if params[:category].present?
-    products = products.where('price >= ?', params[:min_price]) if params[:min_price].present?
-    products = products.where('price <= ?', params[:max_price]) if params[:max_price].present?
+    products = products.where('unitprice >= ?', params[:min_price]) if params[:min_price].present?
+    products = products.where('unitprice <= ?', params[:max_price]) if params[:max_price].present?
     products = products.where(available: true) if params[:available] == 'true'
     
     result = paginate_collection(products)
@@ -177,7 +177,7 @@ class Api::V1::ProductsController < Api::V1::BaseController
     when 'name'
       products.order('products.name')
     when 'price'
-      products.order('products.price')
+      products.order('products.unitprice')
     when 'rating'
       products.joins(:commerce).order('commerces.rating DESC')
     when 'distance'
