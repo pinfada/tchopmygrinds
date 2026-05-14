@@ -1,7 +1,8 @@
 import { Routes, Route } from 'react-router-dom'
 import { Suspense, lazy, useEffect } from 'react'
-import { useAppDispatch } from './hooks/redux'
+import { useAppDispatch, useAppSelector } from './hooks/redux'
 import { checkAuthStatus } from './store/slices/authSlice'
+import { fetchFavorites, clearFavorites } from './store/slices/favoritesSlice'
 import MapLayout from './components/layout/MapLayout'
 import NotificationContainer from './components/NotificationContainer'
 import CartSidebar from './components/CartSidebar'
@@ -26,6 +27,7 @@ const ProductInterestPage = lazy(() => import('./pages/ProductInterestPage'))
 const UnauthorizedPage = lazy(() => import('./pages/UnauthorizedPage'))
 const VendorDashboardPage = lazy(() => import('./pages/VendorDashboardPage'))
 const MessagesPage = lazy(() => import('./pages/MessagesPage'))
+const FavoritesPage = lazy(() => import('./pages/FavoritesPage'))
 
 const RouteFallback = () => (
   <div
@@ -39,10 +41,16 @@ const RouteFallback = () => (
 
 function App() {
   const dispatch = useAppDispatch()
+  const isAuthenticated = useAppSelector((s) => s.auth.isAuthenticated)
 
   useEffect(() => {
     dispatch(checkAuthStatus())
   }, [dispatch])
+
+  useEffect(() => {
+    if (isAuthenticated) dispatch(fetchFavorites())
+    else dispatch(clearFavorites())
+  }, [dispatch, isAuthenticated])
 
   return (
     <>
@@ -68,6 +76,7 @@ function App() {
             <Route path="/dashboard" element={<VendorDashboardPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/messages/:conversationId" element={<MessagesPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>
         </Suspense>
