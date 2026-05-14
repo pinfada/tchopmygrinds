@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_12_231244) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_14_010000) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -58,10 +58,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_12_231244) do
     t.string "image_url"
     t.boolean "is_online", default: false, null: false
     t.datetime "location_updated_at"
+    t.text "search_text"
     t.index ["category"], name: "index_commerces_on_category"
     t.index ["is_online"], name: "index_commerces_on_is_online"
     t.index ["location_updated_at"], name: "index_commerces_on_location_updated_at"
     t.index ["rating"], name: "index_commerces_on_rating"
+    t.index ["search_text"], name: "index_commerces_on_search_text"
     t.index ["user_id"], name: "index_commerces_on_user_id"
     t.index ["verified"], name: "index_commerces_on_verified"
   end
@@ -174,9 +176,11 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_12_231244) do
     t.text "description"
     t.string "image_url"
     t.boolean "available", default: true
+    t.text "search_text"
     t.index ["available"], name: "index_products_on_available"
     t.index ["category"], name: "index_products_on_category"
     t.index ["commerce_id"], name: "index_products_on_commerce_id"
+    t.index ["search_text"], name: "index_products_on_search_text"
   end
 
   create_table "rating_votes", force: :cascade do |t|

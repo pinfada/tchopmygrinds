@@ -12,7 +12,7 @@ class Api::V1::CommercesController < Api::V1::BaseController
     
     # Application des filtres
     commerces = apply_location_filter(commerces) if location_params_present?
-    commerces = commerces.where('LOWER(name) LIKE LOWER(?)', "%#{params[:search]}%") if params[:search].present?
+    commerces = tokenized_search(commerces, params[:search], %i[name details category]) if params[:search].present?
     commerces = commerces.where(category: params[:category]) if params[:category].present?
     commerces = commerces.where('rating >= ?', params[:min_rating]) if params[:min_rating].present?
     commerces = commerces.where(verified: true) if params[:verified] == 'true'
@@ -136,11 +136,11 @@ class Api::V1::CommercesController < Api::V1::BaseController
     query = params[:query]
     return render_error('Paramètre query requis') if query.blank?
     
-    # `description` is exposed by the API but the underlying DB column is `details`.
-    # ILIKE is Postgres-only — LOWER + LIKE is portable to the SQLite dev DB.
-    commerces = Commerce.includes(:user)
-                        .where('LOWER(name) LIKE LOWER(?) OR LOWER(details) LIKE LOWER(?) OR LOWER(category) LIKE LOWER(?)',
-                               "%#{query}%", "%#{query}%", "%#{query}%")
+    commerces = tokenized_search(
+      Commerce.includes(:user),
+      query,
+      %i[name details category]
+    )
     
     # Géolocalisation optionnelle
     commerces = apply_location_filter(commerces) if location_params_present?
@@ -172,7 +172,7 @@ class Api::V1::CommercesController < Api::V1::BaseController
     products = @commerce.products.includes(:categorizations)
     
     # Appliquer les filtres
-    products = products.where('LOWER(name) LIKE LOWER(?)', "%#{params[:search]}%") if params[:search].present?
+    products = tokenized_search(products, params[:search], %i[name description category]) if params[:search].present?
     products = products.where(category: params[:category]) if params[:category].present?
     products = products.where('unitprice >= ?', params[:min_price]) if params[:min_price].present?
     products = products.where('unitprice <= ?', params[:max_price]) if params[:max_price].present?

@@ -127,24 +127,33 @@ class Api::V1::BaseController < ApplicationController
     end
   end
 
-  # Tokenized case-insensitive search across one or more columns.
+  # Tokenized case- AND accent-insensitive search across one or more columns.
   #
-  # Splits `query` on whitespace and requires every token to match at least
-  # one of the listed columns (AND of ORs). So "banane plantain" matches
-  # "Bananes plantain mûres" even though the substring "banane plantain"
-  # never appears literally.
+  # Splits `query` on whitespace and requires every token to match (AND of
+  # ORs). So "banane plantain" matches "Bananes plantain mûres", and so does
+  # "mure" or "PLANTAIN BANANE".
   #
-  # Stays portable: uses `LOWER(col) LIKE LOWER(?)` rather than Postgres-only
-  # ILIKE, so SQLite (dev) and Postgres (prod) behave the same.
+  # When the scope's model has a `search_text` column (kept up to date by the
+  # Searchable concern as a lowercased, accent-stripped concatenation of the
+  # searchable fields), tokens match against that single indexed column —
+  # gives us accent-insensitivity without Postgres extensions and stays
+  # portable to the SQLite dev DB. When the column is missing, we fall back
+  # to per-column LOWER(col) LIKE LOWER(?) on the listed columns.
   def tokenized_search(scope, query, columns)
-    tokens = query.to_s.downcase.split(/\s+/).reject(&:blank?)
+    tokens = Searchable.normalize(query).split(/\s+/).reject(&:blank?)
     return scope if tokens.empty?
 
     table = scope.table_name
+    use_search_text = scope.klass.column_names.include?("search_text")
+
     tokens.each do |token|
       like = "%#{token}%"
-      clause = columns.map { |c| "LOWER(#{table}.#{c}) LIKE ?" }.join(" OR ")
-      scope = scope.where(clause, *Array.new(columns.length, like))
+      if use_search_text
+        scope = scope.where("#{table}.search_text LIKE ?", like)
+      else
+        clause = columns.map { |c| "LOWER(#{table}.#{c}) LIKE ?" }.join(" OR ")
+        scope = scope.where(clause, *Array.new(columns.length, like))
+      end
     end
     scope
   end

@@ -1,4 +1,7 @@
 class Product < ApplicationRecord
+    include Searchable
+    searchable_fields :name, :description, :category
+
     validates :name, presence: true, uniqueness: true, on: :create
     validates :name, length: {minimum: 2}
     validates :quantityperunit, presence: true

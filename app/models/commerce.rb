@@ -1,4 +1,7 @@
 class Commerce < ApplicationRecord
+	include Searchable
+	searchable_fields :name, :details, :category
+
 	validates :name, presence: true, uniqueness: true, on: :create
 	validates :name, length: {minimum: 2}
 	before_save { self.name = name.downcase }
