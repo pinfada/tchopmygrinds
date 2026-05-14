@@ -1,14 +1,75 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { useAddToCart } from '../hooks/useAddToCart'
 import { fetchProducts, searchProducts, setSortBy } from '../store/slices/productSlice'
 import { getCurrentLocation } from '../store/slices/locationSlice'
+import { startConversation } from '../store/slices/messageSlice'
+import { useSeo, breadcrumbsJsonLd } from '../hooks/useSeo'
+import type { Product } from '../types'
 
 const ProductsPage = () => {
+  useSeo({
+    title: 'Bananes plantain et produits frais — TchopMyGrinds',
+    description:
+      "Parcourez le catalogue des produits disponibles chez les commerçants locaux : bananes plantain, fruits, légumes, tubercules et épices. Achetez en circuit court.",
+    canonicalPath: '/products',
+    ogType: 'website',
+    jsonLd: breadcrumbsJsonLd([
+      { name: 'Accueil', path: '/' },
+      { name: 'Produits', path: '/products' },
+    ]),
+  })
+
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { products, loading, sortBy } = useAppSelector((state) => state.product)
   const { currentLocation } = useAppSelector((state) => state.location)
+  const { user } = useAppSelector((state) => state.auth)
+  const [contactingId, setContactingId] = useState<number | null>(null)
+
+  const handleContactMerchant = async (product: Product) => {
+    // The product card only knows the merchant via product.commerce.userId,
+    // which the API now exposes alongside id/name/address/rating.
+    const merchantUserId = product.commerce?.userId
+    if (!merchantUserId) return
+
+    if (!user) {
+      // Send anonymous buyers through the sign-in flow first.
+      navigate('/auth')
+      return
+    }
+    // A merchant viewing their own product shouldn't be able to message themselves.
+    if (user.id === merchantUserId) return
+
+    const draft =
+      `Bonjour, je suis interesse(e) par "${product.name}"` +
+      (product.price ? ` a ${product.price.toFixed(2)} €/${product.unit || 'unite'}` : '') +
+      `. Est-il disponible ?`
+
+    setContactingId(product.id)
+    try {
+      const result = await dispatch(
+        startConversation({ receiver_id: merchantUserId })
+      ).unwrap()
+      const conversationId = (result as { conversation_id?: string })?.conversation_id
+      // The MessagesPage reads `location.state.draft` on mount and prefills the
+      // composer. If the conversation id isn't returned we still navigate to
+      // /messages so the user lands somewhere useful instead of dead-clicking.
+      const target = conversationId ? `/messages/${conversationId}` : '/messages'
+      navigate(target, {
+        state: {
+          draft,
+          productId: product.id,
+          commerceId: product.commerce?.id,
+        },
+      })
+    } catch {
+      navigate('/messages')
+    } finally {
+      setContactingId(null)
+    }
+  }
   
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
@@ -319,6 +380,19 @@ const ProductsPage = () => {
                       </span>
                     </div>
                     
+                    {product.commerce?.userId && user?.id !== product.commerce.userId && (
+                      <button
+                        onClick={() => handleContactMerchant(product)}
+                        disabled={contactingId === product.id}
+                        className="w-full py-1.5 px-4 text-sm rounded-lg font-medium border border-emerald-200 text-emerald-700 hover:bg-emerald-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
+                      >
+                        <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        {contactingId === product.id ? 'Ouverture…' : (user ? 'Contacter' : 'Contacter (connexion)')}
+                      </button>
+                    )}
+
                     <button
                       onClick={() => handleAddToCart(product)}
                       disabled={!product.isAvailable || (product.stock || 0) === 0}
@@ -328,8 +402,8 @@ const ProductsPage = () => {
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                     >
-                      {!product.isAvailable ? 'Indisponible' : 
-                       (product.stock || 0) === 0 ? 'Rupture de stock' : 
+                      {!product.isAvailable ? 'Indisponible' :
+                       (product.stock || 0) === 0 ? 'Rupture de stock' :
                        'Ajouter au panier'}
                     </button>
                   </div>

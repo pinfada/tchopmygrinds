@@ -229,6 +229,9 @@ class Api::V1::ProductsController < Api::V1::BaseController
     if commerce
       data[:commerce] = {
         id: commerce.id,
+        # userId is the merchant's User row id — the product card needs it to
+        # call start_conversation when the buyer taps "Contacter".
+        userId: commerce.user_id,
         name: commerce.name,
         address: commerce.adress1,
         rating: (commerce.rating || 0).to_f,

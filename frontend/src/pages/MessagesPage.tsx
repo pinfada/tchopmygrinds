@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import type { AppDispatch, RootState } from '../store/store';
 import { 
   fetchConversations, 
@@ -17,6 +17,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 const MessagesPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { conversationId } = useParams<{ conversationId?: string }>();
   
   const {
@@ -45,6 +46,17 @@ const MessagesPage: React.FC = () => {
       dispatch(fetchMessages({ conversation_id: conversationId }));
     }
   }, [conversationId, dispatch]);
+
+  // When the page is opened with a draft (from a product card's "Contacter"
+  // button), prefill the composer once. Strip the state after consumption
+  // so a manual refresh doesn't keep injecting the same draft.
+  useEffect(() => {
+    const draft = (location.state as { draft?: string } | null)?.draft;
+    if (typeof draft === 'string' && draft.length > 0) {
+      setNewMessageContent(draft);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state, navigate]);
 
   const handleConversationSelect = (conversation: Conversation) => {
     setSelectedConversation(conversation.conversation_id);
@@ -98,14 +110,20 @@ const MessagesPage: React.FC = () => {
 
   if (loading && conversations.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-12">
         <LoadingSpinner />
       </div>
     );
   }
 
+  const handleBackToList = () => {
+    setSelectedConversation(null);
+    dispatch(setCurrentConversationId(null));
+    navigate('/messages');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <div className="max-w-7xl mx-auto">
         <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
@@ -128,9 +146,9 @@ const MessagesPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex h-[calc(100vh-120px)]">
+        <div className="flex h-[calc(100vh-12rem)] lg:h-[calc(100vh-120px)]">
           {/* Liste des conversations */}
-          <div className="w-1/3 bg-white border-r border-gray-200 flex flex-col">
+          <div className={`${selectedConversation ? 'hidden lg:flex' : 'flex'} w-full lg:w-1/3 bg-white border-r border-gray-200 flex-col`}>
             <div className="p-4 border-b border-gray-200">
               <input
                 type="text"
@@ -221,11 +239,17 @@ const MessagesPage: React.FC = () => {
           </div>
 
           {/* Zone de conversation */}
-          <div className="flex-1 flex flex-col">
+          <div className={`${selectedConversation ? 'flex' : 'hidden lg:flex'} flex-1 flex-col`}>
             {selectedConversation ? (
               <>
                 {/* En-tête de conversation */}
                 <div className="bg-white border-b border-gray-200 p-4">
+                  <button
+                    onClick={handleBackToList}
+                    className="lg:hidden mb-3 inline-flex items-center min-h-[44px] text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    ← Conversations
+                  </button>
                   {(() => {
                     const conv = conversations.find(c => c.conversation_id === selectedConversation);
                     return conv ? (
@@ -288,14 +312,17 @@ const MessagesPage: React.FC = () => {
                 </div>
 
                 {/* Formulaire d'envoi */}
-                <div className="bg-white border-t border-gray-200 p-4">
+                <div
+                  className="bg-white border-t border-gray-200 p-4"
+                  style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+                >
                   <form onSubmit={handleSendMessage} className="flex gap-2">
                     <textarea
                       value={newMessageContent}
                       onChange={(e) => setNewMessageContent(e.target.value)}
                       placeholder="Tapez votre message..."
                       rows={2}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
+                      className="flex-1 min-h-[44px] px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
@@ -306,7 +333,7 @@ const MessagesPage: React.FC = () => {
                     <button
                       type="submit"
                       disabled={!newMessageContent.trim() || sendingMessage}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="min-h-[44px] min-w-[44px] px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {sendingMessage ? '⏳' : '📤'}
                     </button>
