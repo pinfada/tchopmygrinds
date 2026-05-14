@@ -35,6 +35,16 @@ export default defineConfig({
     hmr: {
       port: 3001,
     },
+    // Proxy `/api/*` to the Rails dev server so the React app's relative
+    // baseURL (`/api/v1`) works without setting VITE_RAILS_API_URL by hand.
+    // Without this, fetch('/api/v1/...') hits Vite, which falls back to
+    // index.html and the SPA reads "0 results" silently.
+    proxy: {
+      '/api': {
+        target: process.env.RAILS_DEV_URL || 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
   },
 
   resolve: {

@@ -101,12 +101,30 @@ class Api::V1::BaseController < ApplicationController
   # Geo filter. Returns the collection untouched if coordinates are missing or
   # invalid. The radius is always clamped to GEO_MAX_RADIUS_KM regardless of
   # what the caller asks for, to prevent full-table distance scans.
+  #
+  # `.near` only exists on Geocoder-enabled models (Commerce). For Product we
+  # filter through its commerce association, so the caller doesn't have to
+  # know the model layout. If the collection's model has neither `.near` nor a
+  # commerce association, the filter is a no-op (matches the pre-fix behavior
+  # for unsupported types).
   def apply_location_filter(collection, lat_param: :latitude, lng_param: :longitude, radius_param: :radius)
     coords = parse_optional_coordinates(lat_param: lat_param, lng_param: lng_param, radius_param: radius_param)
     return collection unless coords
 
     lat, lng, radius = coords
-    collection.near([lat, lng], radius)
+    klass = collection.klass
+
+    if klass.respond_to?(:near)
+      collection.near([lat, lng], radius)
+    elsif klass.reflect_on_association(:commerces_through_categorizations)
+      collection.joins(:commerces_through_categorizations)
+                .merge(Commerce.near([lat, lng], radius))
+                .distinct
+    elsif klass.reflect_on_association(:commerce)
+      collection.joins(:commerce).merge(Commerce.near([lat, lng], radius))
+    else
+      collection
+    end
   end
 
   # Strict coordinate parser for endpoints where geo is mandatory.

@@ -145,9 +145,12 @@ const productSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(fetchProducts.fulfilled, (state, action) => {
+      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false
-        state.products = action.payload
+        // Rails returns { products: [...], meta: {...} }; the legacy thunks
+        // forward that whole inner object. Unwrap so state.products stays an
+        // array — matches the pattern already used for fetchProductsByCommerce.
+        state.products = action.payload?.products ?? action.payload
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false
@@ -187,9 +190,9 @@ const productSlice = createSlice({
         state.loading = true
         state.error = null
       })
-      .addCase(searchProducts.fulfilled, (state, action) => {
+      .addCase(searchProducts.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false
-        state.products = action.payload
+        state.products = action.payload?.products ?? action.payload
       })
       .addCase(searchProducts.rejected, (state, action) => {
         state.loading = false

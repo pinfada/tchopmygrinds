@@ -6,12 +6,15 @@ class Api::V1::ProductsController < Api::V1::BaseController
   
   # GET /api/v1/products
   def index
-    products = Product.includes(:commerce)
-    
-    # Filtres
-    products = products.joins(:commerce) if location_params_present?
-    products = apply_location_filter(products, lat_param: :latitude, lng_param: :longitude) if location_params_present?
-    products = products.where('products.name ILIKE ? OR products.description ILIKE ?', "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
+    products = Product.includes(:commerce, :commerces_through_categorizations)
+
+    # Geo filter. apply_location_filter now handles the join via the
+    # commerce association internally — no need to pre-join here (which
+    # would also have filtered on the always-null products.commerce_id).
+    products = apply_location_filter(products) if location_params_present?
+    # Portable case-insensitive match: ILIKE is Postgres-only and crashes the
+    # SQLite dev DB. LOWER(col) LIKE LOWER(?) works on both adapters.
+    products = products.where('LOWER(products.name) LIKE LOWER(?) OR LOWER(products.description) LIKE LOWER(?)', "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
     products = products.where(category: params[:category]) if params[:category].present?
     products = products.where('unitprice >= ?', params[:min_price]) if params[:min_price].present?
     products = products.where('unitprice <= ?', params[:max_price]) if params[:max_price].present?
@@ -45,14 +48,12 @@ class Api::V1::ProductsController < Api::V1::BaseController
     return render_error('Paramètre query requis') if query.blank?
     
     products = Product.includes(:commerce)
-                     .where('products.name ILIKE ? OR products.description ILIKE ? OR products.category ILIKE ?', 
+                     .where('LOWER(products.name) LIKE LOWER(?) OR LOWER(products.description) LIKE LOWER(?) OR LOWER(products.category) LIKE LOWER(?)',
                             "%#{query}%", "%#{query}%", "%#{query}%")
     
-    # Géolocalisation optionnelle pour les commerces
-    if location_params_present?
-      products = products.joins(:commerce)
-      products = apply_location_filter(products)
-    end
+    # Géolocalisation optionnelle pour les commerces (apply_location_filter
+    # handles the join via the commerce association on its own).
+    products = apply_location_filter(products) if location_params_present?
     
     # Autres filtres
     products = products.where(category: params[:category]) if params[:category].present?
@@ -195,7 +196,16 @@ class Api::V1::ProductsController < Api::V1::BaseController
     current_user.id == product.commerce.user_id || current_user.admin?
   end
   
+  # Products are linked to commerces both via a direct FK (products.commerce_id)
+  # and a m2m join (categorizations). Seed data only populates the m2m side,
+  # so always fall back to the join when the direct FK is null — otherwise the
+  # API returns "commerceId: null" and the UI can't show where to buy.
+  def effective_commerce(product)
+    product.commerce || product.commerces_through_categorizations.first
+  end
+
   def product_data(product)
+    commerce = effective_commerce(product)
     {
       id: product.id,
       name: product.name,
@@ -207,35 +217,39 @@ class Api::V1::ProductsController < Api::V1::BaseController
       imageUrl: product.image_url,
       stock: product.unitsinstock,
       isAvailable: product.available,
-      commerceId: product.commerce_id,
+      commerceId: commerce&.id,
       createdAt: product.created_at.iso8601,
       updatedAt: product.updated_at.iso8601
     }
   end
-  
+
   def product_data_with_commerce(product)
     data = product_data(product)
-    if product.commerce
+    commerce = effective_commerce(product)
+    if commerce
       data[:commerce] = {
-        id: product.commerce.id,
-        name: product.commerce.name,
-        address: product.commerce.address,
-        rating: (product.commerce.rating || 0).to_f,
-        distance: product.commerce.respond_to?(:distance) ? product.commerce.distance&.round(2) : nil
+        id: commerce.id,
+        name: commerce.name,
+        address: commerce.adress1,
+        rating: (commerce.rating || 0).to_f,
+        distance: commerce.respond_to?(:distance) ? commerce.distance&.round(2) : nil
       }
     end
     data
   end
-  
+
   def product_data_detailed(product)
     data = product_data_with_commerce(product)
-    if product.commerce
+    commerce = effective_commerce(product)
+    if commerce && data[:commerce]
       data[:commerce].merge!({
-        latitude: product.commerce.latitude,
-        longitude: product.commerce.longitude,
-        phone: product.commerce.phone,
-        category: product.commerce.category,
-        isVerified: product.commerce.verified || false
+        latitude: commerce.latitude,
+        longitude: commerce.longitude,
+        phone: commerce.phone,
+        website: commerce.website,
+        openingHours: commerce.opening_hours,
+        category: commerce.category,
+        isVerified: commerce.verified || false
       })
     end
     data
