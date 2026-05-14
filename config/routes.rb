@@ -100,7 +100,10 @@ Rails.application.routes.draw do
     end
   end
   mount RailsAdmin::Engine => '/admin', as: 'rails_admin'
-  
+
+  # SEO
+  get '/sitemap.xml', to: 'sitemap#show', defaults: { format: 'xml' }, as: :sitemap
+
   # Handle Chrome DevTools requests (ignore silently)
   get '/.well-known/*path', to: proc { |env| [204, {}, ['']] }
   

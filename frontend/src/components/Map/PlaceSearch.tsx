@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { searchPlaces, GeocodingResult } from '../../services/geocoding'
 
 interface PlaceSearchProps {
@@ -34,7 +35,9 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const inputWrapperRef = useRef<HTMLDivElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [dropdownStyle, setDropdownStyle] = useState<{ top: number; left: number; width: number } | null>(null)
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -67,16 +70,37 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
     }
   }, [query])
 
-  // Fermer au click extérieur
+  // Fermer au click extérieur (en prenant en compte la dropdown portalée)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false)
-      }
+      const target = e.target as Node
+      const insideContainer = containerRef.current?.contains(target)
+      const dropdown = document.getElementById('place-search-results')
+      const insideDropdown = dropdown?.contains(target)
+      if (!insideContainer && !insideDropdown) setOpen(false)
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Compute dropdown position relative to the input wrapper.
+  const updateDropdownPosition = () => {
+    const r = inputWrapperRef.current?.getBoundingClientRect()
+    if (!r) return
+    setDropdownStyle({ top: r.bottom + 8, left: r.left, width: r.width })
+  }
+
+  useLayoutEffect(() => {
+    if (!open) return
+    updateDropdownPosition()
+    const onScrollOrResize = () => updateDropdownPosition()
+    window.addEventListener('resize', onScrollOrResize)
+    window.addEventListener('scroll', onScrollOrResize, true)
+    return () => {
+      window.removeEventListener('resize', onScrollOrResize)
+      window.removeEventListener('scroll', onScrollOrResize, true)
+    }
+  }, [open])
 
   const handleSelect = (result: GeocodingResult) => {
     onSelect(result)
@@ -112,7 +136,7 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      <div className="relative">
+      <div ref={inputWrapperRef} className="relative">
         <svg
           className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
           fill="none"
@@ -158,11 +182,18 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
         )}
       </div>
 
-      {showDropdown && (
+      {showDropdown && dropdownStyle && createPortal(
         <ul
           id="place-search-results"
           role="listbox"
-          className="absolute z-[1100] mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-xl max-h-80 overflow-y-auto"
+          style={{
+            position: 'fixed',
+            top: dropdownStyle.top,
+            left: dropdownStyle.left,
+            width: dropdownStyle.width,
+            zIndex: 2147483000,
+          }}
+          className="bg-white border border-gray-200 rounded-xl shadow-xl max-h-80 overflow-y-auto"
         >
           {error && (
             <li className="px-4 py-3 text-sm text-red-600">Erreur : {error}</li>
@@ -186,7 +217,7 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
                   isActive ? 'bg-brand-50' : 'hover:bg-gray-50'
                 }`}
               >
-                <span className="text-lg leading-tight">{categoryIcon(result.category)}</span>
+                <span className="text-lg leading-tight" aria-hidden="true">{categoryIcon(result.category)}</span>
                 <div className="min-w-0 flex-1">
                   <div className="font-medium text-gray-900 truncate">{result.shortName}</div>
                   <div className="text-xs text-gray-500 truncate">{result.displayName}</div>
@@ -194,7 +225,8 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
               </li>
             )
           })}
-        </ul>
+        </ul>,
+        document.body
       )}
     </div>
   )

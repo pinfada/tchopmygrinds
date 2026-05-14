@@ -2,29 +2,102 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= @titre %></title>
-  
-  <!-- React app built assets -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#187a4b" />
+  <meta name="application-name" content="TchopMyGrinds" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="apple-touch-icon" href="/favicon.ico" />
+
+  <title><%= @spa_meta.title %></title>
+  <meta name="description" content="<%= @spa_meta.description %>" />
+  <meta name="robots" content="<%= @spa_meta.noindex ? 'noindex,nofollow' : 'index,follow,max-image-preview:large,max-snippet:-1' %>" />
+  <link rel="canonical" href="<%= @spa_meta.canonical %>" />
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="<%= @spa_meta.og_type %>" />
+  <meta property="og:site_name"   content="TchopMyGrinds" />
+  <meta property="og:locale"      content="fr_FR" />
+  <meta property="og:title"       content="<%= @spa_meta.title %>" />
+  <meta property="og:description" content="<%= @spa_meta.description %>" />
+  <meta property="og:url"         content="<%= @spa_meta.canonical %>" />
+  <meta property="og:image"       content="<%= @spa_meta.image %>" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="<%= @spa_meta.title %>" />
+  <meta name="twitter:description" content="<%= @spa_meta.description %>" />
+  <meta name="twitter:image"       content="<%= @spa_meta.image %>" />
+
+  <!-- Performance hints -->
+  <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin />
+  <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin />
+  <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin />
+  <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
-  
-  <!-- Always use built version to avoid Vite dev server conflicts -->
+
+  <!-- React app built assets -->
   <% @vite_assets.fetch(:stylesheets).each do |stylesheet_path| %>
     <link rel="stylesheet" crossorigin href="<%= stylesheet_path %>">
   <% end %>
   <% @vite_assets.fetch(:scripts).each do |script_path| %>
     <script type="module" crossorigin src="<%= script_path %>"></script>
   <% end %>
+
+  <!-- Structured data: Organization + WebSite (global, present on every page) -->
+  <script type="application/ld+json">
+  <%= raw({
+        '@context' => 'https://schema.org',
+        '@graph'   => [
+          {
+            '@type' => 'Organization',
+            '@id'   => "#{ENV['SITE_URL'].presence&.chomp('/') || "#{request.protocol}#{request.host_with_port}"}/#organization",
+            'name'  => 'TchopMyGrinds',
+            'url'   => ENV['SITE_URL'].presence&.chomp('/') || "#{request.protocol}#{request.host_with_port}",
+            'logo'  => "#{ENV['SITE_URL'].presence&.chomp('/') || "#{request.protocol}#{request.host_with_port}"}/images/logo.png"
+          },
+          {
+            '@type'   => 'WebSite',
+            '@id'     => "#{ENV['SITE_URL'].presence&.chomp('/') || "#{request.protocol}#{request.host_with_port}"}/#website",
+            'url'     => ENV['SITE_URL'].presence&.chomp('/') || "#{request.protocol}#{request.host_with_port}",
+            'name'    => 'TchopMyGrinds',
+            'inLanguage' => 'fr-FR',
+            'publisher' => { '@id' => "#{ENV['SITE_URL'].presence&.chomp('/') || "#{request.protocol}#{request.host_with_port}"}/#organization" },
+            'potentialAction' => {
+              '@type'  => 'SearchAction',
+              'target' => "#{ENV['SITE_URL'].presence&.chomp('/') || "#{request.protocol}#{request.host_with_port}"}/products?q={search_term_string}",
+              'query-input' => 'required name=search_term_string'
+            }
+          }
+        ]
+      }.to_json) %>
+  </script>
+
+  <!-- Per-route structured data -->
+  <% Array(@spa_meta.jsonld).each do |payload| %>
+    <script type="application/ld+json" data-seo-route="true">
+      <%= raw payload.to_json %>
+    </script>
+  <% end %>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Aller au contenu</a>
   <div id="root"></div>
-  
+  <noscript>
+    <p style="padding:1rem;text-align:center;font-family:system-ui,sans-serif">
+      TchopMyGrinds nécessite JavaScript pour afficher la carte et les commerces.
+    </p>
+  </noscript>
+
   <!-- Pass Rails data to React -->
   <script type="text/javascript">
     window.railsData = {
       csrfToken: '<%= form_authenticity_token %>',
-      currentUser: <%= current_user&.as_json&.to_json || 'null' %>,
+      currentUser: <%= raw(current_user&.as_json&.to_json || 'null') %>,
       apiBaseUrl: '<%= request.base_url %>',
       environment: '<%= Rails.env %>'
     };

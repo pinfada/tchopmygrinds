@@ -22,9 +22,25 @@ export default defineConfig({
   build: {
     outDir: '../public/dist',
     emptyOutDir: true,
+    // Target modern evergreen browsers (matches package.json browserslist
+    // `defaults, not IE 11`). Lets Vite skip large legacy polyfills.
+    target: 'es2020',
+    cssCodeSplit: true,
+    // Inline tiny assets (< 4 kB) to save HTTP round-trips on cold loads.
+    assetsInlineLimit: 4096,
+    // Drop the noisy "chunk > 500 kB" warning threshold but still surface real
+    // regressions if our largest chunk crosses 800 kB.
+    chunkSizeWarningLimit: 800,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'frontend/index.html'),
+      },
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          redux: ['@reduxjs/toolkit', 'react-redux'],
+          leaflet: ['leaflet', 'react-leaflet', 'leaflet.markercluster'],
+        },
       },
     },
   },

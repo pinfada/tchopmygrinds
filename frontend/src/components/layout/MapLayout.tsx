@@ -302,8 +302,10 @@ const MapLayout = ({ children }: MapLayoutProps) => {
           onMobileClose={() => setSidebarOpen(false)}
         />
 
-        <div
-          className="flex-1 relative min-w-0 flex flex-col"
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 relative z-0 min-w-0 flex flex-col focus:outline-none"
           style={{ marginLeft: 'var(--sidebar-width, 0px)' }}
         >
           <header
@@ -443,7 +445,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
               )}
             </div>
           </div>
-        </div>
+        </main>
 
         <Modal
           isOpen={showModal}

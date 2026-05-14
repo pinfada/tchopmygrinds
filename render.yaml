@@ -2,8 +2,10 @@ databases:
   - name: postgres
     databaseName: tchopmygrinds
     user: tchopmygrinds
+    plan: basic-256mb
+    region: oregon
+    postgresMajorVersion: "16"
     ipAllowList: []
-    plan: free
 
 services:
   - type: web
@@ -11,6 +13,7 @@ services:
     runtime: ruby
     env: ruby
     plan: free
+    region: oregon
     buildCommand: "./bin/render-build.sh"
     startCommand: "bundle exec rails server -b 0.0.0.0 -p ${PORT:-10000}"
     envVars:
@@ -18,11 +21,13 @@ services:
         fromDatabase:
           name: postgres
           property: connectionString
-      - key: RAILS_MASTER_KEY
-        sync: false
       - key: SECRET_KEY_BASE
         generateValue: true
+      - key: RAILS_ENV
+        value: production
       - key: RAILS_SERVE_STATIC_FILES
+        value: "true"
+      - key: RAILS_LOG_TO_STDOUT
         value: "true"
       - key: LANG
         value: C.UTF-8

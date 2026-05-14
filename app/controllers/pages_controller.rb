@@ -50,6 +50,7 @@ class PagesController < ApplicationController
   def react_app
     @titre = "TchopMyGrinds"
     @vite_assets = react_vite_assets
+    @spa_meta    = SpaMetaInjector.new(request).call
     render 'react_app', layout: false
   end
 
