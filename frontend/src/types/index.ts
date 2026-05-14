@@ -36,6 +36,9 @@ export interface Commerce {
   longitude: number
   phone?: string
   email?: string
+  website?: string
+  openingHours?: string
+  imageUrl?: string
   category?: string
   isVerified?: boolean
   rating?: number

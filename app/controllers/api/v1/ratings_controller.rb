@@ -1,5 +1,9 @@
 class Api::V1::RatingsController < Api::V1::BaseController
-  before_action :authenticate_user!
+  # Reads are public — ratings of a commerce/product are visible to everyone,
+  # the way they are on any other marketplace. Writes (create / update /
+  # destroy / mark_helpful / my_ratings) still require an authenticated user.
+  skip_before_action :authenticate_user_from_token!, only: [:index, :show]
+  before_action :authenticate_user!, except: [:index, :show]
   before_action :set_rateable, only: [:index, :create]
   before_action :set_rating, only: [:show, :update, :destroy, :mark_helpful]
 

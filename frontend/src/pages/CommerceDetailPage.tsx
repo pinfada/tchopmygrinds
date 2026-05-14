@@ -92,7 +92,17 @@ const CommerceDetailPage = () => {
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header du commerce */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 overflow-hidden">
+        {currentCommerce.imageUrl && (
+          <div className="h-48 lg:h-64 w-full bg-gray-100">
+            <img
+              src={currentCommerce.imageUrl}
+              alt={currentCommerce.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
         <div className="p-6 lg:p-8">
           <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
             {/* Informations principales */}
@@ -184,7 +194,30 @@ const CommerceDetailPage = () => {
                     {currentCommerce.email}
                   </div>
                 )}
-                
+
+                {currentCommerce.openingHours && (
+                  <div className="flex items-center text-gray-600">
+                    <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="truncate">{currentCommerce.openingHours}</span>
+                  </div>
+                )}
+
+                {currentCommerce.website && (
+                  <a
+                    href={currentCommerce.website}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="flex items-center text-emerald-600 hover:text-emerald-800 hover:underline"
+                  >
+                    <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-9a9 9 0 010 18m0-18a9 9 0 000 18M3.6 9h16.8M3.6 15h16.8" />
+                    </svg>
+                    <span className="truncate">{currentCommerce.website.replace(/^https?:\/\//, '')}</span>
+                  </a>
+                )}
+
                 {typeof currentCommerce.distance === 'number' && (
                   <div className="flex items-center text-emerald-600 font-medium">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

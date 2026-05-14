@@ -35,11 +35,15 @@ merchants_itinerant = [
       latitude: 4.0511,
       longitude: 9.7679,
       verified: true,
-      rating: 4.7
+      rating: 4.7,
+      phone: '+237 690 00 10 01',
+      opening_hours: 'Lun-Sam 7h-18h, Dim 7h-12h',
+      details: 'Spécialiste des bananes plantain bio du Cameroun, livrées du producteur au panier. Variétés mûres, vertes et douces selon arrivage.',
+      image_url: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=800&q=60'
     }
   },
   {
-    email: 'paul.fruits@test.com', 
+    email: 'paul.fruits@test.com',
     name: 'Paul Fruiter',
     phone: '+237690001002',
     commerce: {
@@ -49,7 +53,11 @@ merchants_itinerant = [
       latitude: 3.8480,
       longitude: 11.5021,
       verified: true,
-      rating: 4.5
+      rating: 4.5,
+      phone: '+237 690 00 10 02',
+      opening_hours: 'Lun-Sam 8h-19h, Dim fermé',
+      details: 'Vendeur de fruits tropicaux frais à Yaoundé : mangues Kent, papayes, ananas Victoria et bien plus.',
+      image_url: 'https://images.unsplash.com/photo-1605478577873-bd4c7c19064c?w=800&q=60'
     }
   }
 ]
@@ -59,7 +67,7 @@ merchants_sedentary = [
   {
     email: 'grace.epicerie@test.com',
     name: 'Grace Épicerie',
-    phone: '+237690002001', 
+    phone: '+237690002001',
     commerce: {
       name: 'Épicerie Grace & Fils',
       category: 'Alimentation générale',
@@ -68,7 +76,11 @@ merchants_sedentary = [
       longitude: 9.7830,
       verified: true,
       rating: 4.8,
-      website: 'https://graceetfils.cm'
+      website: 'https://graceetfils.cm',
+      phone: '+237 690 00 20 01',
+      opening_hours: 'Lun-Ven 8h-20h, Sam 9h-18h, Dim fermé',
+      details: 'Épicerie de quartier depuis 2010. Produits du terroir camerounais, riz parfumé, huile de palme, épices et produits importés.',
+      image_url: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800&q=60'
     }
   },
   {
@@ -77,12 +89,16 @@ merchants_sedentary = [
     phone: '+237690002002',
     commerce: {
       name: 'Légumes Frais Martin',
-      category: 'Légumes frais', 
+      category: 'Légumes frais',
       address: 'Quartier Essos, Yaoundé',
       latitude: 3.8667,
       longitude: 11.5167,
       verified: false,
-      rating: 4.2
+      rating: 4.2,
+      phone: '+237 690 00 20 02',
+      opening_hours: 'Tous les jours 7h30-19h',
+      details: 'Légumes frais du jardin maraîcher familial, récoltés chaque matin. Tomates, oignons, piments et plus encore.',
+      image_url: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=60'
     }
   }
 ]
@@ -120,9 +136,13 @@ merchants_itinerant.each do |merchant_data|
     longitude: merchant_data[:commerce][:longitude],
     verified: merchant_data[:commerce][:verified],
     rating: merchant_data[:commerce][:rating],
-    rating_count: rand(10..50)
+    rating_count: rand(10..50),
+    phone: merchant_data[:commerce][:phone],
+    opening_hours: merchant_data[:commerce][:opening_hours],
+    details: merchant_data[:commerce][:details],
+    image_url: merchant_data[:commerce][:image_url]
   )
-  
+
   puts "✅ Créé commerçant itinérant: #{user.name} - #{commerce.name}"
 end
 
@@ -146,9 +166,13 @@ merchants_sedentary.each do |merchant_data|
     verified: merchant_data[:commerce][:verified],
     rating: merchant_data[:commerce][:rating],
     rating_count: rand(15..60),
-    website: merchant_data[:commerce][:website]
+    website: merchant_data[:commerce][:website],
+    phone: merchant_data[:commerce][:phone],
+    opening_hours: merchant_data[:commerce][:opening_hours],
+    details: merchant_data[:commerce][:details],
+    image_url: merchant_data[:commerce][:image_url]
   )
-  
+
   puts "✅ Créé commerçant sédentaire: #{user.name} - #{commerce.name}"
 end
 

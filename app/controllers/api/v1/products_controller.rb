@@ -12,9 +12,7 @@ class Api::V1::ProductsController < Api::V1::BaseController
     # commerce association internally — no need to pre-join here (which
     # would also have filtered on the always-null products.commerce_id).
     products = apply_location_filter(products) if location_params_present?
-    # Portable case-insensitive match: ILIKE is Postgres-only and crashes the
-    # SQLite dev DB. LOWER(col) LIKE LOWER(?) works on both adapters.
-    products = products.where('LOWER(products.name) LIKE LOWER(?) OR LOWER(products.description) LIKE LOWER(?)', "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
+    products = tokenized_search(products, params[:search], %i[name description]) if params[:search].present?
     products = products.where(category: params[:category]) if params[:category].present?
     products = products.where('unitprice >= ?', params[:min_price]) if params[:min_price].present?
     products = products.where('unitprice <= ?', params[:max_price]) if params[:max_price].present?
@@ -47,9 +45,11 @@ class Api::V1::ProductsController < Api::V1::BaseController
     query = params[:query]
     return render_error('Paramètre query requis') if query.blank?
     
-    products = Product.includes(:commerce)
-                     .where('LOWER(products.name) LIKE LOWER(?) OR LOWER(products.description) LIKE LOWER(?) OR LOWER(products.category) LIKE LOWER(?)',
-                            "%#{query}%", "%#{query}%", "%#{query}%")
+    products = tokenized_search(
+      Product.includes(:commerce, :commerces_through_categorizations),
+      query,
+      %i[name description category]
+    )
     
     # Géolocalisation optionnelle pour les commerces (apply_location_filter
     # handles the join via the commerce association on its own).

@@ -127,6 +127,28 @@ class Api::V1::BaseController < ApplicationController
     end
   end
 
+  # Tokenized case-insensitive search across one or more columns.
+  #
+  # Splits `query` on whitespace and requires every token to match at least
+  # one of the listed columns (AND of ORs). So "banane plantain" matches
+  # "Bananes plantain mûres" even though the substring "banane plantain"
+  # never appears literally.
+  #
+  # Stays portable: uses `LOWER(col) LIKE LOWER(?)` rather than Postgres-only
+  # ILIKE, so SQLite (dev) and Postgres (prod) behave the same.
+  def tokenized_search(scope, query, columns)
+    tokens = query.to_s.downcase.split(/\s+/).reject(&:blank?)
+    return scope if tokens.empty?
+
+    table = scope.table_name
+    tokens.each do |token|
+      like = "%#{token}%"
+      clause = columns.map { |c| "LOWER(#{table}.#{c}) LIKE ?" }.join(" OR ")
+      scope = scope.where(clause, *Array.new(columns.length, like))
+    end
+    scope
+  end
+
   # Strict coordinate parser for endpoints where geo is mandatory.
   # Renders 422 and returns nil on missing/invalid input. Callers should
   # `return unless coords = parse_required_coordinates`.

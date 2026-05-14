@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { useAddToCart } from '../hooks/useAddToCart'
 import { fetchProducts, searchProducts, setSortBy } from '../store/slices/productSlice'
@@ -279,18 +279,34 @@ const ProductsPage = () => {
                     </div>
                     
                     {product.commerce && (
-                      <div className="text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="text-sm text-gray-600 space-y-0.5">
+                        <Link
+                          to={`/commerces/${product.commerce.id}`}
+                          className="flex items-center font-medium text-emerald-700 hover:text-emerald-900 hover:underline"
+                        >
+                          <svg className="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                           <span className="truncate">{product.commerce.name}</span>
-                        </div>
-                        {product.commerce.distance && (
-                          <div className="text-xs text-gray-500 mt-1">
-                            {typeof product.commerce.distance === 'number' ? product.commerce.distance.toFixed(1) : product.commerce.distance} km
+                        </Link>
+                        {(product.commerce.address || product.commerce.adress1) && (
+                          <div className="text-xs text-gray-500 pl-5 truncate">
+                            {product.commerce.address || product.commerce.adress1}
                           </div>
                         )}
+                        <div className="flex items-center gap-3 pl-5 text-xs text-gray-500">
+                          {typeof product.commerce.rating === 'number' && product.commerce.rating > 0 && (
+                            <span className="inline-flex items-center">
+                              <svg className="w-3 h-3 text-yellow-400 mr-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              {product.commerce.rating.toFixed(1)}
+                            </span>
+                          )}
+                          {typeof product.commerce.distance === 'number' && (
+                            <span>{product.commerce.distance.toFixed(1)} km</span>
+                          )}
+                        </div>
                       </div>
                     )}
                     

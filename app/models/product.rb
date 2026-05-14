@@ -13,7 +13,10 @@ class Product < ApplicationRecord
     # Many-to-many association for legacy compatibility
     has_many :categorizations
     has_many :orderdetails, dependent: :destroy
-    has_many :product_interests, dependent: :destroy
+    # NOTE: there is no Product↔ProductInterest association. The
+    # product_interests table is keyed on a free-form product_name string
+    # (a "I'm looking for X, alert me" record), not on a Product row. The
+    # only legitimate access is User.product_interests.
     has_many :ratings, as: :rateable, dependent: :destroy
     has_many :commerces_through_categorizations, -> { distinct }, through: :categorizations, source: :commerce
     has_many :orders, -> { distinct }, through: :orderdetails
