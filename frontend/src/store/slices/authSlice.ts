@@ -58,6 +58,21 @@ export const logout = createAsyncThunk('auth/logout', async () => {
   secureStorage.clearAll()
 })
 
+export const updateProfile = createAsyncThunk(
+  'auth/updateProfile',
+  async (changes: Partial<Pick<User, 'name' | 'phone' | 'avatar'>>, { rejectWithValue }) => {
+    try {
+      const user = await authAPI.updateProfile(changes)
+      return user
+    } catch (error: any) {
+      const message = error.response?.data?.error ||
+                    error.response?.data?.message ||
+                    'Erreur lors de la mise à jour du profil'
+      return rejectWithValue(message)
+    }
+  }
+)
+
 export const checkAuthStatus = createAsyncThunk('auth/checkStatus', async () => {
   const token = secureStorage.getToken()
   if (!token) throw new Error('No token found')
@@ -129,6 +144,21 @@ const authSlice = createSlice({
         state.user = null
         state.token = null
         state.isAuthenticated = false
+      })
+
+      // Update profile
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false
+        state.user = action.payload
+        secureStorage.setUser(action.payload)
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false
+        state.error = (action.payload as string) || 'Erreur de mise à jour'
       })
       
       // Check auth status

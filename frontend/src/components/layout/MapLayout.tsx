@@ -236,7 +236,8 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     if (path === '/') {
       setShowModal(false)
     } else if (path === '/commerces') {
-      setShowModal(false)
+      setModalTitle('Liste des commerces')
+      setShowModal(true)
     } else if (path === '/products') {
       setModalTitle('Catalogue produits')
       setShowModal(true)
@@ -264,6 +265,9 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     } else if (path === '/messages' || path.startsWith('/messages/')) {
       setModalTitle('Messagerie')
       setShowModal(true)
+    } else if (path === '/favorites') {
+      setModalTitle('Mes favoris')
+      setShowModal(true)
     } else if (path.startsWith('/commerces/')) {
       setModalTitle('Détails du commerce')
       setShowModal(true)
@@ -283,7 +287,6 @@ const MapLayout = ({ children }: MapLayoutProps) => {
   }
 
   const filteredCommerces = Array.isArray(commerces) ? commerces : []
-  const isCommerceListRoute = location.pathname === '/commerces'
 
   const headerSubtitle = useMemo(() => {
     if (!activeCenter) {
@@ -382,16 +385,6 @@ const MapLayout = ({ children }: MapLayoutProps) => {
           </header>
 
           <div className="flex-1 flex relative min-h-0">
-            {isCommerceListRoute && (
-              <aside
-                className="absolute inset-0 z-10 bg-white overflow-y-auto overscroll-contain lg:relative lg:inset-auto lg:z-auto lg:w-[420px] lg:max-w-[40%] lg:border-r lg:border-slate-200 lg:shadow-lg"
-                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-                aria-label="Liste des commerces"
-              >
-                {children}
-              </aside>
-            )}
-
             <div className="flex-1 relative">
               <LeafletMap
                 userLocation={currentLocation}

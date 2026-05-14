@@ -117,11 +117,19 @@ class Api::V1::BaseController < ApplicationController
     if klass.respond_to?(:near)
       collection.near([lat, lng], radius)
     elsif klass.reflect_on_association(:commerces_through_categorizations)
+      # Strip Commerce.near's SELECT/ORDER before merging — the `distance` alias
+      # only resolves when commerces.* is in the SELECT clause, but Kaminari's
+      # id-only DISTINCT subquery for paginated joined relations strips the
+      # SELECT down to products.id while keeping the ORDER BY, producing
+      # `no such column: distance`. The bounding-box WHERE survives unscope and
+      # is what we actually need from .near here. Distance-based ORDER is
+      # re-applied explicitly per sort option in the calling controller.
       collection.joins(:commerces_through_categorizations)
-                .merge(Commerce.near([lat, lng], radius))
+                .merge(Commerce.near([lat, lng], radius).unscope(:select, :order))
                 .distinct
     elsif klass.reflect_on_association(:commerce)
-      collection.joins(:commerce).merge(Commerce.near([lat, lng], radius))
+      collection.joins(:commerce)
+                .merge(Commerce.near([lat, lng], radius).unscope(:select, :order))
     else
       collection
     end
