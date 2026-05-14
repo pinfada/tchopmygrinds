@@ -63,6 +63,11 @@ class Api::V1::RatingsController < Api::V1::BaseController
 
     @rating = current_user.ratings.build(rating_params)
     @rating.rateable = @rateable
+    # Match the marketplace default (Yelp/Google/TripAdvisor): user reviews
+    # are public immediately. The `pending` status is reserved for ratings
+    # flagged after the fact — until a moderation queue UI exists, leaving
+    # it as the create-time default would silently hide every new review.
+    @rating.status ||= :approved
 
     # Vérifier si l'utilisateur a une commande liée (pour la vérification)
     if params[:order_id].present?
@@ -233,6 +238,10 @@ class Api::V1::RatingsController < Api::V1::BaseController
     params.require(:rating).permit(:rating, :comment, :rateable_type, :rateable_id)
   end
 
+  # API responses across the v1 namespace use camelCase timestamps
+  # (`createdAt`/`updatedAt`). The React components consume that shape — when
+  # this controller emitted snake_case the UI rendered "Invalid Date" on every
+  # review. Keep snake_case aliases for older callers during the transition.
   def rating_json(rating)
     {
       id: rating.id,
@@ -240,7 +249,8 @@ class Api::V1::RatingsController < Api::V1::BaseController
       comment: rating.comment,
       verified: rating.verified,
       helpful_count: rating.helpful_count,
-      created_at: rating.created_at,
+      createdAt: rating.created_at&.iso8601,
+      created_at: rating.created_at&.iso8601,
       user: {
         id: rating.user.id,
         name: rating.user.name,
@@ -251,7 +261,8 @@ class Api::V1::RatingsController < Api::V1::BaseController
 
   def detailed_rating_json(rating)
     rating_json(rating).merge({
-      updated_at: rating.updated_at,
+      updatedAt: rating.updated_at&.iso8601,
+      updated_at: rating.updated_at&.iso8601,
       can_edit: rating.user == current_user && rating.created_at > 24.hours.ago,
       can_delete: rating.user == current_user || current_user.admin?
     })
@@ -265,8 +276,10 @@ class Api::V1::RatingsController < Api::V1::BaseController
       verified: rating.verified,
       moderated: rating.moderated,
       helpful_count: rating.helpful_count,
-      created_at: rating.created_at,
-      updated_at: rating.updated_at,
+      createdAt: rating.created_at&.iso8601,
+      created_at: rating.created_at&.iso8601,
+      updatedAt: rating.updated_at&.iso8601,
+      updated_at: rating.updated_at&.iso8601,
       rateable: {
         type: rating.rateable_type,
         id: rating.rateable_id,
