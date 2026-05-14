@@ -182,7 +182,7 @@ class Api::V1::MessagesController < Api::V1::BaseController
   end
 
   def message_params
-    params.require(:message).permit(:content, :subject, :receiver_id, :product_id, :commerce_id, :message_type)
+    params.require(:message).permit(:content, :subject, :receiver_id, :product_id, :commerce_id, :message_type, :conversation_id)
   end
 
   def message_data(message)

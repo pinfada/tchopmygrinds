@@ -63,6 +63,7 @@ export interface CreateMessageData {
   product_id?: number;
   commerce_id?: number;
   message_type?: 'general' | 'product_inquiry' | 'order_related' | 'support';
+  conversation_id?: string;
 }
 
 export interface StartConversationData {

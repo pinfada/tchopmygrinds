@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchCommerceById } from '../store/slices/commerceSlice'
 import { fetchProductsByCommerce } from '../store/slices/productSlice'
+import { startConversation } from '../store/slices/messageSlice'
 import { useAddToCart } from '../hooks/useAddToCart'
 import LeafletMap from '../components/Map/LeafletMap'
 import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
@@ -11,16 +12,43 @@ import type { Product } from '../types'
 const CommerceDetailPage = () => {
   const { id } = useParams<{ id: string }>()
   const dispatch = useAppDispatch()
-  
+  const navigate = useNavigate()
+
   const { currentCommerce, loading: commerceLoading, error } = useAppSelector((state) => state.commerce)
   const { products, loading: productsLoading } = useAppSelector((state) => state.product)
   const { currentLocation } = useAppSelector((state) => state.location)
   const { user } = useAppSelector((state) => state.auth)
   const { currentRatingStats } = useAppSelector((state) => state.rating)
-  
+
   const [selectedCategory, setSelectedCategory] = useState('')
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock'>('name')
   const [showRatingModal, setShowRatingModal] = useState(false)
+  const [contactingMerchant, setContactingMerchant] = useState(false)
+
+  const handleContactMerchant = async () => {
+    if (!currentCommerce) return
+    // Not logged in → push to /auth, come back here afterwards.
+    if (!user) {
+      navigate('/auth', { state: { redirect: `/commerces/${currentCommerce.id}` } })
+      return
+    }
+    // Don't let a merchant message themselves.
+    if (user.id === currentCommerce.userId) return
+
+    setContactingMerchant(true)
+    try {
+      const result = await dispatch(
+        startConversation({ receiver_id: currentCommerce.userId as number })
+      ).unwrap()
+      const conversationId = (result as { conversation_id?: string })?.conversation_id
+      if (conversationId) navigate(`/messages/${conversationId}`)
+      else navigate('/messages')
+    } catch {
+      navigate('/messages')
+    } finally {
+      setContactingMerchant(false)
+    }
+  }
 
   useEffect(() => {
     if (id) {
@@ -157,6 +185,31 @@ const CommerceDetailPage = () => {
                     </div>
                   )}
                   
+                  {user && user.id !== currentCommerce.userId && (
+                    <button
+                      onClick={handleContactMerchant}
+                      disabled={contactingMerchant}
+                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      {contactingMerchant ? 'Ouverture…' : 'Contacter'}
+                    </button>
+                  )}
+
+                  {!user && (
+                    <button
+                      onClick={handleContactMerchant}
+                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                      Contacter (connexion requise)
+                    </button>
+                  )}
+
                   {user && (
                     <button
                       onClick={() => setShowRatingModal(true)}

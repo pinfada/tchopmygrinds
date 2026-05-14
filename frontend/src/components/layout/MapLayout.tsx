@@ -273,7 +273,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     } else if (path === '/dashboard') {
       setModalTitle('Dashboard Vendeur')
       setShowModal(true)
-    } else if (path === '/messages') {
+    } else if (path === '/messages' || path.startsWith('/messages/')) {
       setModalTitle('Messagerie')
       setShowModal(true)
     } else if (path.startsWith('/commerces/')) {

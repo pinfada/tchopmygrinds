@@ -84,8 +84,21 @@ class Message < ApplicationRecord
 
   def generate_conversation_id
     return if conversation_id.present?
-    
-    # Générer un ID de conversation basé sur les IDs des utilisateurs (ordre déterministe)
+
+    # Reuse the existing conversation between the same pair of users, so a
+    # second message lands in the same thread as the first. Without this, the
+    # random suffix would produce a new conversation row per message — the
+    # left rail filled up with fake "new conversations" of one message each.
+    existing = Message
+      .where(sender_id: [sender_id, receiver_id], receiver_id: [sender_id, receiver_id])
+      .order(:created_at)
+      .pick(:conversation_id)
+
+    if existing
+      self.conversation_id = existing
+      return
+    end
+
     user_ids = [sender_id, receiver_id].sort
     self.conversation_id = "conv_#{user_ids.join('_')}_#{SecureRandom.hex(4)}"
   end
