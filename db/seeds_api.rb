@@ -140,7 +140,11 @@ merchants_itinerant.each do |merchant_data|
     phone: merchant_data[:commerce][:phone],
     opening_hours: merchant_data[:commerce][:opening_hours],
     details: merchant_data[:commerce][:details],
-    image_url: merchant_data[:commerce][:image_url]
+    image_url: merchant_data[:commerce][:image_url],
+    # Seed merchants are all Cameroon-based (Douala, Yaoundé) — local
+    # currency is XAF, not the column default EUR. Prices below are quoted
+    # in FCFA at realistic retail levels, not converted from EUR.
+    currency: 'XAF'
   )
 
   puts "✅ Créé commerçant itinérant: #{user.name} - #{commerce.name}"
@@ -170,7 +174,8 @@ merchants_sedentary.each do |merchant_data|
     phone: merchant_data[:commerce][:phone],
     opening_hours: merchant_data[:commerce][:opening_hours],
     details: merchant_data[:commerce][:details],
-    image_url: merchant_data[:commerce][:image_url]
+    image_url: merchant_data[:commerce][:image_url],
+    currency: 'XAF'
   )
 
   puts "✅ Créé commerçant sédentaire: #{user.name} - #{commerce.name}"
@@ -194,37 +199,40 @@ end
 puts "🛍️  Création des produits..."
 
 Commerce.find_each do |commerce|
+  # Prices below are typical Cameroonian retail in FCFA (XAF). They are NOT
+  # auto-converted from a EUR seed: a merchant who flips currency must
+  # re-price. Seed merchants are CMR-based so XAF is the right starting point.
   case commerce.category
   when 'Bananes plantain'
     products = [
-      { name: 'Bananes plantain mûres', price: 2.50, unit: 'kg', category: 'Bananes plantain', stock: 50 },
-      { name: 'Bananes plantain vertes', price: 2.00, unit: 'kg', category: 'Bananes plantain', stock: 30 },
-      { name: 'Bananes douce', price: 3.00, unit: 'régime', category: 'Bananes plantain', stock: 20 }
+      { name: 'Bananes plantain mûres', price: 600, unit: 'kg', category: 'Bananes plantain', stock: 50 },
+      { name: 'Bananes plantain vertes', price: 500, unit: 'kg', category: 'Bananes plantain', stock: 30 },
+      { name: 'Bananes douce', price: 2_000, unit: 'régime', category: 'Bananes plantain', stock: 20 }
     ]
   when 'Fruits locaux'
     products = [
-      { name: 'Mangues Kent', price: 4.00, unit: 'kg', category: 'Fruits locaux', stock: 25 },
-      { name: 'Papayes', price: 3.50, unit: 'pièce', category: 'Fruits locaux', stock: 15 },
-      { name: 'Ananas Victoria', price: 5.00, unit: 'pièce', category: 'Fruits locaux', stock: 10 }
+      { name: 'Mangues Kent', price: 1_000, unit: 'kg', category: 'Fruits locaux', stock: 25 },
+      { name: 'Papayes', price: 750, unit: 'pièce', category: 'Fruits locaux', stock: 15 },
+      { name: 'Ananas Victoria', price: 2_000, unit: 'pièce', category: 'Fruits locaux', stock: 10 }
     ]
   when 'Légumes frais'
     products = [
-      { name: 'Tomates fraîches', price: 2.80, unit: 'kg', category: 'Légumes frais', stock: 40 },
-      { name: 'Oignons rouges', price: 2.20, unit: 'kg', category: 'Légumes frais', stock: 35 },
-      { name: 'Piments forts', price: 8.00, unit: 'kg', category: 'Légumes frais', stock: 12 }
+      { name: 'Tomates fraîches', price: 900, unit: 'kg', category: 'Légumes frais', stock: 40 },
+      { name: 'Oignons rouges', price: 1_000, unit: 'kg', category: 'Légumes frais', stock: 35 },
+      { name: 'Piments forts', price: 2_000, unit: 'kg', category: 'Légumes frais', stock: 12 }
     ]
   when 'Alimentation générale'
     products = [
-      { name: 'Riz parfumé 5kg', price: 12.00, unit: 'sac', category: 'Céréales', stock: 25 },
-      { name: 'Huile de palme', price: 6.50, unit: 'litre', category: 'Épicerie fine', stock: 18 },
-      { name: 'Farine de maïs', price: 4.50, unit: 'kg', category: 'Céréales', stock: 30 }
+      { name: 'Riz parfumé 5kg', price: 4_000, unit: 'sac', category: 'Céréales', stock: 25 },
+      { name: 'Huile de palme', price: 1_500, unit: 'litre', category: 'Épicerie fine', stock: 18 },
+      { name: 'Farine de maïs', price: 700, unit: 'kg', category: 'Céréales', stock: 30 }
     ]
   else
     products = [
-      { name: 'Produit local', price: 3.00, unit: 'kg', category: 'Divers', stock: 20 }
+      { name: 'Produit local', price: 1_000, unit: 'kg', category: 'Divers', stock: 20 }
     ]
   end
-  
+
   products.each do |product_data|
     product = commerce.products.create!(
       name: product_data[:name],
@@ -235,8 +243,8 @@ Commerce.find_each do |commerce|
       unitsinstock: product_data[:stock],
       available: true
     )
-    
-    puts "  ✅ Produit: #{product.name} - #{product.unitprice}€/#{product.quantityperunit}"
+
+    puts "  ✅ Produit: #{product.name} - #{product.unitprice} #{commerce.currency}/#{product.quantityperunit}"
   end
 end
 

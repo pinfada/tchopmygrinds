@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { removeFromCart, updateQuantity, clearCart } from '../store/slices/cartSlice'
+import { formatPrice } from '../utils/format'
 
 const CartPage = () => {
   const dispatch = useAppDispatch()
   const { items, totalItems, totalPrice, deliveryFee } = useAppSelector((state) => state.cart)
+  const cartCurrency = items[0]?.product.currency
 
   const handleRemoveItem = (itemId: string) => {
     dispatch(removeFromCart(itemId))
@@ -115,7 +117,7 @@ const CartPage = () => {
                     {/* Prix unitaire */}
                     <div className="text-right">
                       <div className="text-lg font-semibold text-gray-900">
-                        {item.unitPrice.toFixed(2)}€
+                        {formatPrice(item.unitPrice, item.product.currency)}
                       </div>
                       <div className="text-sm text-gray-500">
                         / {item.product.unit}
@@ -149,7 +151,7 @@ const CartPage = () => {
                     {/* Prix total */}
                     <div className="text-right">
                       <div className="text-xl font-bold text-gray-900">
-                        {item.totalPrice.toFixed(2)}€
+                        {formatPrice(item.totalPrice, item.product.currency)}
                       </div>
                     </div>
 
@@ -181,17 +183,17 @@ const CartPage = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Sous-total ({totalItems} articles)</span>
-                  <span className="font-medium">{totalPrice.toFixed(2)}€</span>
+                  <span className="font-medium">{formatPrice(totalPrice, cartCurrency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Frais de livraison</span>
-                  <span className="font-medium">{deliveryFee.toFixed(2)}€</span>
+                  <span className="font-medium">{formatPrice(deliveryFee, cartCurrency)}</span>
                 </div>
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-900">Total</span>
                     <span className="text-2xl font-bold text-brand-600">
-                      {grandTotal.toFixed(2)}€
+                      {formatPrice(grandTotal, cartCurrency)}
                     </span>
                   </div>
                 </div>
@@ -223,9 +225,11 @@ const CartPage = () => {
                     <h4 className="text-sm font-medium text-brand-900">
                       Livraison sous 24-48h
                     </h4>
-                    <p className="text-sm text-brand-700">
-                      Livraison gratuite à partir de 50€
-                    </p>
+                    {(!cartCurrency || cartCurrency === 'EUR') && (
+                      <p className="text-sm text-brand-700">
+                        Livraison gratuite à partir de 50&nbsp;€
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -3,6 +3,7 @@ import { useAppDispatch } from '../../hooks/redux'
 import { Product, Commerce } from '../../types'
 import { Modal } from '../ui'
 import { createProduct, fetchProductsByCommerce } from '../../store/slices/productSlice'
+import { formatPrice, currencySymbol } from '../../utils/format'
 
 interface VendorProductsProps {
   commerce: Commerce | null
@@ -233,7 +234,7 @@ const VendorProducts: React.FC<VendorProductsProps> = ({ commerce, products }) =
               className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               placeholder="0.00"
             />
-            <span className="absolute right-3 top-2 text-gray-500">€</span>
+            <span className="absolute right-3 top-2 text-gray-500">{currencySymbol(commerce?.currency)}</span>
           </div>
         </div>
 
@@ -447,7 +448,7 @@ const VendorProducts: React.FC<VendorProductsProps> = ({ commerce, products }) =
                     
                     <div className="flex items-center space-x-6 text-sm text-gray-600">
                       <span className="font-semibold text-gray-900">
-                        {Number(product.price ?? 0).toFixed(2)}€ / {product.unit}
+                        {formatPrice(product.price, product.currency ?? commerce?.currency)} / {product.unit}
                       </span>
                       <span>Stock: {product.stock}</span>
                       <span>Ajouté le {new Date(product.createdAt).toLocaleDateString('fr-FR')}</span>

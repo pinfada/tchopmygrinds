@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_05_14_010000) do
+ActiveRecord::Schema[7.1].define(version: 2026_05_14_210000) do
   create_table "addresses", force: :cascade do |t|
     t.integer "user_id"
     t.text "address1"
@@ -59,7 +59,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_14_010000) do
     t.boolean "is_online", default: false, null: false
     t.datetime "location_updated_at"
     t.text "search_text"
+    t.string "currency", limit: 3, default: "EUR", null: false
     t.index ["category"], name: "index_commerces_on_category"
+    t.index ["currency"], name: "index_commerces_on_currency"
     t.index ["is_online"], name: "index_commerces_on_is_online"
     t.index ["location_updated_at"], name: "index_commerces_on_location_updated_at"
     t.index ["rating"], name: "index_commerces_on_rating"
@@ -72,6 +74,24 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_14_010000) do
     t.integer "commerce_id", null: false
     t.integer "product_id", null: false
     t.index ["commerce_id", "product_id"], name: "index_commerces_products_on_commerce_id_and_product_id"
+  end
+
+  create_table "currencies", primary_key: "code", id: { type: :string, limit: 3 }, force: :cascade do |t|
+    t.string "label", null: false
+    t.integer "decimals", default: 2, null: false
+    t.string "suffix", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "commerce_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["commerce_id"], name: "index_favorites_on_commerce_id"
+    t.index ["user_id", "commerce_id"], name: "index_favorites_on_user_id_and_commerce_id", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "jwt_denylists", force: :cascade do |t|
@@ -241,6 +261,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_14_010000) do
     t.integer "statut_type"
     t.string "phone"
     t.string "avatar_url"
+    t.string "whatsapp_phone"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["phone"], name: "index_users_on_phone"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -248,6 +269,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_05_14_010000) do
 
   add_foreign_key "addresses", "users"
   add_foreign_key "commerces", "users"
+  add_foreign_key "favorites", "commerces"
+  add_foreign_key "favorites", "users"
   add_foreign_key "messages", "commerces"
   add_foreign_key "messages", "products"
   add_foreign_key "messages", "users", column: "receiver_id"

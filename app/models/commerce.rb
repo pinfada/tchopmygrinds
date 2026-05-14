@@ -2,8 +2,15 @@ class Commerce < ApplicationRecord
 	include Searchable
 	searchable_fields :name, :details, :category
 
+	# Currency support is driven by the `currencies` table — a single source
+	# of truth shared with the frontend via GET /api/v1/currencies. Adding a
+	# new market is now one INSERT, no Ruby/TS edits.
 	validates :name, presence: true, uniqueness: true, on: :create
 	validates :name, length: {minimum: 2}
+	validates :currency, inclusion: {
+		in: ->(_c) { Currency.codes },
+		message: ->(_c, data) { "#{data[:value]} non supporté (attendu : #{Currency.codes.join(', ')})" }
+	}
 	before_save { self.name = name.downcase }
 
 	belongs_to :user

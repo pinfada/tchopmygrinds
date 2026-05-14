@@ -67,8 +67,7 @@ export function formatOrderDate(iso: string | undefined | null, includeTime = tr
   })
 }
 
-export function formatPrice(amount: number | string | null | undefined): string {
-  const n = Number(amount ?? 0)
-  if (!Number.isFinite(n)) return '0,00 €'
-  return n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
-}
+// Re-export the currency-aware formatter so existing imports keep working.
+// Callers that have a currency in hand should pass it; the default falls
+// back to EUR to preserve behavior on legacy data.
+export { formatPrice } from './format'

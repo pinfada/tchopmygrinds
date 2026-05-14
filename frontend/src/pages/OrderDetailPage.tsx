@@ -167,9 +167,9 @@ const OrderDetailPage = () => {
                       )}
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="font-semibold text-gray-900">{formatPrice(item.totalPrice)}</div>
+                      <div className="font-semibold text-gray-900">{formatPrice(item.totalPrice, order.currency)}</div>
                       <div className="text-xs text-gray-500">
-                        {item.quantity} × {formatPrice(item.unitPrice)}
+                        {item.quantity} × {formatPrice(item.unitPrice, order.currency)}
                       </div>
                     </div>
                   </div>
@@ -219,18 +219,18 @@ const OrderDetailPage = () => {
           <dl className="text-sm space-y-2">
             <div className="flex justify-between">
               <dt className="text-gray-600">Sous-total articles</dt>
-              <dd className="text-gray-900">{formatPrice(order.totalAmount ?? itemsSubtotal)}</dd>
+              <dd className="text-gray-900">{formatPrice(order.totalAmount ?? itemsSubtotal, order.currency)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-gray-600">Frais de livraison</dt>
               <dd className="text-gray-900">
-                {order.deliveryFee > 0 ? formatPrice(order.deliveryFee) : <span className="text-gray-400">Gratuit</span>}
+                {order.deliveryFee > 0 ? formatPrice(order.deliveryFee, order.currency) : <span className="text-gray-400">Gratuit</span>}
               </dd>
             </div>
             <div className="flex justify-between pt-2 mt-2 border-t border-gray-100">
               <dt className="font-semibold text-gray-900">Total</dt>
               <dd className="font-bold text-lg text-gray-900">
-                {formatPrice(order.grandTotal ?? Number(order.totalAmount ?? 0) + Number(order.deliveryFee ?? 0))}
+                {formatPrice(order.grandTotal ?? Number(order.totalAmount ?? 0) + Number(order.deliveryFee ?? 0), order.currency)}
               </dd>
             </div>
           </dl>

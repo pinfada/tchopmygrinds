@@ -112,11 +112,67 @@ export const authAPI = {
   updateProfile: async (userData: Partial<User>): Promise<User> => {
     const response = await api.patch('/auth/profile', { user: userData })
     const user = response.data.data.user
-    
+
     // Mettre à jour le stockage sécurisé
     secureStorage.setUser(user)
-    
+
     return user
+  },
+
+  updatePassword: async (payload: {
+    current_password: string
+    password: string
+    password_confirmation: string
+  }): Promise<User> => {
+    const response = await api.patch('/auth/password', { user: payload })
+    return response.data.data.user
+  },
+}
+
+// API Favorites (commerces only for now)
+export interface FavoriteCommerce {
+  id: number
+  name: string
+  latitude: number | null
+  longitude: number | null
+  address: string | null
+  city: string | null
+  country: string | null
+  category: string | null
+  image_url: string | null
+  rating: number | null
+  verified: boolean
+}
+
+export interface FavoriteEntry {
+  id: number
+  commerce_id: number
+  created_at: string
+  commerce: FavoriteCommerce
+}
+
+export const favoritesAPI = {
+  list: async (): Promise<FavoriteEntry[]> => {
+    const response = await api.get('/favorites')
+    return response.data.data.favorites as FavoriteEntry[]
+  },
+
+  add: async (commerceId: number): Promise<FavoriteEntry> => {
+    const response = await api.post('/favorites', { commerce_id: commerceId })
+    return response.data.data as FavoriteEntry
+  },
+
+  remove: async (commerceId: number): Promise<void> => {
+    await api.delete(`/favorites/${commerceId}`)
+  },
+}
+
+// API Currencies — public read-only registry. Cached in localStorage by
+// `lib/currencyRegistry.ts`. Only fetched once at app boot.
+export const currenciesAPI = {
+  list: async (): Promise<ApiResponse<{ currencies: Array<{ code: string; label: string; decimals: number; suffix: string }> }>> => {
+    const response = await api.get('/currencies')
+    return response.data
   },
 }
 

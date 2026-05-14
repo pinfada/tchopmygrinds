@@ -6,8 +6,10 @@ import { useAddToCart } from '../hooks/useAddToCart'
 import { ProductInterestForm } from '../components/ProductInterest'
 import { Modal } from '../components/ui'
 import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
+import WhatsappContactButton from '../components/whatsapp/WhatsappContactButton'
 import { useSeo, breadcrumbsJsonLd, absoluteUrl } from '../hooks/useSeo'
 import type { Product } from '../types'
+import { formatPrice } from '../utils/format'
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -32,7 +34,7 @@ const ProductDetailPage = () => {
     : 'Produit — TchopMyGrinds'
   const productDescription = product
     ? (product.description?.slice(0, 160) ||
-        `${product.name} (${product.unit ?? 'unité'}) ${product.price ? `à ${product.price} €` : ''} chez ${product.commerce?.name ?? 'un commerçant local'}.`)
+        `${product.name} (${product.unit ?? 'unité'}) ${product.price ? `à ${formatPrice(product.price, product.currency)}` : ''} chez ${product.commerce?.name ?? 'un commerçant local'}.`)
     : 'Découvrez ce produit local sur TchopMyGrinds.'
 
   useSeo({
@@ -245,7 +247,7 @@ const ProductDetailPage = () => {
           <div className="mb-6">
             <div className="flex items-baseline space-x-2">
               <span className="text-4xl font-bold text-gray-900">
-                {product.price.toFixed(2)}€
+                {formatPrice(product.price, product.currency)}
               </span>
               <span className="text-lg text-gray-500">
                 par {product.unit}
@@ -308,6 +310,15 @@ const ProductDetailPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </Link>
+              <div className="mt-3 flex items-center gap-2">
+                <WhatsappContactButton
+                  merchantWhatsappPhone={(product.commerce as any).merchantWhatsappPhone}
+                  merchantName={(product.commerce as any).merchantName}
+                  commerceName={product.commerce.name}
+                  productName={product.name}
+                  size="sm"
+                />
+              </div>
             </div>
           )}
 
@@ -351,7 +362,7 @@ const ProductDetailPage = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Prix total</span>
                   <span className="text-xl font-bold text-brand-600">
-                    {(product.price * quantity).toFixed(2)}€
+                    {formatPrice(product.price * quantity, product.currency)}
                   </span>
                 </div>
               </div>

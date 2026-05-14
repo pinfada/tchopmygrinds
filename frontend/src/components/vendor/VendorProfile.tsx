@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { useAppDispatch } from '../../hooks/redux'
+import { updateCommerce } from '../../store/slices/commerceSlice'
 import { Commerce, User } from '../../types'
+import { getAllCurrencies, getCurrencyDef } from '../../lib/currencyRegistry'
 
 interface VendorProfileProps {
   commerce: Commerce | null
@@ -15,22 +17,31 @@ interface CommerceFormData {
   phone: string
   email: string
   category: string
+  // ISO-4217 — drives price formatting across the marketplace. Kept on the
+  // form so the merchant can switch markets (e.g. EUR diaspora → XAF local)
+  // without an admin round-trip.
+  currency: string
 }
+
+const buildInitialState = (commerce: Commerce | null): CommerceFormData => ({
+  name: commerce?.name || '',
+  description: commerce?.description || '',
+  adress1: commerce?.adress1 || '',
+  ville: commerce?.ville || '',
+  phone: commerce?.phone || '',
+  email: commerce?.email || '',
+  category: commerce?.category || '',
+  currency: commerce?.currency || 'EUR',
+})
 
 const VendorProfile: React.FC<VendorProfileProps> = ({ commerce, user }) => {
   const dispatch = useAppDispatch()
   const [isEditing, setIsEditing] = useState(false)
   const [activeTab, setActiveTab] = useState<'info' | 'settings' | 'hours'>('info')
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const [formData, setFormData] = useState<CommerceFormData>({
-    name: commerce?.name || '',
-    description: commerce?.description || '',
-    adress1: commerce?.adress1 || '',
-    ville: commerce?.ville || '',
-    phone: commerce?.phone || '',
-    email: commerce?.email || '',
-    category: commerce?.category || ''
-  })
+  const [formData, setFormData] = useState<CommerceFormData>(buildInitialState(commerce))
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -42,25 +53,50 @@ const VendorProfile: React.FC<VendorProfileProps> = ({ commerce, user }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!commerce?.id) {
+      setSaveError("Aucun commerce associé à ce compte.")
+      return
+    }
+    setSaving(true)
+    setSaveError(null)
     try {
-      console.log('Updating commerce:', formData)
-      // TODO: Dispatch update action
+      // Send the public-API shape (address rather than adress1). Backend
+      // remaps to DB columns. Only send changed fields to keep the PATCH
+      // minimal and avoid re-geocoding when nothing about the address moved.
+      const payload: Partial<Commerce> & { address?: string; ville?: string } = {}
+      if (formData.name !== (commerce.name || '')) payload.name = formData.name
+      if (formData.description !== (commerce.description || '')) payload.description = formData.description
+      if (formData.adress1 !== (commerce.adress1 || '')) payload.address = formData.adress1
+      if (formData.ville !== (commerce.ville || '')) payload.ville = formData.ville
+      if (formData.phone !== (commerce.phone || '')) payload.phone = formData.phone
+      if (formData.email !== (commerce.email || '')) payload.email = formData.email
+      if (formData.category !== (commerce.category || '')) payload.category = formData.category
+      if (formData.currency !== (commerce.currency || 'EUR')) payload.currency = formData.currency
+
+      if (Object.keys(payload).length === 0) {
+        setIsEditing(false)
+        return
+      }
+
+      await dispatch(updateCommerce({ id: commerce.id, data: payload })).unwrap()
       setIsEditing(false)
-    } catch (error) {
-      console.error('Error updating commerce:', error)
+      if ((window as any).addNotification) {
+        ;(window as any).addNotification({
+          type: 'success',
+          title: 'Commerce mis à jour',
+          message: 'Vos informations ont été enregistrées.',
+        })
+      }
+    } catch (error: any) {
+      setSaveError(error?.message || error?.response?.data?.message || "Échec de la sauvegarde.")
+    } finally {
+      setSaving(false)
     }
   }
 
   const resetForm = () => {
-    setFormData({
-      name: commerce?.name || '',
-      description: commerce?.description || '',
-      adress1: commerce?.adress1 || '',
-      ville: commerce?.ville || '',
-      phone: commerce?.phone || '',
-      email: commerce?.email || '',
-      category: commerce?.category || ''
-    })
+    setFormData(buildInitialState(commerce))
+    setSaveError(null)
     setIsEditing(false)
   }
 
@@ -144,19 +180,27 @@ const VendorProfile: React.FC<VendorProfileProps> = ({ commerce, user }) => {
                   <div className="flex space-x-2">
                     <button
                       onClick={resetForm}
-                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                      disabled={saving}
+                      className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                     >
                       Annuler
                     </button>
                     <button
                       onClick={handleSubmit}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                      disabled={saving}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60"
                     >
-                      Sauvegarder
+                      {saving ? 'Sauvegarde…' : 'Sauvegarder'}
                     </button>
                   </div>
                 )}
               </div>
+
+              {saveError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700" role="alert">
+                  {saveError}
+                </div>
+              )}
 
               {isEditing ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -273,6 +317,32 @@ const VendorProfile: React.FC<VendorProfileProps> = ({ commerce, user }) => {
                       />
                     </div>
                   </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-2">
+                        Devise affichée *
+                      </label>
+                      <select
+                        id="currency"
+                        name="currency"
+                        value={formData.currency}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                      >
+                        {getAllCurrencies().map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.label}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Devise d'affichage de vos prix. Les montants ne sont pas convertis — saisissez vos prix
+                        dans cette devise.
+                      </p>
+                    </div>
+                  </div>
                 </form>
               ) : (
                 <div className="space-y-6">
@@ -324,6 +394,13 @@ const VendorProfile: React.FC<VendorProfileProps> = ({ commerce, user }) => {
                           <p className="text-gray-900">{commerce.email}</p>
                         </div>
                       )}
+
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-600 mb-1">Devise</h3>
+                        <p className="text-gray-900">
+                          {getCurrencyDef(commerce?.currency).label}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

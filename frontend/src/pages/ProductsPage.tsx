@@ -6,11 +6,12 @@ import { fetchProducts, searchProducts, setSortBy } from '../store/slices/produc
 import { getCurrentLocation } from '../store/slices/locationSlice'
 import { startConversation } from '../store/slices/messageSlice'
 import { useSeo, breadcrumbsJsonLd } from '../hooks/useSeo'
+import { formatPrice } from '../utils/format'
 import type { Product } from '../types'
 
 const ProductsPage = () => {
   useSeo({
-    title: 'Bananes plantain et produits frais — TchopMyGrinds',
+    title: 'Produits frais — TchopMyGrinds',
     description:
       "Parcourez le catalogue des produits disponibles chez les commerçants locaux : bananes plantain, fruits, légumes, tubercules et épices. Achetez en circuit court.",
     canonicalPath: '/products',
@@ -44,7 +45,7 @@ const ProductsPage = () => {
 
     const draft =
       `Bonjour, je suis interesse(e) par "${product.name}"` +
-      (product.price ? ` a ${product.price.toFixed(2)} €/${product.unit || 'unite'}` : '') +
+      (product.price ? ` a ${formatPrice(product.price, product.currency)}/${product.unit || 'unite'}` : '') +
       `. Est-il disponible ?`
 
     setContactingId(product.id)
@@ -332,7 +333,7 @@ const ProductsPage = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-brand-600">
-                        {product.price ? product.price.toFixed(2) : '0.00'}€
+                        {formatPrice(product.price, product.currency)}
                       </span>
                       <span className="text-gray-500 text-sm">
                         / {product.unit || 'unité'}

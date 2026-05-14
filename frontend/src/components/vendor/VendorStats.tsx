@@ -1,5 +1,6 @@
 import React from 'react'
 import { Product, Order, Commerce } from '../../types'
+import { formatPrice } from '../../utils/format'
 
 interface VendorStatsProps {
   products: Product[]
@@ -60,8 +61,8 @@ const VendorStats: React.FC<VendorStatsProps> = ({ products, orders, commerce })
     },
     {
       title: 'Revenus aujourd\'hui',
-      value: `${todayRevenue.toFixed(2)}€`,
-      total: `${totalRevenue.toFixed(2)}€`,
+      value: formatPrice(todayRevenue, commerce?.currency),
+      total: formatPrice(totalRevenue, commerce?.currency),
       icon: '💰',
       color: 'yellow',
       trend: 'positive'
@@ -195,7 +196,7 @@ const VendorStats: React.FC<VendorStatsProps> = ({ products, orders, commerce })
               <div>
                 <h3 className="text-sm font-medium text-gray-600 mb-1">Panier moyen</h3>
                 <p className="text-lg font-semibold text-gray-900">
-                  {averageOrderValue.toFixed(2)}€
+                  {formatPrice(averageOrderValue, commerce?.currency)}
                 </p>
               </div>
             </div>
@@ -262,7 +263,7 @@ const VendorStats: React.FC<VendorStatsProps> = ({ products, orders, commerce })
                 
                 <div className="text-right">
                   <p className="text-sm font-semibold text-gray-900">
-                    {order.grandTotal.toFixed(2)}€
+                    {formatPrice(order.grandTotal, order.currency ?? commerce?.currency)}
                   </p>
                   <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
                     order.status === 'delivered' ? 'bg-green-100 text-green-800' :

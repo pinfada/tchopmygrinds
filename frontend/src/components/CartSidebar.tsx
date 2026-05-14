@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { setCartOpen, removeFromCart, updateQuantity, clearCart } from '../store/slices/cartSlice'
 import { Link } from 'react-router-dom'
+import { formatPrice } from '../utils/format'
 
 const CartSidebar = () => {
   const dispatch = useAppDispatch()
@@ -21,6 +22,11 @@ const CartSidebar = () => {
   const handleClearCart = () => {
     dispatch(clearCart())
   }
+
+  // Cart is per-merchant in practice (no cross-shop checkout), so the first
+  // item's currency is authoritative for the whole basket. Defaults to EUR
+  // for an empty cart — the totals will just be 0,00 € briefly.
+  const cartCurrency = items[0]?.product.currency
 
   return (
     <>
@@ -108,7 +114,7 @@ const CartSidebar = () => {
                         {item.product.name}
                       </h4>
                       <p className="text-sm text-gray-600">
-                        {item.unitPrice.toFixed(2)}€ / {item.product.unit}
+                        {formatPrice(item.unitPrice, item.product.currency)} / {item.product.unit}
                       </p>
                       {item.product.commerce && (
                         <p className="text-xs text-gray-500 truncate">
@@ -174,15 +180,15 @@ const CartSidebar = () => {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Sous-total</span>
-                  <span>{totalPrice.toFixed(2)}€</span>
+                  <span>{formatPrice(totalPrice, cartCurrency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Livraison</span>
-                  <span>{deliveryFee.toFixed(2)}€</span>
+                  <span>{formatPrice(deliveryFee, cartCurrency)}</span>
                 </div>
                 <div className="flex justify-between font-semibold text-lg border-t border-gray-200 pt-2">
                   <span>Total</span>
-                  <span>{(totalPrice + deliveryFee).toFixed(2)}€</span>
+                  <span>{formatPrice(totalPrice + deliveryFee, cartCurrency)}</span>
                 </div>
               </div>
 

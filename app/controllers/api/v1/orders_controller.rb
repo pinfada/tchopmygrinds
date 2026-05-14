@@ -236,12 +236,17 @@ class Api::V1::OrdersController < Api::V1::BaseController
   def order_data(order)
     total_amount = order.total_amount.to_f
     delivery_fee = order.delivery_fee.to_f
+    # Orders span a single commerce in practice (cart is per-merchant); take
+    # the currency from the first commerce we can resolve. Fallback EUR for
+    # legacy rows where the join is missing.
+    first_commerce = order.products.first&.commerce
     {
       id: order.id,
       status: order.status,
       totalAmount: total_amount,
       deliveryFee: delivery_fee,
       grandTotal: total_amount + delivery_fee,
+      currency: first_commerce&.currency || 'EUR',
       paymentMethod: order.payment_method,
       deliveryAddress: order.delivery_address,
       phone: order.phone,
@@ -273,6 +278,7 @@ class Api::V1::OrdersController < Api::V1::BaseController
           commerce: commerce && {
             id: commerce.id,
             name: commerce.name,
+            currency: commerce.currency,
             address: commerce_address(commerce)
           }
         }

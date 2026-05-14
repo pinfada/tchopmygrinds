@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { completeOrder } from '../store/slices/cartSlice'
 import { createOrder } from '../store/slices/orderSlice'
 import type { Address, OrderFormData } from '../types'
+import { formatPrice } from '../utils/format'
 
 const CheckoutPage = () => {
   const navigate = useNavigate()
@@ -11,6 +12,7 @@ const CheckoutPage = () => {
   const { items, totalPrice, deliveryFee } = useAppSelector((state) => state.cart)
   const { user, isAuthenticated } = useAppSelector((state) => state.auth)
   const { loading: orderLoading, error: orderError } = useAppSelector((state) => state.order)
+  const cartCurrency = items[0]?.product.currency
 
   const [formData, setFormData] = useState<OrderFormData>({
     deliveryAddress: {
@@ -320,11 +322,11 @@ const CheckoutPage = () => {
                         {item.product.name}
                       </h4>
                       <p className="text-sm text-gray-500">
-                        {item.quantity} × {item.unitPrice.toFixed(2)}€
+                        {item.quantity} × {formatPrice(item.unitPrice, item.product.currency)}
                       </p>
                     </div>
                     <div className="text-sm font-medium">
-                      {item.totalPrice.toFixed(2)}€
+                      {formatPrice(item.totalPrice, item.product.currency)}
                     </div>
                   </div>
                 ))}
@@ -334,17 +336,17 @@ const CheckoutPage = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Sous-total</span>
-                  <span className="font-medium">{totalPrice.toFixed(2)}€</span>
+                  <span className="font-medium">{formatPrice(totalPrice, cartCurrency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Frais de livraison</span>
-                  <span className="font-medium">{deliveryFee.toFixed(2)}€</span>
+                  <span className="font-medium">{formatPrice(deliveryFee, cartCurrency)}</span>
                 </div>
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-900">Total</span>
                     <span className="text-2xl font-bold text-brand-600">
-                      {grandTotal.toFixed(2)}€
+                      {formatPrice(grandTotal, cartCurrency)}
                     </span>
                   </div>
                 </div>

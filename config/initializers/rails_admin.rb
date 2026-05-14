@@ -46,4 +46,50 @@ RailsAdmin.config do |config|
     # history_index
     # history_show
   end
+
+  # Currency uses `code` as its primary key (ISO-4217 string, not an integer).
+  # Without this block RailsAdmin still auto-discovers it, but the field order,
+  # labels and help text below make the form usable without reading docs.
+  config.model 'Currency' do
+    navigation_label 'Configuration'
+    navigation_icon 'fas fa-coins'
+    label 'Devise'
+    label_plural 'Devises'
+
+    list do
+      field :code do
+        column_width 80
+      end
+      field :label
+      field :suffix do
+        column_width 80
+      end
+      field :decimals do
+        column_width 80
+      end
+      field :updated_at
+    end
+
+    edit do
+      field :code do
+        # Currency.code is the natural primary key — commerces.currency
+        # references it as a plain string with no FK constraint, so renaming
+        # would silently break every shop using the old code. Lock the field
+        # after creation.
+        read_only do
+          !bindings[:object].new_record?
+        end
+        help 'Code ISO-4217 sur 3 lettres majuscules (ex : EUR, XAF, ETB, NGN, USD). Non modifiable après création.'
+      end
+      field :label do
+        help 'Libellé affiché dans le menu déroulant marchand. Préfixer du symbole aide la lisibilité (ex : « € Euro (zone euro) »).'
+      end
+      field :decimals do
+        help '2 pour la plupart des devises, 0 pour celles sans unité fractionnaire (XAF, JPY).'
+      end
+      field :suffix do
+        help 'Suffixe ajouté après le montant formaté (ex : €, FCFA, Br, ₦).'
+      end
+    end
+  end
 end

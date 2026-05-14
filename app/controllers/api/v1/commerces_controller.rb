@@ -260,8 +260,14 @@ class Api::V1::CommercesController < Api::V1::BaseController
     permitted = params.require(:commerce).permit(
       :name, :description, :address, :adress2, :postal, :city, :country,
       :latitude, :longitude, :phone, :website, :opening_hours, :image_url,
-      :category, :verified
+      :category, :verified, :currency
     )
+    # Currency is validated against the Currency table by the model; reject
+    # the param early when it's set to an unsupported value so the merchant
+    # gets a clean error before the model validation surfaces it.
+    if permitted[:currency].present? && !Currency.codes.include?(permitted[:currency])
+      permitted.delete(:currency)
+    end
     COMMERCE_PUBLIC_TO_DB_ATTR_MAP.each do |public_key, db_key|
       permitted[db_key] = permitted.delete(public_key) if permitted.key?(public_key)
     end
@@ -298,11 +304,21 @@ class Api::V1::CommercesController < Api::V1::BaseController
       latitude: commerce.latitude,
       longitude: commerce.longitude,
       phone: commerce.phone,
+      # WhatsApp deep-link target. Read from the owner's profile, not the
+      # commerce row: a merchant has a single WhatsApp identity across all
+      # their shops. Public field — surfaces the same number a customer would
+      # find on the merchant's leaflet.
+      merchantWhatsappPhone: commerce.user&.whatsapp_phone,
+      # Display name of the commerce owner — used by the WhatsApp greeting
+      # so it addresses the person ("Bonjour Grace") instead of echoing the
+      # shop name twice ("Bonjour épicerie X, j'ai trouvé épicerie X…").
+      merchantName: commerce.user&.name,
       website: commerce.website,
       openingHours: commerce.opening_hours,
       imageUrl: commerce.image_url,
       email: commerce.user&.email,
       category: commerce.category,
+      currency: commerce.currency,
       type: commerce.user&.statut_type == 'itinerant' ? 'itinerant' : 'sedentary',
       # rating is a BigDecimal in the DB; JSON would emit "4.8" (string) — cast
       # so the React UI can call Number#toFixed without crashing.
@@ -344,6 +360,7 @@ class Api::V1::CommercesController < Api::V1::BaseController
       name: product.name,
       description: product.description || "",
       price: (product.unitprice || 0).to_f,
+      currency: commerce&.currency || 'EUR',
       unit: product.quantityperunit,
       stock: product.unitsinstock || 0,
       category: product.category,
@@ -354,7 +371,10 @@ class Api::V1::CommercesController < Api::V1::BaseController
       updatedAt: product.updated_at.iso8601,
       commerce: commerce && {
         id: commerce.id,
-        name: commerce.name
+        name: commerce.name,
+        currency: commerce.currency,
+        merchantName: commerce.user&.name,
+        merchantWhatsappPhone: commerce.user&.whatsapp_phone
       }
     }
   end

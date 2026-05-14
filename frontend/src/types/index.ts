@@ -10,6 +10,9 @@ export interface User {
   role: 'itinerant' | 'sedentary' | 'others'
   name?: string
   phone?: string
+  // International format without leading "+" or spaces (e.g. "237699999999").
+  // Drives the "Contact WhatsApp" deep-link the customer can use to reach the merchant.
+  whatsapp_phone?: string
   avatar?: string
   isVerified?: boolean
   // Populated for merchants by /api/v1/auth/login and /api/v1/auth/me.
@@ -35,6 +38,16 @@ export interface Commerce {
   latitude: number
   longitude: number
   phone?: string
+  // ISO-4217 currency this shop sells in (EUR, XAF). Drives price formatting
+  // across product cards, cart, checkout and vendor screens.
+  currency?: string
+  // Mirrored from the owner's User.whatsapp_phone — used by the customer-side
+  // "Contact via WhatsApp" deep-link. Optional: merchants without a WhatsApp
+  // number simply do not see that CTA.
+  merchantWhatsappPhone?: string
+  // Merchant's display name (User.name on the commerce owner). Surfaced so the
+  // WhatsApp greeting can address the person rather than echoing the shop name.
+  merchantName?: string
   email?: string
   website?: string
   openingHours?: string
@@ -70,6 +83,10 @@ export interface Product {
   name: string
   description: string
   price: number
+  // ISO-4217 currency of the price field. Set server-side from the commerce's
+  // currency; defaults to "EUR" on legacy rows. Always pass this to
+  // `formatPrice(amount, currency)` rather than assuming €.
+  currency?: string
   unit: string
   category: string
   imageUrl?: string
@@ -176,6 +193,9 @@ export interface Order {
   totalAmount: number
   deliveryFee: number
   grandTotal: number
+  // ISO-4217 code of the merchant's currency at the time the order was placed.
+  // Cart is per-merchant, so a single order is always in one currency.
+  currency?: string
   paymentMethod: PaymentMethod | null
   deliveryAddress: string | null
   phone: string | null

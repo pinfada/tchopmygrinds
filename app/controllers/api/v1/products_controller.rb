@@ -54,13 +54,18 @@ class Api::V1::ProductsController < Api::V1::BaseController
     # Géolocalisation optionnelle pour les commerces (apply_location_filter
     # handles the join via the commerce association on its own).
     products = apply_location_filter(products) if location_params_present?
-    
+
     # Autres filtres
     products = products.where(category: params[:category]) if params[:category].present?
     products = products.where('unitprice >= ?', params[:min_price]) if params[:min_price].present?
     products = products.where('unitprice <= ?', params[:max_price]) if params[:max_price].present?
     products = products.where(available: true) if params[:available] == 'true'
-    
+
+    # Re-apply ordering explicitly: apply_location_filter strips Commerce.near's
+    # alias-based ORDER BY (breaks Kaminari id-only pagination), so closest-first
+    # ordering must be opted into here. Falls back to name for non-geo searches.
+    products = location_params_present? ? products_ordered_by_distance(products) : products.order('products.name')
+
     result = paginate_collection(products)
     
     render_success({
@@ -182,13 +187,25 @@ class Api::V1::ProductsController < Api::V1::BaseController
     when 'rating'
       products.joins(:commerce).order('commerces.rating DESC')
     when 'distance'
-      # Géré par apply_location_filter si coordonnées présentes
-      location_params_present? ? products : products.order('products.name')
+      products_ordered_by_distance(products)
     when 'created_at'
       products.order('products.created_at DESC')
     else
       products.order('products.name') # Défaut
     end
+  end
+
+  # Distance ordering can't rely on Commerce.near's `distance` alias because
+  # apply_location_filter unscopes it (see base_controller — the alias breaks
+  # Kaminari's id-only DISTINCT subquery). Re-emit the raw distance expression
+  # so the ORDER BY stays valid even when Rails reduces the SELECT to ids.
+  def products_ordered_by_distance(products)
+    coords = parse_optional_coordinates
+    return products.order('products.name') unless coords
+
+    lat, lng, _ = coords
+    distance_expr = Commerce.distance_sql(lat, lng)
+    products.order(Arel.sql("#{distance_expr} ASC"))
   end
   
   def can_manage_product?(product)
@@ -212,6 +229,10 @@ class Api::V1::ProductsController < Api::V1::BaseController
       description: product.description || "",
       # unitprice is BigDecimal — cast so the UI can call Number#toFixed safely.
       price: (product.unitprice || 0).to_f,
+      # Currency follows the commerce, not the product — a single shop sells
+      # in one currency. Surfaced here too so cart/order lines that only carry
+      # a product reference can render the price without re-fetching the shop.
+      currency: commerce&.currency || 'EUR',
       unit: product.quantityperunit,
       category: product.category,
       imageUrl: product.image_url,
@@ -235,7 +256,10 @@ class Api::V1::ProductsController < Api::V1::BaseController
         name: commerce.name,
         address: commerce.adress1,
         rating: (commerce.rating || 0).to_f,
-        distance: commerce.respond_to?(:distance) ? commerce.distance&.round(2) : nil
+        distance: commerce.respond_to?(:distance) ? commerce.distance&.round(2) : nil,
+        currency: commerce.currency,
+        merchantName: commerce.user&.name,
+        merchantWhatsappPhone: commerce.user&.whatsapp_phone
       }
     end
     data

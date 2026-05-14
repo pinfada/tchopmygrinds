@@ -7,8 +7,11 @@ import { startConversation } from '../store/slices/messageSlice'
 import { useAddToCart } from '../hooks/useAddToCart'
 import LeafletMap from '../components/Map/LeafletMap'
 import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
+import FavoriteButton from '../components/favorites/FavoriteButton'
+import WhatsappContactButton from '../components/whatsapp/WhatsappContactButton'
 import { useSeo, breadcrumbsJsonLd } from '../hooks/useSeo'
 import type { Product } from '../types'
+import { formatPrice } from '../utils/format'
 
 const CommerceDetailPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -31,7 +34,7 @@ const CommerceDetailPage = () => {
     : 'Commerce — TchopMyGrinds'
   const commerceDescription = currentCommerce
     ? (currentCommerce.description?.slice(0, 160) ||
-        `${currentCommerce.name}, commerce ${currentCommerce.type === 'itinerant' ? 'ambulant' : 'local'} ${currentCommerce.address ? `à ${currentCommerce.address}` : ''}. Bananes plantain et produits frais.`)
+        `${currentCommerce.name}, commerce ${currentCommerce.type === 'itinerant' ? 'ambulant' : 'local'} ${currentCommerce.address ? `à ${currentCommerce.address}` : ''}. Produits frais.`)
     : 'Découvrez ce commerce local sur TchopMyGrinds.'
 
   useSeo({
@@ -194,10 +197,17 @@ const CommerceDetailPage = () => {
             <div className="flex-1">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <div className="flex items-center space-x-3 mb-2">
+                  <div className="flex items-center flex-wrap gap-3 mb-2">
                     <h1 className="text-3xl font-bold text-gray-900">
                       {currentCommerce.name}
                     </h1>
+                    <FavoriteButton commerceId={Number(currentCommerce.id)} size="sm" />
+                    <WhatsappContactButton
+                      merchantWhatsappPhone={currentCommerce.merchantWhatsappPhone}
+                      merchantName={currentCommerce.merchantName}
+                      commerceName={currentCommerce.name}
+                      size="sm"
+                    />
                     {currentCommerce.isVerified && (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -454,7 +464,7 @@ const CommerceDetailPage = () => {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="text-2xl font-bold text-gray-900">
-                          {Number(product.price ?? 0).toFixed(2)}€
+                          {formatPrice(product.price, product.currency ?? currentCommerce.currency)}
                         </div>
                         <div className="text-sm text-gray-500">
                           par {product.unit}

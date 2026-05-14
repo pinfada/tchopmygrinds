@@ -10,6 +10,13 @@ Rails.application.routes.draw do
       post 'auth/logout', to: 'auth#logout'
       get 'auth/me', to: 'auth#me'
       patch 'auth/profile', to: 'auth#update_profile'
+      patch 'auth/password', to: 'auth#update_password'
+
+      # Registre des devises supportées (lecture publique, mise en cache côté front)
+      resources :currencies, only: [:index]
+
+      # Favoris (commerces uniquement pour cette version)
+      resources :favorites, only: [:index, :create, :destroy]
       
       # Commerces
       resources :commerces do

@@ -127,11 +127,11 @@ const OrdersPage = () => {
                 <div className="flex items-center gap-4 shrink-0">
                   <div className="text-right">
                     <div className="text-lg font-bold text-gray-900">
-                      {formatPrice(order.grandTotal ?? order.totalAmount)}
+                      {formatPrice(order.grandTotal ?? order.totalAmount, order.currency)}
                     </div>
                     {order.deliveryFee > 0 && (
                       <div className="text-xs text-gray-400">
-                        dont {formatPrice(order.deliveryFee)} de livraison
+                        dont {formatPrice(order.deliveryFee, order.currency)} de livraison
                       </div>
                     )}
                   </div>

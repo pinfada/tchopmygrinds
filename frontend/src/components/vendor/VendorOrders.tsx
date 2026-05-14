@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAppDispatch } from '../../hooks/redux'
 import { Order, Commerce } from '../../types'
+import { formatPrice } from '../../utils/format'
 
 interface VendorOrdersProps {
   orders: Order[]
@@ -151,12 +152,12 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ orders, commerce }) => {
               <div className="flex-1">
                 <h5 className="font-medium text-gray-900">{item.product.name}</h5>
                 <p className="text-sm text-gray-600">
-                  {item.unitPrice.toFixed(2)}€ / {item.product.unit}
+                  {formatPrice(item.unitPrice, order.currency ?? commerce?.currency)} / {item.product.unit}
                 </p>
               </div>
               <div className="text-right">
                 <p className="font-medium">x{item.quantity}</p>
-                <p className="text-sm text-gray-600">{item.totalPrice.toFixed(2)}€</p>
+                <p className="text-sm text-gray-600">{formatPrice(item.totalPrice, order.currency ?? commerce?.currency)}</p>
               </div>
             </div>
           ))}
@@ -167,15 +168,15 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ orders, commerce }) => {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span>Sous-total:</span>
-            <span>{order.totalAmount.toFixed(2)}€</span>
+            <span>{formatPrice(order.totalAmount, order.currency ?? commerce?.currency)}</span>
           </div>
           <div className="flex justify-between">
             <span>Frais de livraison:</span>
-            <span>{order.deliveryFee.toFixed(2)}€</span>
+            <span>{formatPrice(order.deliveryFee, order.currency ?? commerce?.currency)}</span>
           </div>
           <div className="flex justify-between font-semibold text-lg border-t pt-2">
             <span>Total:</span>
-            <span>{order.grandTotal.toFixed(2)}€</span>
+            <span>{formatPrice(order.grandTotal, order.currency ?? commerce?.currency)}</span>
           </div>
         </div>
       </div>
@@ -285,7 +286,7 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ orders, commerce }) => {
                     <div className="flex items-center space-x-6 text-sm text-gray-600 mb-3">
                       <span>📞 {order.phone}</span>
                       <span>📅 {new Date(order.createdAt).toLocaleDateString('fr-FR')}</span>
-                      <span className="font-semibold text-gray-900">{order.grandTotal.toFixed(2)}€</span>
+                      <span className="font-semibold text-gray-900">{formatPrice(order.grandTotal, order.currency ?? commerce?.currency)}</span>
                       <span>{order.items.length} article{order.items.length !== 1 ? 's' : ''}</span>
                     </div>
 
