@@ -64,7 +64,7 @@ class SpaMetaInjector
   def commerce_list
     Result.new(
       title: 'Commerces locaux près de chez vous — TchopMyGrinds',
-      description: 'Découvrez les commerces locaux (fixes et ambulants) qui vendent des bananes plantain et produits frais à moins de 50 km. Filtrez par catégorie, note et type.',
+      description: 'Découvrez les commerces locaux (fixes et ambulants) qui vendent des produits frais à moins de 50 km. Filtrez par catégorie, note et type.',
       canonical: absolute('/commerces'),
       og_type: 'website',
       image: absolute(DEFAULT_IMAGE_PATH),
@@ -75,7 +75,7 @@ class SpaMetaInjector
 
   def product_list
     Result.new(
-      title: 'Bananes plantain et produits frais — TchopMyGrinds',
+      title: 'Produits frais — TchopMyGrinds',
       description: 'Parcourez le catalogue des produits disponibles chez les commerçants locaux : bananes plantain, fruits, légumes, tubercules et épices. Achetez en circuit court.',
       canonical: absolute('/products'),
       og_type: 'website',
@@ -90,7 +90,7 @@ class SpaMetaInjector
     return generic_default unless commerce
 
     name        = commerce.name.to_s
-    description = (commerce.details.presence || "#{name} — commerce local sur TchopMyGrinds. Bananes plantain et produits frais.").to_s.truncate(160, separator: ' ')
+    description = (commerce.details.presence || "#{name} — commerce local sur TchopMyGrinds. Produits frais.").to_s.truncate(160, separator: ' ')
 
     business_type = commerce.respond_to?(:type) && commerce.type.to_s == 'itinerant' ? 'Organization' : 'LocalBusiness'
 

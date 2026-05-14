@@ -11,7 +11,7 @@ const CommerceListPage = () => {
   useSeo({
     title: 'Commerces locaux près de chez vous — TchopMyGrinds',
     description:
-      "Découvrez les commerces locaux (fixes et ambulants) qui vendent des bananes plantain et produits frais à moins de 50 km. Filtrez par catégorie, note et type.",
+      "Découvrez les commerces locaux (fixes et ambulants) qui vendent des produits frais à moins de 50 km. Filtrez par catégorie, note et type.",
     canonicalPath: '/commerces',
     ogType: 'website',
     jsonLd: breadcrumbsJsonLd([
