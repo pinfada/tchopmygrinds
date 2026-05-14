@@ -9,6 +9,15 @@ export LC_ALL=C.UTF-8
 # ex. "\xC2" présent dans rails_admin/popper.js et bootstrap.js).
 export RUBYOPT="-EUTF-8"
 
+# `puppeteer` est une devDependency utilisée par les tests E2E locaux. On
+# l'installe quand même ici (npm ci --include=dev est nécessaire pour Vite),
+# mais son postinstall qui télécharge Chromium plante sur Render (cache
+# Puppeteer corrompu, ~250 Mo sans intérêt en prod). Skip explicite —
+# couvre les variables qu'utilisent puppeteer >=22 (DOWNLOAD) et <22
+# (CHROMIUM_DOWNLOAD).
+export PUPPETEER_SKIP_DOWNLOAD=true
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 bundle install
 # Installer les dépendances frontend, puis générer les assets React/Vite utilisés par pages/react_app.html.erb
 npm ci --include=dev
