@@ -7,6 +7,7 @@ import { startConversation } from '../store/slices/messageSlice'
 import { useAddToCart } from '../hooks/useAddToCart'
 import LeafletMap from '../components/Map/LeafletMap'
 import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
+import { useSeo, breadcrumbsJsonLd } from '../hooks/useSeo'
 import type { Product } from '../types'
 
 const CommerceDetailPage = () => {
@@ -24,6 +25,62 @@ const CommerceDetailPage = () => {
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock'>('name')
   const [showRatingModal, setShowRatingModal] = useState(false)
   const [contactingMerchant, setContactingMerchant] = useState(false)
+
+  const commerceTitle = currentCommerce
+    ? `${currentCommerce.name} — Commerce local sur TchopMyGrinds`
+    : 'Commerce — TchopMyGrinds'
+  const commerceDescription = currentCommerce
+    ? (currentCommerce.description?.slice(0, 160) ||
+        `${currentCommerce.name}, commerce ${currentCommerce.type === 'itinerant' ? 'ambulant' : 'local'} ${currentCommerce.address ? `à ${currentCommerce.address}` : ''}. Bananes plantain et produits frais.`)
+    : 'Découvrez ce commerce local sur TchopMyGrinds.'
+
+  useSeo({
+    title: commerceTitle,
+    description: commerceDescription,
+    canonicalPath: `/commerces/${id ?? ''}`,
+    ogType: 'website',
+    jsonLd: currentCommerce
+      ? [
+          breadcrumbsJsonLd([
+            { name: 'Accueil', path: '/' },
+            { name: 'Commerces', path: '/commerces' },
+            { name: currentCommerce.name, path: `/commerces/${currentCommerce.id}` },
+          ]),
+          {
+            '@context': 'https://schema.org',
+            '@type': currentCommerce.type === 'itinerant' ? 'MobileApplication' : 'LocalBusiness',
+            '@id': `https://tchopmygrinds.com/commerces/${currentCommerce.id}#business`,
+            name: currentCommerce.name,
+            description: currentCommerce.description,
+            telephone: currentCommerce.phone,
+            email: currentCommerce.email,
+            url: `https://tchopmygrinds.com/commerces/${currentCommerce.id}`,
+            address: currentCommerce.address
+              ? { '@type': 'PostalAddress', streetAddress: currentCommerce.address }
+              : undefined,
+            geo:
+              currentCommerce.latitude && currentCommerce.longitude
+                ? {
+                    '@type': 'GeoCoordinates',
+                    latitude: currentCommerce.latitude,
+                    longitude: currentCommerce.longitude,
+                  }
+                : undefined,
+            aggregateRating:
+              currentRatingStats && currentRatingStats.totalRatings > 0
+                ? {
+                    '@type': 'AggregateRating',
+                    ratingValue: currentRatingStats.averageRating,
+                    reviewCount: currentRatingStats.totalRatings,
+                  }
+                : undefined,
+          },
+        ]
+      : breadcrumbsJsonLd([
+          { name: 'Accueil', path: '/' },
+          { name: 'Commerces', path: '/commerces' },
+        ]),
+  })
 
   const handleContactMerchant = async () => {
     if (!currentCommerce) return
@@ -142,7 +199,7 @@ const CommerceDetailPage = () => {
                       {currentCommerce.name}
                     </h1>
                     {currentCommerce.isVerified && (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">
                         <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
@@ -167,11 +224,11 @@ const CommerceDetailPage = () => {
                 <div className="flex items-center space-x-4">
                   {currentCommerce.rating && (
                     <div className="flex items-center space-x-2">
-                      <div className="flex text-yellow-400">
+                      <div className="flex text-accent-500">
                         {[...Array(5)].map((_, i) => (
                           <svg 
                             key={i} 
-                            className={`w-5 h-5 ${i < Math.floor(Number(currentCommerce.rating) || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                            className={`w-5 h-5 ${i < Math.floor(Number(currentCommerce.rating) || 0) ? 'text-accent-500' : 'text-gray-300'}`} 
                             fill="currentColor" 
                             viewBox="0 0 20 20"
                           >
@@ -189,7 +246,7 @@ const CommerceDetailPage = () => {
                     <button
                       onClick={handleContactMerchant}
                       disabled={contactingMerchant}
-                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-brand-600 rounded-lg hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
                     >
                       <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -201,7 +258,7 @@ const CommerceDetailPage = () => {
                   {!user && (
                     <button
                       onClick={handleContactMerchant}
-                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-brand-700 bg-brand-50 rounded-lg hover:bg-brand-100 transition-colors"
                     >
                       <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -213,7 +270,7 @@ const CommerceDetailPage = () => {
                   {user && (
                     <button
                       onClick={() => setShowRatingModal(true)}
-                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+                      className="inline-flex items-center px-3 py-1.5 text-sm font-medium text-brand-600 bg-brand-50 rounded-lg hover:bg-brand-100 transition-colors"
                     >
                       ⭐ Laisser un avis
                     </button>
@@ -262,7 +319,7 @@ const CommerceDetailPage = () => {
                     href={currentCommerce.website}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="flex items-center text-emerald-600 hover:text-emerald-800 hover:underline"
+                    className="flex items-center text-brand-600 hover:text-brand-800 hover:underline"
                   >
                     <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-9a9 9 0 010 18m0-18a9 9 0 000 18M3.6 9h16.8M3.6 15h16.8" />
@@ -272,7 +329,7 @@ const CommerceDetailPage = () => {
                 )}
 
                 {typeof currentCommerce.distance === 'number' && (
-                  <div className="flex items-center text-emerald-600 font-medium">
+                  <div className="flex items-center text-brand-600 font-medium">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
@@ -318,7 +375,7 @@ const CommerceDetailPage = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               >
                 <option value="">Toutes catégories</option>
                 {categories.map(category => (
@@ -329,7 +386,7 @@ const CommerceDetailPage = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'name' | 'price' | 'stock')}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               >
                 <option value="name">Trier par nom</option>
                 <option value="price">Trier par prix</option>
@@ -385,7 +442,7 @@ const CommerceDetailPage = () => {
                       <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">
                         {product.name}
                       </h3>
-                      <span className="ml-2 inline-block px-2 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded-full">
+                      <span className="ml-2 inline-block px-2 py-1 bg-brand-100 text-brand-800 text-xs font-medium rounded-full">
                         {product.category}
                       </span>
                     </div>

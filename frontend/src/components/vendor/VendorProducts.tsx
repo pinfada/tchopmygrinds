@@ -433,7 +433,7 @@ const VendorProducts: React.FC<VendorProductsProps> = ({ commerce, products }) =
                         </span>
                       )}
                       {product.stock <= 5 && product.stock > 0 && (
-                        <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+                        <span className="inline-block px-2 py-1 bg-accent-100 text-accent-700 text-xs font-medium rounded-full">
                           Stock faible
                         </span>
                       )}

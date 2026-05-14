@@ -9,7 +9,7 @@ interface StatusMeta {
 const STATUS_META: Record<OrderStatus, StatusMeta> = {
   Waiting: {
     label: 'En attente',
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    color: 'bg-accent-100 text-accent-700 border-accent-300',
     cancellable: true,
   },
   Accepted: {
@@ -29,7 +29,7 @@ const STATUS_META: Record<OrderStatus, StatusMeta> = {
   },
   Delivered: {
     label: 'Livrée',
-    color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    color: 'bg-brand-100 text-brand-700 border-brand-300',
     cancellable: false,
   },
   Completed: {

@@ -32,46 +32,52 @@ const Modal = ({ isOpen, onClose, title, size = 'lg', children }: ModalProps) =>
 
   const handleClose = () => {
     onClose()
-    navigate('/')  // Retour à la carte
+    navigate('/')
   }
 
   if (!isOpen) return null
 
   const sizeClasses = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
-    full: 'max-w-7xl w-full mx-4'
+    sm: 'sm:max-w-md',
+    md: 'sm:max-w-lg',
+    lg: 'sm:max-w-2xl',
+    xl: 'sm:max-w-4xl',
+    full: 'sm:max-w-7xl sm:w-full',
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] overflow-y-auto">
-      {/* Overlay */}
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+    <div className="fixed inset-0 z-[9999] overflow-y-auto" role="dialog" aria-modal="true" aria-label={title}>
+      <div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
         onClick={handleClose}
+        aria-hidden="true"
       />
-      
-      {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className={`relative bg-white rounded-xl shadow-2xl max-h-[90vh] overflow-hidden ${sizeClasses[size]} z-[10000]`}>
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+
+      <div className="relative flex min-h-full sm:items-center sm:justify-center sm:p-4">
+        <div
+          className={`relative flex flex-col bg-white shadow-2xl w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:rounded-xl overflow-hidden z-[10000] ${sizeClasses[size]}`}
+        >
+          <div
+            className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 bg-slate-50"
+            style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
+          >
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-900 truncate">{title}</h2>
             <button
+              type="button"
               onClick={handleClose}
-              className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
-              aria-label="Fermer la modal"
+              className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] -mr-2 text-slate-500 hover:text-slate-700 hover:bg-slate-200 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              aria-label="Fermer"
             >
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {/* Content */}
-          <div className="overflow-y-auto max-h-[calc(90vh-4rem)]">
+          <div
+            className="flex-1 overflow-y-auto overscroll-contain"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+          >
             {children}
           </div>
         </div>

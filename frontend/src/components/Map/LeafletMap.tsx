@@ -192,10 +192,10 @@ const LeafletMap = ({
       </MapContainer>
 
       {locationTrackingService.getTrackedCommerces().length > 0 && (
-        <div className="absolute top-4 right-4 bg-amber-100 border border-amber-300 rounded-lg px-3 py-2 text-sm">
+        <div className="absolute top-4 right-4 bg-accent-100 border border-accent-300 rounded-lg px-3 py-2 text-sm">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-            <span className="text-amber-800 font-medium">
+            <div className="w-2 h-2 bg-accent-500 rounded-full animate-pulse" />
+            <span className="text-accent-700 font-medium">
               {locationTrackingService.getTrackedCommerces().length} commerce
               {locationTrackingService.getTrackedCommerces().length > 1 ? 's' : ''} suivi
               {locationTrackingService.getTrackedCommerces().length > 1 ? 's' : ''}

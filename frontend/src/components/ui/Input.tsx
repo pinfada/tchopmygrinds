@@ -44,7 +44,7 @@ const Input: React.FC<InputProps> = ({
       <input
         id={inputId}
         className={cn(
-          'block w-full rounded-md border-slate-300 focus:border-brand-600 focus:ring-brand-600 text-slate-900 transition-all duration-200',
+          'block w-full min-h-[44px] rounded-md border-slate-300 focus:border-brand-600 focus:ring-brand-600 text-base text-slate-900 transition-all duration-200',
           error && 'border-red-300 focus:border-red-500 focus:ring-red-500',
           className
         )}
@@ -86,7 +86,7 @@ const Textarea: React.FC<TextareaProps> = ({
       <textarea
         id={inputId}
         className={cn(
-          'block w-full rounded-md border-slate-300 focus:border-brand-600 focus:ring-brand-600 text-slate-900 transition-all duration-200 min-h-[120px] resize-none',
+          'block w-full rounded-md border-slate-300 focus:border-brand-600 focus:ring-brand-600 text-base text-slate-900 transition-all duration-200 min-h-[120px] resize-none',
           error && 'border-red-300 focus:border-red-500 focus:ring-red-500',
           className
         )}
@@ -129,7 +129,7 @@ const Select: React.FC<SelectProps> = ({
       <select
         id={inputId}
         className={cn(
-          'block w-full rounded-md border-slate-300 focus:border-brand-600 focus:ring-brand-600 text-slate-900 transition-all duration-200 pr-8',
+          'block w-full min-h-[44px] rounded-md border-slate-300 focus:border-brand-600 focus:ring-brand-600 text-base text-slate-900 transition-all duration-200 pr-8',
           error && 'border-red-300 focus:border-red-500 focus:ring-red-500',
           className
         )}

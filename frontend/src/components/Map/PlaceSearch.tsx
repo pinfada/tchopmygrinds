@@ -132,14 +132,14 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-200 rounded-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+          className="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-200 rounded-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
           aria-autocomplete="list"
           aria-expanded={showDropdown}
           aria-controls="place-search-results"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
         {!loading && query && (
@@ -183,7 +183,7 @@ const PlaceSearch = ({ onSelect, placeholder = 'Rechercher un lieu, une ville…
                   handleSelect(result)
                 }}
                 className={`px-4 py-2.5 cursor-pointer flex items-start gap-3 text-sm transition-colors ${
-                  isActive ? 'bg-emerald-50' : 'hover:bg-gray-50'
+                  isActive ? 'bg-brand-50' : 'hover:bg-gray-50'
                 }`}
               >
                 <span className="text-lg leading-tight">{categoryIcon(result.category)}</span>

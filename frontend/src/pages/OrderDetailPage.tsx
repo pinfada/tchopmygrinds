@@ -147,7 +147,7 @@ const OrderDetailPage = () => {
                       {item.product ? (
                         <Link
                           to={`/products/${item.product.id}`}
-                          className="font-medium text-gray-900 hover:text-emerald-600 line-clamp-1"
+                          className="font-medium text-gray-900 hover:text-brand-600 line-clamp-1"
                         >
                           {item.product.name}
                         </Link>
@@ -157,7 +157,7 @@ const OrderDetailPage = () => {
                       {item.product?.commerce && (
                         <Link
                           to={`/commerces/${item.product.commerce.id}`}
-                          className="block text-xs text-gray-500 hover:text-emerald-600 truncate"
+                          className="block text-xs text-gray-500 hover:text-brand-600 truncate"
                         >
                           {item.product.commerce.name}
                         </Link>

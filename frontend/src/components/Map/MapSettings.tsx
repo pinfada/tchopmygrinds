@@ -76,7 +76,7 @@ const MapSettings = ({ isOpen, onClose }: MapSettingsProps) => {
                   type="checkbox"
                   checked={settings.autoRefreshEnabled}
                   onChange={(e) => handleSettingChange('autoRefreshEnabled', e.target.checked)}
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
                 />
               </div>
               
@@ -115,7 +115,7 @@ const MapSettings = ({ isOpen, onClose }: MapSettingsProps) => {
                   type="checkbox"
                   checked={settings.ambulantAutoTrack}
                   onChange={(e) => handleSettingChange('ambulantAutoTrack', e.target.checked)}
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
                 />
               </div>
               
@@ -172,7 +172,7 @@ const MapSettings = ({ isOpen, onClose }: MapSettingsProps) => {
                   type="checkbox"
                   checked={settings.showUserLocation}
                   onChange={(e) => handleSettingChange('showUserLocation', e.target.checked)}
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
                 />
               </div>
             </div>
@@ -189,7 +189,7 @@ const MapSettings = ({ isOpen, onClose }: MapSettingsProps) => {
                   type="checkbox"
                   checked={settings.showTrackingIndicator}
                   onChange={(e) => handleSettingChange('showTrackingIndicator', e.target.checked)}
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
                 />
               </div>
               
@@ -201,7 +201,7 @@ const MapSettings = ({ isOpen, onClose }: MapSettingsProps) => {
                   type="checkbox"
                   checked={settings.showLastUpdate}
                   onChange={(e) => handleSettingChange('showLastUpdate', e.target.checked)}
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
                 />
               </div>
               
@@ -213,7 +213,7 @@ const MapSettings = ({ isOpen, onClose }: MapSettingsProps) => {
                   type="checkbox"
                   checked={settings.animateMovements}
                   onChange={(e) => handleSettingChange('animateMovements', e.target.checked)}
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-brand-600 focus:ring-brand-500 border-gray-300 rounded"
                 />
               </div>
             </div>
@@ -240,7 +240,7 @@ const MapSettings = ({ isOpen, onClose }: MapSettingsProps) => {
                 disabled={!hasChanges}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                   hasChanges
-                    ? 'text-white bg-emerald-500 hover:bg-emerald-600'
+                    ? 'text-white bg-brand-500 hover:bg-brand-600'
                     : 'text-gray-400 bg-gray-200 cursor-not-allowed'
                 }`}
               >

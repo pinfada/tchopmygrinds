@@ -25,7 +25,7 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ orders, commerce }) => {
 
   const getStatusColor = (status: OrderStatus) => {
     const colors = {
-      pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      pending: 'bg-accent-100 text-accent-700 border-accent-100',
       confirmed: 'bg-blue-100 text-blue-800 border-blue-200',
       preparing: 'bg-orange-100 text-orange-800 border-orange-200',
       delivered: 'bg-green-100 text-green-800 border-green-200',
@@ -137,7 +137,7 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ orders, commerce }) => {
       {order.notes && (
         <div>
           <h4 className="font-medium text-gray-900 mb-2">Notes du client</h4>
-          <div className="bg-yellow-50 p-3 rounded-lg text-sm border border-yellow-200">
+          <div className="bg-accent-100 p-3 rounded-lg text-sm border border-accent-100">
             {order.notes}
           </div>
         </div>
@@ -276,7 +276,7 @@ const VendorOrders: React.FC<VendorOrdersProps> = ({ orders, commerce }) => {
                         {getStatusIcon(order.status)} {getStatusLabel(order.status)}
                       </span>
                       {order.paymentMethod === 'cash' && (
-                        <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full">
+                        <span className="inline-block px-2 py-1 bg-accent-100 text-accent-700 text-xs font-medium rounded-full">
                           💰 Paiement cash
                         </span>
                       )}

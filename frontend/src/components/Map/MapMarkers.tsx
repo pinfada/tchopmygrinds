@@ -37,7 +37,8 @@ export const createCustomIcon = (type: MarkerType, options: {
   const config = markerConfig[type]
   const { isOnline = false, hasNotification = false } = options
   
-  const size = config.size === 'large' ? 40 : 32
+  const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches
+  const size = config.size === 'large' ? (isMobile ? 48 : 40) : (isMobile ? 44 : 32)
   const iconSize = config.size === 'large' ? 20 : 16
   
   const pulseAnimation = config.animated ? 'animate-pulse' : ''
@@ -185,7 +186,7 @@ export const createCommercePopup = (commerce: any, onProductsClick: (id: string)
         
         ${commerce.category ? `
           <div class="text-sm">
-            <span class="inline-block bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs">
+            <span class="inline-block bg-brand-100 text-brand-700 px-2 py-1 rounded-full text-xs">
               ${commerce.category}
             </span>
           </div>
@@ -202,7 +203,7 @@ export const createCommercePopup = (commerce: any, onProductsClick: (id: string)
       <div class="space-y-2">
         <button 
           onclick="window.handleProductsClick('${commerce.id}')"
-          class="w-full bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-emerald-600 transition-colors"
+          class="w-full bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
         >
           🛍️ Voir les produits
         </button>
@@ -210,7 +211,7 @@ export const createCommercePopup = (commerce: any, onProductsClick: (id: string)
         ${isAmbulant ? `
           <button 
             onclick="window.handleTrackClick('${commerce.id}')"
-            class="w-full bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-600 transition-colors"
+            class="w-full bg-accent-500 text-slate-900 px-4 py-2 rounded-lg text-sm font-medium hover:bg-accent-700 hover:text-white transition-colors"
           >
             📍 Suivre le trajet
           </button>

@@ -45,14 +45,14 @@ const StarRating: React.FC<StarRatingProps> = ({
           onClick={() => handleStarClick(i)}
           disabled={!interactive}
           className={`
-            ${sizeClasses[size]}
-            ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'}
-            ${filled ? 'text-yellow-400' : halfFilled ? 'text-yellow-300' : 'text-gray-300'}
-            ${interactive ? 'hover:text-yellow-400' : ''}
-            focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-1 rounded
+            ${interactive ? 'min-w-[44px] min-h-[44px] inline-flex items-center justify-center cursor-pointer hover:scale-110 transition-transform' : `${sizeClasses[size]} cursor-default`}
+            ${filled ? 'text-accent-500' : halfFilled ? 'text-accent-300' : 'text-gray-300'}
+            ${interactive ? 'hover:text-accent-500' : ''}
+            focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-1 rounded
           `}
         >
           <svg
+            className={sizeClasses[size]}
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"

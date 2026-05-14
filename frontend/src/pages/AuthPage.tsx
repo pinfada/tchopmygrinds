@@ -69,10 +69,10 @@ const AuthPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center py-8 px-4 sm:py-12 sm:px-6">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 bg-emerald-500 rounded-full flex items-center justify-center">
+          <div className="mx-auto h-12 w-12 bg-brand-500 rounded-full flex items-center justify-center">
             <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
@@ -86,7 +86,7 @@ const AuthPage = () => {
                 Pas encore de compte ?{' '}
                 <button
                   onClick={() => setIsLogin(false)}
-                  className="font-medium text-emerald-600 hover:text-emerald-500"
+                  className="font-medium text-brand-600 hover:text-brand-500"
                 >
                   Inscrivez-vous
                 </button>
@@ -96,7 +96,7 @@ const AuthPage = () => {
                 Déjà un compte ?{' '}
                 <button
                   onClick={() => setIsLogin(true)}
-                  className="font-medium text-emerald-600 hover:text-emerald-500"
+                  className="font-medium text-brand-600 hover:text-brand-500"
                 >
                   Connectez-vous
                 </button>
@@ -248,11 +248,11 @@ const AuthPage = () => {
             <div className="text-sm text-gray-600">
               <p>
                 En créant un compte, vous acceptez nos{' '}
-                <a href="/terms" className="text-emerald-600 hover:text-emerald-500">
+                <a href="/terms" className="text-brand-600 hover:text-brand-500">
                   conditions d'utilisation
                 </a>{' '}
                 et notre{' '}
-                <a href="/privacy" className="text-emerald-600 hover:text-emerald-500">
+                <a href="/privacy" className="text-brand-600 hover:text-brand-500">
                   politique de confidentialité
                 </a>.
               </p>

@@ -80,7 +80,7 @@ const VendorStats: React.FC<VendorStatsProps> = ({ products, orders, commerce })
     const colors = {
       green: 'bg-green-500 text-green-50',
       blue: 'bg-blue-500 text-blue-50',
-      yellow: 'bg-yellow-500 text-yellow-50',
+      yellow: 'bg-accent-500 text-accent-100',
       orange: 'bg-orange-500 text-orange-50'
     }
     return colors[color as keyof typeof colors] || colors.green
@@ -173,11 +173,11 @@ const VendorStats: React.FC<VendorStatsProps> = ({ products, orders, commerce })
                 <div>
                   <h3 className="text-sm font-medium text-gray-600 mb-1">Note moyenne</h3>
                   <div className="flex items-center space-x-2">
-                    <div className="flex text-yellow-400">
+                    <div className="flex text-accent-500">
                       {[...Array(5)].map((_, i) => (
                         <svg 
                           key={i} 
-                          className={`w-4 h-4 ${i < Math.floor(commerce.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                          className={`w-4 h-4 ${i < Math.floor(commerce.rating || 0) ? 'text-accent-500' : 'text-gray-300'}`} 
                           fill="currentColor" 
                           viewBox="0 0 20 20"
                         >
@@ -266,7 +266,7 @@ const VendorStats: React.FC<VendorStatsProps> = ({ products, orders, commerce })
                   </p>
                   <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
                     order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                    order.status === 'preparing' ? 'bg-yellow-100 text-yellow-800' :
+                    order.status === 'preparing' ? 'bg-accent-100 text-accent-700' :
                     order.status === 'pending' ? 'bg-blue-100 text-blue-800' :
                     'bg-gray-100 text-gray-800'
                   }`}>

@@ -19,7 +19,7 @@ const Alert: React.FC<AlertProps> = ({
   const variants = {
     info: 'bg-blue-50 text-blue-900 border border-blue-200',
     success: 'bg-green-50 text-green-900 border border-green-200',
-    warning: 'bg-yellow-50 text-yellow-900 border border-yellow-200',
+    warning: 'bg-accent-100 text-accent-700 border border-accent-100',
     error: 'bg-red-50 text-red-900 border border-red-200'
   };
 

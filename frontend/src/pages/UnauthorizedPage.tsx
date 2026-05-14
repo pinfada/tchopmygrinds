@@ -4,7 +4,7 @@ import { Card, Button } from '../components/ui';
 
 const UnauthorizedPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+    <div className="flex items-center justify-center px-4 py-8 sm:py-12">
       <Card className="max-w-md w-full">
         <Card.Body className="text-center py-12">
           <div className="text-red-500 text-6xl mb-6">🚫</div>

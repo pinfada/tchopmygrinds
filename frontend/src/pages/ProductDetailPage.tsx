@@ -6,6 +6,7 @@ import { useAddToCart } from '../hooks/useAddToCart'
 import { ProductInterestForm } from '../components/ProductInterest'
 import { Modal } from '../components/ui'
 import { RatingSummary, RatingsList, RatingForm } from '../components/rating'
+import { useSeo, breadcrumbsJsonLd, absoluteUrl } from '../hooks/useSeo'
 import type { Product } from '../types'
 
 const ProductDetailPage = () => {
@@ -25,6 +26,64 @@ const ProductDetailPage = () => {
       dispatch(fetchProductById(Number(id)))
     }
   }, [id, dispatch])
+
+  const productTitle = product
+    ? `${product.name} — ${product.commerce?.name ?? 'Commerce local'} | TchopMyGrinds`
+    : 'Produit — TchopMyGrinds'
+  const productDescription = product
+    ? (product.description?.slice(0, 160) ||
+        `${product.name} (${product.unit ?? 'unité'}) ${product.price ? `à ${product.price} €` : ''} chez ${product.commerce?.name ?? 'un commerçant local'}.`)
+    : 'Découvrez ce produit local sur TchopMyGrinds.'
+
+  useSeo({
+    title: productTitle,
+    description: productDescription,
+    canonicalPath: `/products/${id ?? ''}`,
+    ogType: 'product',
+    image: product?.image_url,
+    jsonLd: product
+      ? [
+          breadcrumbsJsonLd([
+            { name: 'Accueil', path: '/' },
+            { name: 'Produits', path: '/products' },
+            { name: product.name, path: `/products/${product.id}` },
+          ]),
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            '@id': `https://tchopmygrinds.com/products/${product.id}#product`,
+            name: product.name,
+            description: product.description,
+            image: product.image_url ? absoluteUrl(product.image_url) : undefined,
+            category: product.category,
+            offers: {
+              '@type': 'Offer',
+              price: product.price,
+              priceCurrency: 'EUR',
+              availability:
+                product.isAvailable && product.stock > 0
+                  ? 'https://schema.org/InStock'
+                  : 'https://schema.org/OutOfStock',
+              url: absoluteUrl(`/products/${product.id}`),
+              seller: product.commerce
+                ? { '@type': 'Organization', name: product.commerce.name }
+                : undefined,
+            },
+            aggregateRating:
+              currentRatingStats && currentRatingStats.totalRatings > 0
+                ? {
+                    '@type': 'AggregateRating',
+                    ratingValue: currentRatingStats.averageRating,
+                    reviewCount: currentRatingStats.totalRatings,
+                  }
+                : undefined,
+          },
+        ]
+      : breadcrumbsJsonLd([
+          { name: 'Accueil', path: '/' },
+          { name: 'Produits', path: '/products' },
+        ]),
+  })
 
   const addToCartWithGuard = useAddToCart()
   const handleAddToCart = () => {
@@ -153,7 +212,7 @@ const ProductDetailPage = () => {
                   key={index}
                   onClick={() => setSelectedImage(index)}
                   className={`flex-1 aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 ${
-                    selectedImage === index ? 'border-emerald-500' : 'border-transparent'
+                    selectedImage === index ? 'border-brand-500' : 'border-transparent'
                   }`}
                 >
                   <img
@@ -171,7 +230,7 @@ const ProductDetailPage = () => {
         <div>
           {/* Header */}
           <div className="mb-6">
-            <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full mb-3">
+            <span className="inline-block px-3 py-1 bg-brand-100 text-brand-800 text-sm font-medium rounded-full mb-3">
               {product.category}
             </span>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -199,7 +258,7 @@ const ProductDetailPage = () => {
             <div className="flex items-center space-x-2">
               <div className={`w-3 h-3 rounded-full ${
                 product.stock > 10 ? 'bg-green-500' : 
-                product.stock > 0 ? 'bg-yellow-500' : 'bg-red-500'
+                product.stock > 0 ? 'bg-accent-500' : 'bg-red-500'
               }`}></div>
               <span className="text-sm font-medium text-gray-900">
                 {product.stock > 0 ? (
@@ -224,8 +283,8 @@ const ProductDetailPage = () => {
                 to={`/commerces/${product.commerce.id}`}
                 className="flex items-center space-x-3 hover:bg-gray-100 rounded-lg p-2 transition-colors"
               >
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                  <span className="text-emerald-600 font-medium text-lg">
+                <div className="w-12 h-12 bg-brand-100 rounded-full flex items-center justify-center">
+                  <span className="text-brand-600 font-medium text-lg">
                     {product.commerce.name[0]}
                   </span>
                 </div>
@@ -233,14 +292,14 @@ const ProductDetailPage = () => {
                   <div className="flex items-center space-x-2">
                     <h4 className="font-medium text-gray-900">{product.commerce.name}</h4>
                     {product.commerce.isVerified && (
-                      <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-4 h-4 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                     )}
                   </div>
                   <p className="text-sm text-gray-600">{product.commerce.category}</p>
                   {product.commerce.distance && (
-                    <p className="text-sm text-emerald-600 font-medium">
+                    <p className="text-sm text-brand-600 font-medium">
                       {product.commerce.distance.toFixed(1)} km
                     </p>
                   )}
@@ -288,10 +347,10 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Prix total */}
-              <div className="mb-4 p-3 bg-emerald-50 rounded-lg">
+              <div className="mb-4 p-3 bg-brand-50 rounded-lg">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Prix total</span>
-                  <span className="text-xl font-bold text-emerald-600">
+                  <span className="text-xl font-bold text-brand-600">
                     {(product.price * quantity).toFixed(2)}€
                   </span>
                 </div>
@@ -313,19 +372,19 @@ const ProductDetailPage = () => {
           {/* Manifestation d'intérêt pour produits en rupture de stock */}
           {product.stock === 0 && (
             <div className="mb-6">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <div className="bg-accent-100 border border-accent-100 rounded-lg p-4 mb-4">
                 <div className="flex items-center mb-2">
-                  <svg className="w-5 h-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-accent-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
-                  <h4 className="text-yellow-800 font-medium">Produit en rupture de stock</h4>
+                  <h4 className="text-accent-700 font-medium">Produit en rupture de stock</h4>
                 </div>
-                <p className="text-yellow-700 text-sm mb-3">
+                <p className="text-accent-700 text-sm mb-3">
                   Ce produit n'est actuellement pas disponible. Manifestez votre intérêt et nous vous notifierons dès qu'il sera à nouveau en stock près de vous !
                 </p>
                 <button
                   onClick={handleShowInterest}
-                  className="w-full bg-yellow-600 text-white font-medium py-3 px-4 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors"
+                  className="w-full bg-accent-700 text-white font-medium py-3 px-4 rounded-lg hover:bg-accent-700 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2 transition-colors"
                 >
                   <svg className="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5-5-5h5v-9a4 4 0 118 0v9z" />

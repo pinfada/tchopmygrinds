@@ -107,7 +107,7 @@ const CartPage = () => {
                           Vendu par {item.product.commerce.name}
                         </p>
                       )}
-                      <p className="text-sm text-emerald-600 font-medium">
+                      <p className="text-sm text-brand-600 font-medium">
                         {item.product.category}
                       </p>
                     </div>
@@ -190,7 +190,7 @@ const CartPage = () => {
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-900">Total</span>
-                    <span className="text-2xl font-bold text-emerald-600">
+                    <span className="text-2xl font-bold text-brand-600">
                       {grandTotal.toFixed(2)}€
                     </span>
                   </div>
@@ -213,17 +213,17 @@ const CartPage = () => {
               </div>
 
               {/* Informations livraison */}
-              <div className="mt-6 p-4 bg-emerald-50 rounded-lg">
+              <div className="mt-6 p-4 bg-brand-50 rounded-lg">
                 <div className="flex items-start space-x-3">
-                  <svg className="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
                     <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707L16 7.586A1 1 0 0015.414 7H14z" />
                   </svg>
                   <div>
-                    <h4 className="text-sm font-medium text-emerald-900">
+                    <h4 className="text-sm font-medium text-brand-900">
                       Livraison sous 24-48h
                     </h4>
-                    <p className="text-sm text-emerald-700">
+                    <p className="text-sm text-brand-700">
                       Livraison gratuite à partir de 50€
                     </p>
                   </div>

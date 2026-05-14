@@ -43,11 +43,11 @@ function distanceInMeters(a: Coordinates, b: Coordinates): number {
 const MapLayout = ({ children }: MapLayoutProps) => {
   const dispatch = useAppDispatch()
   const location = useLocation()
-  
+
   const { commerces, loading } = useAppSelector((state) => state.commerce)
   const { currentLocation, loading: locationLoading } = useAppSelector((state) => state.location)
   const { user } = useAppSelector((state) => state.auth)
-  
+
   const [selectedCommerce, setSelectedCommerce] = useState<Commerce | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [modalTitle, setModalTitle] = useState('')
@@ -57,20 +57,19 @@ const MapLayout = ({ children }: MapLayoutProps) => {
   const [showRadiusCircle, setShowRadiusCircle] = useState(false)
   const [viewCenter, setViewCenter] = useState<Coordinates | null>(null)
   const [searchLabel, setSearchLabel] = useState<string | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const userWatchIdRef = useRef<number | null>(null)
   const lastNearbyRefreshAtRef = useRef<number>(0)
   const lastNearbyRefreshLocationRef = useRef<Coordinates | null>(null)
   const lastLivePublishAtRef = useRef<number>(0)
   const lastLivePublishLocationRef = useRef<Coordinates | null>(null)
 
-  // Géolocalisation automatique au montage
   useEffect(() => {
     if (!currentLocation && !locationLoading) {
       dispatch(getCurrentLocation())
     }
   }, [dispatch, currentLocation, locationLoading])
 
-  // Suivi temps réel de la position utilisateur
   useEffect(() => {
     if (!navigator.geolocation || userWatchIdRef.current !== null) {
       return
@@ -103,10 +102,8 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     }
   }, [dispatch])
 
-  // Centre actif (priorité : sélection de recherche > position GPS)
   const activeCenter = viewCenter ?? currentLocation
 
-  // Fonction pour recharger les commerces
   const reloadCommerces = (overrideRadius?: number, overrideCenter?: Coordinates) => {
     const center = overrideCenter ?? activeCenter
     if (center) {
@@ -146,8 +143,6 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     setLastRefresh(new Date())
   }
 
-  // Rafraîchir les commerces quand le centre actif change vraiment (GPS ou recherche).
-  // On limite la fréquence pour éviter de surcharger l'API.
   useEffect(() => {
     if (!activeCenter) {
       lastNearbyRefreshLocationRef.current = null
@@ -184,7 +179,6 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     setLastRefresh(new Date())
   }, [activeCenter?.latitude, activeCenter?.longitude, radiusKm, dispatch])
 
-  // Publier la position live des commerçants itinérants connectés
   useEffect(() => {
     if (!currentLocation || user?.role !== 'itinerant') {
       return
@@ -219,15 +213,11 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     lastLivePublishAtRef.current = now
   }, [currentLocation, user?.role])
 
-  // Écouter les événements de rafraîchissement automatique
   useEffect(() => {
     const handleAutoRefresh = () => {
-      console.log('🕐 Rafraîchissement automatique déclenché')
       reloadCommerces()
     }
-
     const handleForceRefresh = () => {
-      console.log('🔄 Rafraîchissement forcé déclenché')
       reloadCommerces()
     }
 
@@ -240,14 +230,12 @@ const MapLayout = ({ children }: MapLayoutProps) => {
     }
   }, [currentLocation])
 
-  // Gérer l'affichage des modals selon la route
   useEffect(() => {
     const path = location.pathname
 
     if (path === '/') {
       setShowModal(false)
     } else if (path === '/commerces') {
-      // /commerces utilise le side-panel, pas la modal (sync hover liste<->carte)
       setShowModal(false)
     } else if (path === '/products') {
       setModalTitle('Catalogue produits')
@@ -268,7 +256,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
       setModalTitle('Mon panier')
       setShowModal(true)
     } else if (path === '/interests') {
-      setModalTitle('Manifestations d\'intérêt')
+      setModalTitle("Manifestations d'intérêt")
       setShowModal(true)
     } else if (path === '/dashboard') {
       setModalTitle('Dashboard Vendeur')
@@ -292,11 +280,6 @@ const MapLayout = ({ children }: MapLayoutProps) => {
 
   const handleCommerceClick = (commerce: Commerce) => {
     setSelectedCommerce(commerce)
-    // Optionnel: ouvrir une modal détail commerce
-  }
-
-  const handleLocationRequest = () => {
-    dispatch(getCurrentLocation())
   }
 
   const filteredCommerces = Array.isArray(commerces) ? commerces : []
@@ -304,7 +287,7 @@ const MapLayout = ({ children }: MapLayoutProps) => {
 
   const headerSubtitle = useMemo(() => {
     if (!activeCenter) {
-      return 'Activez la géolocalisation ou recherchez un lieu pour découvrir les commerces'
+      return 'Activez la géolocalisation pour découvrir les commerces'
     }
     const count = filteredCommerces.length
     const where = searchLabel ? ` autour de ${searchLabel}` : ''
@@ -313,170 +296,169 @@ const MapLayout = ({ children }: MapLayoutProps) => {
 
   return (
     <MapHoverProvider>
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <Sidebar />
+      <div className="flex h-[100dvh] bg-slate-100 overflow-hidden">
+        <Sidebar
+          isMobileOpen={sidebarOpen}
+          onMobileClose={() => setSidebarOpen(false)}
+        />
 
-      {/* Main Content - Carte */}
-      <div className="flex-1 transition-all duration-300 relative" style={{ marginLeft: 'var(--sidebar-width, 256px)' }}>
-        {/* Header de la carte */}
-        <div className="absolute top-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200">
-          <div className="flex items-center gap-4 px-6 py-4">
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold text-gray-900 truncate">Marketplace Géolocalisé</h1>
-              <p className="text-sm text-gray-600 truncate">{headerSubtitle}</p>
-            </div>
-
-            {/* Barre de recherche d'adresses (Nominatim) */}
-            <div className="flex-1 max-w-xl">
-              <PlaceSearch onSelect={handlePlaceSelected} />
-            </div>
-
-            {/* Actions rapides */}
-            <div className="flex items-center space-x-4">
-              {!currentLocation && (
-                <GeolocationButton
-                  onLocationFound={(coords) => {
-                    dispatch(fetchNearbyCommerces({
-                      location: coords,
-                      radius: radiusKm,
-                    }))
-                  }}
-                  className="btn-primary"
-                >
-                  📍 Géolocalisation
-                </GeolocationButton>
-              )}
-
-              {currentLocation && (
-                <div className="flex items-center space-x-2 text-sm text-emerald-600">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Position active</span>
-                </div>
-              )}
-
-
-              {/* Bouton paramètres */}
+        <div
+          className="flex-1 relative min-w-0 flex flex-col"
+          style={{ marginLeft: 'var(--sidebar-width, 0px)' }}
+        >
+          <header
+            className="relative z-20 bg-white/95 backdrop-blur-sm shadow-sm border-b border-slate-200 flex-shrink-0"
+            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          >
+            <div className="px-3 sm:px-6 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-4">
               <button
-                onClick={() => setShowSettings(true)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Paramètres de la carte"
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden inline-flex items-center justify-center min-w-[44px] min-h-[44px] -ml-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                aria-label="Ouvrir le menu"
+                aria-expanded={sidebarOpen}
+                aria-controls="app-sidebar"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
-            </div>
-          </div>
-        </div>
 
-        {/* Layout carte (+ side-panel sur /commerces) */}
-        <div className="h-full pt-20 flex">
-          {isCommerceListRoute && (
-            <aside
-              className="w-[420px] max-w-[40%] h-full overflow-y-auto bg-white border-r border-gray-200 shadow-lg"
-              aria-label="Liste des commerces"
-            >
-              {children}
-            </aside>
-          )}
-
-          <div className="flex-1 relative">
-            <LeafletMap
-              userLocation={currentLocation}
-              viewCenter={viewCenter}
-              commerces={filteredCommerces}
-              onCommerceClick={handleCommerceClick}
-              height="100%"
-              zoom={activeCenter ? 12 : 6}
-              center={activeCenter
-                ? [activeCenter.latitude, activeCenter.longitude]
-                : [4.0511, 9.7679] // Douala, Cameroun
-              }
-              radiusKm={radiusKm}
-              showRadiusCircle={showRadiusCircle && !!activeCenter}
-              selectedCommerce={selectedCommerce}
-            />
-
-            <AroundMeControl
-              radiusKm={radiusKm}
-              onRadiusChange={handleRadiusChange}
-              onLocateMe={handleLocateMe}
-              hasLocation={!!currentLocation}
-              loading={locationLoading || loading}
-            />
-          </div>
-        </div>
-
-        {/* Informations géolocalisation (overlay) */}
-        {locationLoading && (
-          <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 z-10">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
-              <span className="text-sm font-medium text-gray-700">Géolocalisation en cours...</span>
-            </div>
-          </div>
-        )}
-
-        {loading && (
-          <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 z-10">
-            <div className="flex items-center space-x-3">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-emerald-500"></div>
-              <span className="text-sm font-medium text-gray-700">Chargement des commerces...</span>
-            </div>
-          </div>
-        )}
-
-        {/* Statistiques et info refresh (overlay) */}
-        {currentLocation && filteredCommerces.length > 0 && (
-          <div className="absolute bottom-6 right-6 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-4 z-10">
-            <div className="text-sm space-y-2">
-              <div>
-                <p className="font-medium text-gray-900">Statistiques</p>
-                <p className="text-gray-600">{filteredCommerces.length} commerces</p>
-                <p className="text-gray-600">Rayon: {radiusKm} km</p>
+              <div className="min-w-0 flex-1 lg:flex-none lg:max-w-md">
+                <h1 className="text-base sm:text-xl lg:text-2xl font-bold text-slate-900 truncate leading-tight">
+                  Marketplace géolocalisé
+                </h1>
+                <p className="hidden sm:block text-xs sm:text-sm text-slate-600 truncate">{headerSubtitle}</p>
               </div>
-              
-              <div className="border-t border-gray-200 pt-2">
-                <p className="text-xs text-gray-500">
-                  Dernière MAJ: {lastRefresh.toLocaleTimeString()}
-                </p>
-                {mapSettingsService.getSettings().autoRefreshEnabled && (
-                  <p className="text-xs text-emerald-600">
-                    ⏰ Auto-refresh: {mapSettingsService.getSettings().mapRefreshInterval}min
-                  </p>
+
+              <div className="hidden md:block flex-1 max-w-xl">
+                <PlaceSearch onSelect={handlePlaceSelected} />
+              </div>
+
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                {!currentLocation ? (
+                  <GeolocationButton
+                    onLocationFound={(coords) => {
+                      dispatch(fetchNearbyCommerces({
+                        location: coords,
+                        radius: radiusKm,
+                      }))
+                    }}
+                    className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] px-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                  >
+                    <svg className="w-5 h-5 sm:mr-1.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="hidden sm:inline">Géoloc</span>
+                  </GeolocationButton>
+                ) : (
+                  <div className="hidden sm:flex items-center gap-1.5 text-sm text-brand-600 px-2">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="hidden lg:inline">Position active</span>
+                  </div>
                 )}
+
                 <button
-                  onClick={() => mapSettingsService.forceRefresh()}
-                  className="mt-1 text-xs text-blue-600 hover:text-blue-800 underline"
+                  type="button"
+                  onClick={() => setShowSettings(true)}
+                  className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                  aria-label="Paramètres de la carte"
                 >
-                  🔄 Actualiser maintenant
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
                 </button>
               </div>
             </div>
+
+            <div className="md:hidden px-3 pb-2.5">
+              <PlaceSearch onSelect={handlePlaceSelected} />
+            </div>
+          </header>
+
+          <div className="flex-1 flex relative min-h-0">
+            {isCommerceListRoute && (
+              <aside
+                className="absolute inset-0 z-10 bg-white overflow-y-auto overscroll-contain lg:relative lg:inset-auto lg:z-auto lg:w-[420px] lg:max-w-[40%] lg:border-r lg:border-slate-200 lg:shadow-lg"
+                style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+                aria-label="Liste des commerces"
+              >
+                {children}
+              </aside>
+            )}
+
+            <div className="flex-1 relative">
+              <LeafletMap
+                userLocation={currentLocation}
+                viewCenter={viewCenter}
+                commerces={filteredCommerces}
+                onCommerceClick={handleCommerceClick}
+                height="100%"
+                zoom={activeCenter ? 12 : 6}
+                center={activeCenter
+                  ? [activeCenter.latitude, activeCenter.longitude]
+                  : [4.0511, 9.7679]
+                }
+                radiusKm={radiusKm}
+                showRadiusCircle={showRadiusCircle && !!activeCenter}
+                selectedCommerce={selectedCommerce}
+              />
+
+              <AroundMeControl
+                radiusKm={radiusKm}
+                onRadiusChange={handleRadiusChange}
+                onLocateMe={handleLocateMe}
+                hasLocation={!!currentLocation}
+                loading={locationLoading || loading}
+              />
+
+              {(locationLoading || loading) && (
+                <div
+                  className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 py-2 z-10"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-brand-500 border-t-transparent" />
+                    <span className="text-xs sm:text-sm font-medium text-slate-700">
+                      {locationLoading ? 'Géolocalisation…' : 'Chargement…'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {currentLocation && filteredCommerces.length > 0 && (
+                <div
+                  className="hidden sm:block absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg px-3 py-2 z-10 max-w-[200px]"
+                  role="status"
+                >
+                  <p className="text-xs sm:text-sm font-medium text-slate-900">
+                    {filteredCommerces.length} commerce{filteredCommerces.length !== 1 ? 's' : ''}
+                  </p>
+                  <p className="text-xs text-slate-500">Maj : {lastRefresh.toLocaleTimeString()}</p>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
+
+        <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title={modalTitle}
+          size="xl"
+        >
+          {children}
+        </Modal>
+
+        <MapSettings
+          isOpen={showSettings}
+          onClose={() => setShowSettings(false)}
+        />
       </div>
-
-      {/* Modal pour les pages */}
-      <Modal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        title={modalTitle}
-        size="xl"
-      >
-        {children}
-      </Modal>
-
-      {/* Modal des paramètres */}
-      <MapSettings
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-      />
-    </div>
     </MapHoverProvider>
   )
 }

@@ -4,9 +4,22 @@ import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { fetchNearbyCommerces, searchCommerces } from '../store/slices/commerceSlice'
 import { getCurrentLocation } from '../store/slices/locationSlice'
 import { useMapHover } from '../contexts/MapHoverContext'
+import { useSeo, breadcrumbsJsonLd } from '../hooks/useSeo'
 import type { Commerce } from '../types'
 
 const CommerceListPage = () => {
+  useSeo({
+    title: 'Commerces locaux près de chez vous — TchopMyGrinds',
+    description:
+      "Découvrez les commerces locaux (fixes et ambulants) qui vendent des bananes plantain et produits frais à moins de 50 km. Filtrez par catégorie, note et type.",
+    canonicalPath: '/commerces',
+    ogType: 'website',
+    jsonLd: breadcrumbsJsonLd([
+      { name: 'Accueil', path: '/' },
+      { name: 'Commerces', path: '/commerces' },
+    ]),
+  })
+
   const dispatch = useAppDispatch()
   const { commerces, loading } = useAppSelector((state) => state.commerce)
   const { currentLocation } = useAppSelector((state) => state.location)
@@ -108,8 +121,8 @@ const CommerceListPage = () => {
 
       {/* Info géolocalisation */}
       {!currentLocation && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
-          <p className="text-amber-800 text-sm">
+        <div className="bg-accent-100 border border-accent-100 rounded-lg p-4 text-center">
+          <p className="text-accent-700 text-sm">
             📍 Activez la géolocalisation depuis la carte pour voir les commerces près de vous
           </p>
         </div>
@@ -179,7 +192,7 @@ const CommerceListPage = () => {
                 id="verified"
                 checked={verifiedOnly}
                 onChange={(e) => setVerifiedOnly(e.target.checked)}
-                className="w-4 h-4 text-emerald-600 border-gray-300 rounded focus:ring-emerald-500"
+                className="w-4 h-4 text-brand-600 border-gray-300 rounded focus-visible:ring-brand-500"
               />
               <label htmlFor="verified" className="text-sm text-gray-700">
                 Commerces vérifiés uniquement
@@ -220,7 +233,7 @@ const CommerceListPage = () => {
           
           {currentLocation && (
             <div className="text-sm text-gray-600">
-              <svg className="w-4 h-4 inline mr-1 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-4 h-4 inline mr-1 text-brand-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
               </svg>
               Rayon de 50km
@@ -257,17 +270,17 @@ const CommerceListPage = () => {
                 onMouseLeave={() => clearHover()}
                 className={`card transition-all duration-200 ${
                   isHovered
-                    ? 'ring-2 ring-emerald-500 shadow-2xl -translate-y-0.5'
+                    ? 'ring-2 ring-brand-500 shadow-2xl -translate-y-0.5'
                     : 'hover:shadow-xl'
                 }`}
               >
-                <div className="h-48 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-t-xl flex items-center justify-center relative">
-                  <svg className="w-16 h-16 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="h-48 bg-gradient-to-br from-brand-50 to-brand-100 rounded-t-xl flex items-center justify-center relative">
+                  <svg className="w-16 h-16 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                   
                   {commerce.isVerified && (
-                    <div className="absolute top-3 right-3 bg-emerald-500 text-white p-1 rounded-full">
+                    <div className="absolute top-3 right-3 bg-brand-500 text-white p-1 rounded-full">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
@@ -293,7 +306,7 @@ const CommerceListPage = () => {
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-emerald-600 font-medium">
+                      <span className="text-brand-600 font-medium">
                         {commerce.category}
                       </span>
                       {commerce.distance && (
@@ -304,11 +317,11 @@ const CommerceListPage = () => {
                     </div>
                     
                     <div className="flex items-center">
-                      <div className="flex text-yellow-400">
+                      <div className="flex text-accent-500">
                         {[...Array(5)].map((_, i) => (
                           <svg 
                             key={i} 
-                            className={`w-4 h-4 ${i < Math.floor(commerce.rating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                            className={`w-4 h-4 ${i < Math.floor(commerce.rating || 0) ? 'text-accent-500' : 'text-gray-300'}`} 
                             fill="currentColor" 
                             viewBox="0 0 20 20"
                           >

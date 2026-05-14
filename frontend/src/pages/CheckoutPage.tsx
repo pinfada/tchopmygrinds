@@ -343,7 +343,7 @@ const CheckoutPage = () => {
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-bold text-gray-900">Total</span>
-                    <span className="text-2xl font-bold text-emerald-600">
+                    <span className="text-2xl font-bold text-brand-600">
                       {grandTotal.toFixed(2)}€
                     </span>
                   </div>

@@ -105,7 +105,7 @@ const OrdersPage = () => {
             <li key={order.id}>
               <Link
                 to={`/orders/${order.id}`}
-                className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200 hover:border-emerald-300 hover:shadow-md rounded-xl px-5 py-4 transition-all"
+                className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-gray-200 hover:border-brand-300 hover:shadow-md rounded-xl px-5 py-4 transition-all"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-3 mb-1">
@@ -146,7 +146,7 @@ const OrdersPage = () => {
                   )}
 
                   <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition-colors"
+                    className="w-5 h-5 text-gray-400 group-hover:text-brand-600 transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

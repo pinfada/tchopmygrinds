@@ -17,7 +17,7 @@ const Logo = ({ size = 'md', className = '' }: LogoProps) => {
   }
 
   return (
-    <div className={`flex items-center justify-center bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg ${sizeClasses[size]} ${className}`}>
+    <div className={`flex items-center justify-center bg-gradient-to-br from-brand-500 to-brand-600 rounded-xl shadow-lg ${sizeClasses[size]} ${className}`}>
       {/* Logo vectoriel simple */}
       <svg 
         className={`${textSizes[size]} text-white font-bold`} 

@@ -20,7 +20,7 @@ const AroundMeControl = ({
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] flex flex-col items-center gap-2 pointer-events-none">
+    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 z-[1000] flex flex-col items-center gap-2 pointer-events-none" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 24px)' }}>
       {expanded && (
         <div
           className="pointer-events-auto bg-white/95 backdrop-blur-sm border border-gray-200 rounded-full shadow-lg px-2 py-1 flex items-center gap-1"
@@ -37,7 +37,7 @@ const AroundMeControl = ({
                 onClick={() => onRadiusChange(km)}
                 className={`px-3 py-1.5 text-sm font-medium rounded-full transition-colors ${
                   isActive
-                    ? 'bg-emerald-600 text-white shadow-sm'
+                    ? 'bg-brand-600 text-white shadow-sm'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -52,7 +52,7 @@ const AroundMeControl = ({
         <button
           onClick={onLocateMe}
           disabled={loading}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-semibold px-5 py-3 rounded-full shadow-xl transition-colors"
+          className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-60 text-white font-semibold px-5 py-3 rounded-full shadow-xl transition-colors"
           aria-label="Recentrer sur ma position et chercher autour de moi"
         >
           {loading ? (

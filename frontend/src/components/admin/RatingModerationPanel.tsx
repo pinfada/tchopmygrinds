@@ -137,7 +137,7 @@ const RatingModerationPanel = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { label: 'En attente', color: 'bg-yellow-100 text-yellow-800' },
+      pending: { label: 'En attente', color: 'bg-accent-100 text-accent-700' },
       approved: { label: 'Approuvé', color: 'bg-green-100 text-green-800' },
       rejected: { label: 'Rejeté', color: 'bg-red-100 text-red-800' }
     }
@@ -175,7 +175,7 @@ const RatingModerationPanel = () => {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm font-medium text-gray-500">En attente</div>
-            <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
+            <div className="text-2xl font-bold text-accent-700">{stats.pending}</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm font-medium text-gray-500">Approuvés</div>
@@ -202,7 +202,7 @@ const RatingModerationPanel = () => {
                 setFilter(e.target.value)
                 setCurrentPage(1)
               }}
-              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             >
               <option value="">Tous les statuts</option>
               <option value="pending">En attente</option>
@@ -216,7 +216,7 @@ const RatingModerationPanel = () => {
         <div className="divide-y divide-gray-200">
           {loading ? (
             <div className="p-8 text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500 mx-auto"></div>
             </div>
           ) : ratings.length === 0 ? (
             <div className="p-8 text-center">
@@ -228,11 +228,11 @@ const RatingModerationPanel = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <div className="flex text-yellow-400">
+                      <div className="flex text-accent-500">
                         {[...Array(5)].map((_, i) => (
                           <svg
                             key={i}
-                            className={`w-4 h-4 ${i < rating.score ? 'text-yellow-400' : 'text-gray-300'}`}
+                            className={`w-4 h-4 ${i < rating.score ? 'text-accent-500' : 'text-gray-300'}`}
                             fill="currentColor"
                             viewBox="0 0 20 20"
                           >

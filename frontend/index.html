@@ -2,17 +2,83 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#187a4b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="application-name" content="TchopMyGrinds" />
+    <meta name="format-detection" content="telephone=no" />
+
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TchopMyGrinds - Marketplace Bananes Plantain</title>
-    
-    <!-- Géolocalisation et cartes -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
+    <link rel="apple-touch-icon" href="/favicon.ico" />
+    <link rel="canonical" href="https://tchopmygrinds.com/" />
+
+    <title>TchopMyGrinds — Marketplace local de bananes plantain</title>
+    <meta name="description" content="Achetez vos bananes plantain et produits frais auprès de commerçants locaux géolocalisés à moins de 50 km. Livraison ou retrait, paiement sécurisé." />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TchopMyGrinds" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content="TchopMyGrinds — Marketplace local de bananes plantain" />
+    <meta property="og:description" content="Achetez vos bananes plantain et produits frais auprès de commerçants locaux géolocalisés à moins de 50 km." />
+    <meta property="og:url" content="https://tchopmygrinds.com/" />
+    <meta property="og:image" content="https://tchopmygrinds.com/og-cover.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="TchopMyGrinds, marketplace local de bananes plantain" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TchopMyGrinds — Marketplace local de bananes plantain" />
+    <meta name="twitter:description" content="Commerçants locaux géolocalisés à moins de 50 km. Bananes plantain et produits frais." />
+    <meta name="twitter:image" content="https://tchopmygrinds.com/og-cover.jpg" />
+
+    <!-- Performance hints -->
+    <link rel="preconnect" href="https://a.tile.openstreetmap.org" crossorigin />
+    <link rel="preconnect" href="https://b.tile.openstreetmap.org" crossorigin />
+    <link rel="preconnect" href="https://c.tile.openstreetmap.org" crossorigin />
+    <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+
+    <!-- Structured data: Organization + WebSite (sitelinks search) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://tchopmygrinds.com/#organization",
+          "name": "TchopMyGrinds",
+          "url": "https://tchopmygrinds.com/",
+          "logo": "https://tchopmygrinds.com/images/logo.png"
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://tchopmygrinds.com/#website",
+          "url": "https://tchopmygrinds.com/",
+          "name": "TchopMyGrinds",
+          "publisher": { "@id": "https://tchopmygrinds.com/#organization" },
+          "inLanguage": "fr-FR",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://tchopmygrinds.com/products?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Aller au contenu</a>
     <div id="root"></div>
+    <noscript>
+      <p style="padding:1rem;text-align:center;font-family:system-ui,sans-serif">
+        TchopMyGrinds nécessite JavaScript pour afficher la carte et les commerces.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

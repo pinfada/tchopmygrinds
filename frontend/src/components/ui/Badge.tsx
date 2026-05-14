@@ -18,7 +18,7 @@ const Badge: React.FC<BadgeProps> = ({
     brand: 'bg-brand-50 text-brand-700',
     accent: 'bg-accent-100 text-accent-700',
     success: 'bg-green-50 text-green-700',
-    warning: 'bg-yellow-50 text-yellow-800',
+    warning: 'bg-accent-100 text-accent-700',
     error: 'bg-red-50 text-red-700',
     info: 'bg-blue-50 text-blue-700'
   };

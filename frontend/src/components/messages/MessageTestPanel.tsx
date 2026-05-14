@@ -30,9 +30,9 @@ const MessageTestPanel: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-        <p className="text-yellow-800">Vous devez être connecté pour tester la messagerie.</p>
-        <a href="/auth" className="text-yellow-600 underline">Se connecter</a>
+      <div className="bg-accent-100 border border-accent-100 rounded-lg p-4 mb-4">
+        <p className="text-accent-700">Vous devez être connecté pour tester la messagerie.</p>
+        <a href="/auth" className="text-accent-700 underline">Se connecter</a>
       </div>
     );
   }
@@ -115,7 +115,7 @@ const MessageTestPanel: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <span className="font-medium">État:</span>
-          <span className={loading ? 'text-yellow-600' : 'text-green-600'}>
+          <span className={loading ? 'text-accent-700' : 'text-green-600'}>
             {loading ? 'Chargement...' : 'Prêt'}
           </span>
         </div>

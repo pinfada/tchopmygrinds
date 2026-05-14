@@ -22,27 +22,38 @@ const CartSidebar = () => {
     dispatch(clearCart())
   }
 
-  if (!isOpen) return null
-
   return (
     <>
-      {/* Overlay */}
-      <div 
-        className="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
+      <div
+        className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-opacity duration-300 ${
+          isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
         onClick={handleClose}
+        aria-hidden="true"
       />
-      
-      {/* Sidebar */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-xl z-[9999] transform transition-transform duration-300">
+
+      <aside
+        className={`fixed right-0 top-0 h-[100dvh] w-full max-w-md bg-white shadow-2xl z-[9999] transition-transform duration-300 ease-out ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Panier"
+        aria-hidden={!isOpen}
+      >
         <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200">
+            <h2 className="text-lg font-semibold text-slate-900">
               Panier ({totalItems})
             </h2>
             <button
+              type="button"
               onClick={handleClose}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] -mr-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               aria-label="Fermer le panier"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +197,7 @@ const CartSidebar = () => {
             </div>
           )}
         </div>
-      </div>
+      </aside>
     </>
   )
 }

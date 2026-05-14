@@ -39,7 +39,7 @@ const NotificationToast = ({ notification }: NotificationToastProps) => {
         )
       case 'warning':
         return (
-          <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-5 h-5 text-accent-500" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
         )
@@ -55,7 +55,7 @@ const NotificationToast = ({ notification }: NotificationToastProps) => {
   }
 
   const getStyles = () => {
-    const baseStyles = "relative flex items-start p-4 mb-4 rounded-lg shadow-lg border-l-4 bg-white"
+    const baseStyles = "relative flex items-start p-4 rounded-lg shadow-lg border-l-4 bg-white"
     
     switch (notification.type) {
       case 'success':
@@ -63,7 +63,7 @@ const NotificationToast = ({ notification }: NotificationToastProps) => {
       case 'error':
         return `${baseStyles} border-red-400`
       case 'warning':
-        return `${baseStyles} border-yellow-400`
+        return `${baseStyles} border-accent-500`
       case 'info':
         return `${baseStyles} border-blue-400`
       default:
@@ -89,8 +89,10 @@ const NotificationToast = ({ notification }: NotificationToastProps) => {
       </div>
       
       <button
+        type="button"
         onClick={handleClose}
-        className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+        aria-label="Fermer la notification"
+        className="ml-2 -my-1 -mr-1 inline-flex items-center justify-center min-w-[44px] min-h-[44px] flex-shrink-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -104,7 +106,7 @@ const NotificationToast = ({ notification }: NotificationToastProps) => {
             className={`h-full ${
               notification.type === 'success' ? 'bg-green-400' :
               notification.type === 'error' ? 'bg-red-400' :
-              notification.type === 'warning' ? 'bg-yellow-400' :
+              notification.type === 'warning' ? 'bg-accent-500' :
               'bg-blue-400'
             } transition-all ease-linear`}
             style={{
@@ -114,12 +116,6 @@ const NotificationToast = ({ notification }: NotificationToastProps) => {
         </div>
       )}
 
-      <style jsx>{`
-        @keyframes shrinkProgress {
-          from { width: 100%; }
-          to { width: 0%; }
-        }
-      `}</style>
     </div>
   )
 }
