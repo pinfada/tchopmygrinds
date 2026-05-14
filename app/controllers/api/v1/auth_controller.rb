@@ -53,7 +53,7 @@ class Api::V1::AuthController < Api::V1::BaseController
   # PATCH /api/v1/auth/profile
   def update_profile
     authenticate_user!
-    
+
     if current_user.update(profile_params)
       render_success({
         user: user_data(current_user)
@@ -62,18 +62,50 @@ class Api::V1::AuthController < Api::V1::BaseController
       render_error(current_user.errors.full_messages.join(', '))
     end
   end
-  
+
+  # PATCH /api/v1/auth/password
+  # Requires the current password to authorize the change. Devise will then
+  # validate the new password (length, presence) and re-issue a JWT on the
+  # next /auth/me call since the password change does not by itself revoke
+  # existing tokens here.
+  def update_password
+    authenticate_user!
+
+    current_password = params.dig(:user, :current_password).to_s
+    unless current_user.valid_password?(current_password)
+      return render_error('Mot de passe actuel incorrect', :unauthorized)
+    end
+
+    if current_user.update(password_params)
+      render_success({ user: user_data(current_user) }, message: 'Mot de passe mis à jour')
+    else
+      render_error(current_user.errors.full_messages.join(', '))
+    end
+  end
+
   private
   
+  ALLOWED_STATUT_TYPES = %w[itinerant sedentary others].freeze
+
   def registration_params
-    # statut_type, buyer_role, seller_role and admin are intentionally excluded:
-    # they are NOT self-assignable through the public registration endpoint.
-    # Role elevation must go through an admin or a dedicated flow.
-    params.require(:user).permit(:email, :password, :password_confirmation, :name, :phone)
+    # Public marketplace: the user picks itinerant / sedentary / others at sign-up.
+    # The frontend sends this as `role`; we map it to the model attribute `statut_type`
+    # after a whitelist check so the request cannot inject other enum values.
+    # `admin`, `buyer_role`, `seller_role` remain NOT self-assignable — those require
+    # an admin or a dedicated approval flow.
+    permitted = params.require(:user)
+                      .permit(:email, :password, :password_confirmation, :name, :phone, :role)
+    role = permitted.delete(:role)
+    permitted[:statut_type] = role if ALLOWED_STATUT_TYPES.include?(role)
+    permitted
   end
   
   def profile_params
-    params.require(:user).permit(:name, :phone, :avatar)
+    params.require(:user).permit(:name, :phone, :whatsapp_phone, :avatar)
+  end
+
+  def password_params
+    params.require(:user).permit(:password, :password_confirmation)
   end
   
   def user_data(user)
@@ -82,6 +114,7 @@ class Api::V1::AuthController < Api::V1::BaseController
       email: user.email,
       name: user.name,
       phone: user.phone,
+      whatsapp_phone: user.whatsapp_phone,
       role: user.statut_type, # itinerant, sedentary, others
       seller_role: user.seller_role,
       buyer_role: user.buyer_role,

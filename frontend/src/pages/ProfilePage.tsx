@@ -1,9 +1,123 @@
-import { useState } from 'react'
-import { useAppSelector } from '../hooks/redux'
+import { useEffect, useState } from 'react'
+import { useAppDispatch, useAppSelector } from '../hooks/redux'
+import { updateProfile } from '../store/slices/authSlice'
+import { authAPI } from '../services/api'
+import { Link } from 'react-router-dom'
+import { validateWhatsappPhone } from '../lib/whatsapp'
 
 const ProfilePage = () => {
-  const { user, isAuthenticated } = useAppSelector((state) => state.auth)
+  const dispatch = useAppDispatch()
+  const { user, isAuthenticated, loading, error } = useAppSelector((state) => state.auth)
   const [isEditing, setIsEditing] = useState(false)
+  const [formState, setFormState] = useState({ name: '', phone: '', whatsapp_phone: '' })
+  const [whatsappError, setWhatsappError] = useState<string | null>(null)
+
+  // Change-password sub-form state. Kept local — there is no Redux mutation
+  // tied to a password change (the user object itself doesn't change), so a
+  // thunk would add ceremony without benefit.
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [pwState, setPwState] = useState({ current: '', next: '', confirm: '' })
+  const [pwLoading, setPwLoading] = useState(false)
+  const [pwError, setPwError] = useState<string | null>(null)
+
+  const resetPwForm = () => {
+    setPwState({ current: '', next: '', confirm: '' })
+    setPwError(null)
+  }
+
+  const handlePwChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPwState((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handlePwSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setPwError(null)
+    if (pwState.next.length < 6) {
+      setPwError('Le nouveau mot de passe doit contenir au moins 6 caractères.')
+      return
+    }
+    if (pwState.next !== pwState.confirm) {
+      setPwError('La confirmation ne correspond pas.')
+      return
+    }
+    setPwLoading(true)
+    try {
+      await authAPI.updatePassword({
+        current_password: pwState.current,
+        password: pwState.next,
+        password_confirmation: pwState.confirm,
+      })
+      resetPwForm()
+      setIsChangingPassword(false)
+      if ((window as any).addNotification) {
+        ;(window as any).addNotification({
+          type: 'success',
+          title: 'Mot de passe',
+          message: 'Mot de passe mis à jour.',
+        })
+      }
+    } catch (err: any) {
+      setPwError(err.response?.data?.message || 'Erreur lors du changement de mot de passe.')
+    } finally {
+      setPwLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      setFormState({
+        name: user.name ?? '',
+        phone: user.phone ?? '',
+        whatsapp_phone: user.whatsapp_phone ?? '',
+      })
+    }
+  }, [user, isEditing])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormState((prev) => ({ ...prev, [name]: value }))
+    if (name === 'whatsapp_phone') setWhatsappError(null)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!user) return
+    const changes: { name?: string; phone?: string; whatsapp_phone?: string } = {}
+    const nextName = formState.name.trim()
+    const nextPhone = formState.phone.trim()
+    const rawWhatsapp = formState.whatsapp_phone.trim()
+    // Empty WhatsApp clears the field — only validate when something was typed.
+    let nextWhatsapp = ''
+    if (rawWhatsapp) {
+      const check = validateWhatsappPhone(rawWhatsapp)
+      if (!check.valid) {
+        setWhatsappError(check.message)
+        return
+      }
+      nextWhatsapp = check.normalized
+    }
+    setWhatsappError(null)
+    if (nextName !== (user.name ?? '')) changes.name = nextName
+    if (nextPhone !== (user.phone ?? '')) changes.phone = nextPhone || ''
+    if (nextWhatsapp !== (user.whatsapp_phone ?? '')) changes.whatsapp_phone = nextWhatsapp || ''
+    if (Object.keys(changes).length === 0) {
+      setIsEditing(false)
+      return
+    }
+    try {
+      await dispatch(updateProfile(changes)).unwrap()
+      setIsEditing(false)
+      if ((window as any).addNotification) {
+        ;(window as any).addNotification({
+          type: 'success',
+          title: 'Profil mis à jour',
+          message: 'Vos informations ont été enregistrées.',
+        })
+      }
+    } catch {
+      // error already in redux state
+    }
+  }
 
   if (!isAuthenticated || !user) {
     return (
@@ -87,29 +201,74 @@ const ProfilePage = () => {
               </h2>
               
               {isEditing ? (
-                <form className="space-y-6">
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  {error && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                      {error}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="form-label">Nom complet</label>
+                      <label htmlFor="profile-name" className="form-label">Nom complet</label>
                       <input
+                        id="profile-name"
+                        name="name"
                         type="text"
-                        defaultValue={user.name || ''}
+                        value={formState.name}
+                        onChange={handleChange}
                         className="form-input"
+                        autoComplete="name"
                       />
                     </div>
                     <div>
-                      <label className="form-label">Téléphone</label>
+                      <label htmlFor="profile-phone" className="form-label">Téléphone</label>
                       <input
+                        id="profile-phone"
+                        name="phone"
                         type="tel"
-                        defaultValue={user.phone || ''}
+                        value={formState.phone}
+                        onChange={handleChange}
                         className="form-input"
+                        autoComplete="tel"
+                        placeholder="+33 6 12 34 56 78"
                       />
                     </div>
                   </div>
-                  
+
+                  {(user.role === 'itinerant' || user.role === 'sedentary') && (
+                    <div>
+                      <label htmlFor="profile-whatsapp" className="form-label">
+                        Numéro WhatsApp (visible par les clients)
+                      </label>
+                      <input
+                        id="profile-whatsapp"
+                        name="whatsapp_phone"
+                        type="tel"
+                        value={formState.whatsapp_phone}
+                        onChange={handleChange}
+                        className={`form-input ${whatsappError ? 'border-red-500 focus:ring-red-500' : ''}`}
+                        placeholder="237699999999"
+                        inputMode="numeric"
+                        aria-invalid={whatsappError ? 'true' : 'false'}
+                        aria-describedby={whatsappError ? 'profile-whatsapp-error' : 'profile-whatsapp-help'}
+                      />
+                      {whatsappError ? (
+                        <p id="profile-whatsapp-error" className="text-xs text-red-600 mt-1" role="alert">
+                          {whatsappError}
+                        </p>
+                      ) : (
+                        <p id="profile-whatsapp-help" className="text-xs text-gray-500 mt-1">
+                          Format international sans le « + » (ex. 237 pour le Cameroun, 33 pour la France). Permet
+                          à un client de vous contacter directement sur WhatsApp depuis votre fiche.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   <div>
-                    <label className="form-label">Email</label>
+                    <label htmlFor="profile-email" className="form-label">Email</label>
                     <input
+                      id="profile-email"
                       type="email"
                       defaultValue={user.email}
                       className="form-input"
@@ -119,15 +278,16 @@ const ProfilePage = () => {
                       L'email ne peut pas être modifié
                     </p>
                   </div>
-                  
+
                   <div className="flex space-x-4">
-                    <button type="submit" className="btn-primary">
-                      Sauvegarder
+                    <button type="submit" className="btn-primary" disabled={loading}>
+                      {loading ? 'Sauvegarde…' : 'Sauvegarder'}
                     </button>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setIsEditing(false)}
                       className="btn-secondary"
+                      disabled={loading}
                     >
                       Annuler
                     </button>
@@ -145,6 +305,15 @@ const ProfilePage = () => {
                       <dd className="mt-1 text-sm text-gray-900">{user.phone || 'Non renseigné'}</dd>
                     </div>
                   </div>
+
+                  {(user.role === 'itinerant' || user.role === 'sedentary') && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">WhatsApp</dt>
+                      <dd className="mt-1 text-sm text-gray-900">
+                        {user.whatsapp_phone ? `+${user.whatsapp_phone}` : 'Non renseigné'}
+                      </dd>
+                    </div>
+                  )}
                   
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Email</dt>
@@ -194,14 +363,14 @@ const ProfilePage = () => {
                   </a>
                 )}
                 
-                <a href="/favorites" className="block w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                <Link to="/favorites" className="block w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                     <span className="text-gray-900">Mes favoris</span>
                   </div>
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -249,21 +418,97 @@ const ProfilePage = () => {
                 Sécurité
               </h3>
               <div className="space-y-3">
-                <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
-                    </svg>
-                    <span className="text-gray-900">Changer mot de passe</span>
-                  </div>
-                </button>
-                
-                <button className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
-                  <div className="flex items-center space-x-3">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-gray-900">Vérification deux facteurs</span>
+                {isChangingPassword ? (
+                  <form onSubmit={handlePwSubmit} className="space-y-3 bg-gray-50 rounded-lg p-4">
+                    {pwError && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-sm text-red-700">
+                        {pwError}
+                      </div>
+                    )}
+                    <div>
+                      <label htmlFor="pw-current" className="form-label">Mot de passe actuel</label>
+                      <input
+                        id="pw-current"
+                        name="current"
+                        type="password"
+                        autoComplete="current-password"
+                        required
+                        value={pwState.current}
+                        onChange={handlePwChange}
+                        className="form-input"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="pw-next" className="form-label">Nouveau mot de passe</label>
+                      <input
+                        id="pw-next"
+                        name="next"
+                        type="password"
+                        autoComplete="new-password"
+                        minLength={6}
+                        required
+                        value={pwState.next}
+                        onChange={handlePwChange}
+                        className="form-input"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="pw-confirm" className="form-label">Confirmer</label>
+                      <input
+                        id="pw-confirm"
+                        name="confirm"
+                        type="password"
+                        autoComplete="new-password"
+                        required
+                        value={pwState.confirm}
+                        onChange={handlePwChange}
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-1">
+                      <button type="submit" className="btn-primary" disabled={pwLoading}>
+                        {pwLoading ? 'Enregistrement…' : 'Mettre à jour'}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-secondary"
+                        disabled={pwLoading}
+                        onClick={() => { resetPwForm(); setIsChangingPassword(false) }}
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsChangingPassword(true)}
+                    className="w-full text-left px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                      </svg>
+                      <span className="text-gray-900">Changer mot de passe</span>
+                    </div>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  disabled
+                  aria-disabled="true"
+                  title="Fonctionnalité à venir"
+                  className="w-full text-left px-4 py-3 bg-gray-50 rounded-lg cursor-not-allowed opacity-60"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center space-x-3">
+                      <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-gray-700">Vérification deux facteurs</span>
+                    </div>
+                    <span className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-0.5 rounded-full">Bientôt</span>
                   </div>
                 </button>
               </div>

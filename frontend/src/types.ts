@@ -18,6 +18,9 @@ export interface User {
   role: 'itinerant' | 'sedentary' | 'others'
   statut_type?: string
   phone?: string
+  // International format without leading "+". Drives the "Contact WhatsApp"
+  // deep-link on the merchant's commerce / product cards.
+  whatsapp_phone?: string
   addresses?: Address[]
   // Populated for merchants by /api/v1/auth/login and /api/v1/auth/me.
   // Empty array for buyers.
@@ -36,6 +39,9 @@ export interface Commerce {
   longitude: number
   address: string
   phone?: string
+  // Mirrored from the owner's User.whatsapp_phone. Optional — merchants with
+  // no WhatsApp number simply do not see the "Contact WhatsApp" CTA.
+  merchantWhatsappPhone?: string
   email?: string
   website?: string
   rating?: number
