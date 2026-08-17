@@ -1,6 +1,13 @@
 # Seeds pour l'API React - Données de test
 puts "🌱 Création des données de test pour l'API..."
 
+# Autonome : ce fichier est joué par `rails runner`, qui ne passe pas par
+# `db:seed`. Sur une base montée par `db:schema:load` le registre de devises
+# est vide, et chaque Commerce ci-dessous échouerait sur sa validation
+# d'inclusion (`Currency XAF non supporté (attendu : )`). Idempotent.
+Currency.bootstrap!
+puts "💶 Devises disponibles : #{Currency.codes.join(', ')}"
+
 # Nettoyer les données existantes en mode développement
 if Rails.env.development?
   puts "🗑️  Nettoyage des données existantes..."

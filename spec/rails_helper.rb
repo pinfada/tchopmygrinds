@@ -33,20 +33,8 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
   # The currency seed lives inside the `create_currencies` migration, which
-  # `maintain_test_schema!` does NOT replay. Re-seed once per suite so any
-  # spec that touches Commerce#currency or hits /api/v1/currencies has the
-  # registry populated. Idempotent — find_or_create_by guards re-runs.
-  config.before(:suite) do
-    [
-      { code: 'EUR', label: '€ Euro (zone euro)', decimals: 2, suffix: '€' },
-      { code: 'XAF', label: 'FCFA Franc CFA (Cameroun, Tchad, Congo…)', decimals: 0, suffix: 'FCFA' },
-      { code: 'ETB', label: 'Br Birr éthiopien (Éthiopie)', decimals: 2, suffix: 'Br' },
-    ].each do |attrs|
-      Currency.find_or_create_by!(code: attrs[:code]) do |c|
-        c.label = attrs[:label]
-        c.decimals = attrs[:decimals]
-        c.suffix = attrs[:suffix]
-      end
-    end
-  end
+  # `maintain_test_schema!` does NOT replay — same gap as any database built
+  # by `db:schema:load`. `Currency.bootstrap!` is the single, idempotent
+  # source of truth used here, by db/seeds.rb and by db/seeds_api.rb.
+  config.before(:suite) { Currency.bootstrap! }
 end

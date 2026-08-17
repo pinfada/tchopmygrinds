@@ -4,8 +4,6 @@
 
 Une plateforme e-commerce géolocalisée connectant les marchands locaux avec leurs clients dans un rayon de 50km.
 
-**Essayer sans rien installer → [pinfada.github.io/tchopmygrinds](https://pinfada.github.io/tchopmygrinds/)**
-
 ## 🎯 Vue d'ensemble
 
 TchopMyGrinds est une application web qui permet aux utilisateurs de découvrir et d'acheter des produits auprès de commerçants locaux basés sur leur géolocalisation. La plateforme propose une expérience de commerce de proximité avec cartographie interactive et gestion complète des commandes.

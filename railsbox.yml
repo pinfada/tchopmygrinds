@@ -15,8 +15,10 @@ database: postgresql
 
 seed:
   # Joué À LA CONSTRUCTION, avant la capture d'instantané : le visiteur trouve
-  # une base déjà peuplée. seeds_api.rb fixe les coordonnées en dur, donc aucun
-  # appel de géocodage n'est nécessaire.
+  # une base déjà peuplée. Les coordonnées sont fixées en dur dans le script,
+  # mais Commerce#geocode se déclenche quand même sur `adress1` : Geocoder
+  # échoue sans clé d'API et le journal de build le signale, sans conséquence
+  # (l'erreur est absorbée, les lat/lng posées par le seed sont conservées).
   command: "bin/rails runner db/seeds_api.rb"
   # Le visiteur arrive connecté en tant qu'acheteur (cf. db/seeds_api.rb).
   auto_login: "client1@test.com"

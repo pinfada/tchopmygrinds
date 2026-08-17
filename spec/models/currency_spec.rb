@@ -32,6 +32,50 @@ RSpec.describe Currency, type: :model do
     end
   end
 
+  describe '.bootstrap!' do
+    # Régression : `db:schema:load` (chemin de `db:prepare` / `db:setup`, et de
+    # la construction railsbox) crée la table `currencies` VIDE, l'insertion
+    # vivant dans la migration. Le registre vide faisait échouer toute
+    # création de commerce avec « Currency XAF non supporté (attendu : ) ».
+    let(:user) { create(:user, :sedentary) }
+
+    def build_shop(currency)
+      user.commerces.build(name: "shop-#{SecureRandom.hex(2)}", currency: currency, adress1: '1 rue Test')
+    end
+
+    it 'repeuple un registre vide et débloque la validation de Commerce' do
+      Currency.delete_all
+      Rails.cache.delete(Currency::CACHE_KEY)
+      expect(Currency.codes).to be_empty
+      expect(build_shop('XAF')).to be_invalid
+
+      Currency.bootstrap!
+
+      expect(Currency.codes).to include('EUR', 'XAF', 'ETB')
+      expect(build_shop('XAF')).to be_valid
+    end
+
+    it 'est idempotent et ne réécrit pas les lignes existantes' do
+      Currency.find_by(code: 'EUR').update!(label: 'Libellé maison')
+
+      expect { Currency.bootstrap! }.not_to change(Currency, :count)
+      expect(Currency.find_by(code: 'EUR').label).to eq('Libellé maison')
+    end
+
+    it 'invalide le cache même sans création', :memory_cache do
+      original = Rails.cache
+      Rails.cache = ActiveSupport::Cache::MemoryStore.new
+
+      Rails.cache.write(Currency::CACHE_KEY, [])
+      Currency.bootstrap!
+
+      expect(Rails.cache.read(Currency::CACHE_KEY)).to be_nil
+      expect(Currency.codes).to include('EUR')
+    ensure
+      Rails.cache = original
+    end
+  end
+
   describe '.codes' do
     it 'returns the seeded codes' do
       # spec/rails_helper.rb seeds EUR/XAF/ETB before the suite — schema.rb

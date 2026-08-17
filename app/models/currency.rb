@@ -4,6 +4,18 @@ class Currency < ApplicationRecord
 
   CACHE_KEY = 'currencies/codes'.freeze
 
+  # Registre de référence, tenu en Ruby et pas seulement dans la migration qui
+  # a créé la table. `db/schema.rb` décrit une structure, jamais des lignes :
+  # toute base montée par `db:schema:load` — le chemin emprunté par
+  # `db:prepare` et `db:setup` sur une base vide — obtient donc la table
+  # `currencies` SANS aucune devise. `Currency.codes` renvoie alors `[]` et la
+  # validation d'inclusion de Commerce rejette tout, y compris "EUR".
+  CANONICAL = [
+    { code: 'EUR', label: '€ Euro (zone euro)',                        decimals: 2, suffix: '€' },
+    { code: 'XAF', label: 'FCFA Franc CFA (Cameroun, Tchad, Congo…)',  decimals: 0, suffix: 'FCFA' },
+    { code: 'ETB', label: 'Br Birr éthiopien (Éthiopie)',              decimals: 2, suffix: 'Br' }
+  ].freeze
+
   # All-caps 3-letter ISO codes. Locked early so callers don't have to upcase
   # everywhere — the UI may send "eur" if user toggled it.
   before_validation :normalize_code
@@ -28,6 +40,25 @@ class Currency < ApplicationRecord
     Rails.cache.fetch(CACHE_KEY, expires_in: 1.hour) do
       pluck(:code).sort
     end
+  end
+
+  # Garantit que le registre contient au moins les devises de CANONICAL.
+  # Idempotent : appelable sur une base déjà peuplée comme sur une base vierge.
+  # Les lignes existantes ne sont PAS écrasées — un opérateur qui a retouché un
+  # libellé le conserve. Le cache est invalidé explicitement : sans création,
+  # aucun `after_commit` ne se déclenche et un `[]` mémorisé plus tôt dans le
+  # même processus survivrait à l'amorçage.
+  def self.bootstrap!
+    CANONICAL.each do |attributes|
+      find_or_create_by!(code: attributes[:code]) do |currency|
+        currency.label    = attributes[:label]
+        currency.decimals = attributes[:decimals]
+        currency.suffix   = attributes[:suffix]
+      end
+    end
+
+    Rails.cache.delete(CACHE_KEY)
+    self
   end
 
   private
