@@ -50,7 +50,11 @@ jobs:
     - name: 💎 Setup Ruby pour Rails
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.0'
+        # Lue depuis .ruby-version : une version épinglée ici diverge
+        # silencieusement du Gemfile, et `bundle install` s'arrête sur
+        # « Your Ruby version is X, but your Gemfile specified Y » — avant
+        # d'exécuter le moindre test.
+        ruby-version: .ruby-version
         bundler-cache: true
 
     - name: 🗄️ Configuration de la base de données

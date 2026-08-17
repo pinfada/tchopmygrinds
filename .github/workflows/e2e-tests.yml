@@ -67,7 +67,8 @@ jobs:
     - name: 💎 Configuration Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.2.3'
+        # Lue depuis .ruby-version — voir regression-tests.yml.
+        ruby-version: .ruby-version
         bundler-cache: true
 
     - name: 🔧 Installation des dépendances JavaScript

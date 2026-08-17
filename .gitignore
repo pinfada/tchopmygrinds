@@ -7,11 +7,24 @@
 # Ignore bundler config
 /.bundle
 
+# Gems installés localement. Le dépôt a longtemps versionné un bundle Ruby 2.5
+# (~133 Mo, 9880 fichiers) devenu mort avec le passage à Ruby 3.3 : il ne
+# servait plus à rien, gonflait chaque `COPY . .` et chaque image construite.
+/vendor/bundle
+
+# Core dumps déposés par un crash — jamais du code, parfois de la mémoire
+# de processus.
+/core.*
+
 # Ignore the default SQLite database (and the WAL/SHM sidecar files Rails 7.1 emits).
 /db/*.sqlite3
 /db/*.sqlite3-shm
 /db/*.sqlite3-wal
 /db/*.sqlite3-journal
+
+# Base sqlite de la sandbox railsbox — DATABASE_URL=sqlite3:storage/production.sqlite3.
+# Construite dans l'image, jamais dans le dépôt.
+/storage/*.sqlite3*
 
 # Ignore all logfiles and tempfiles.
 /log/*.log

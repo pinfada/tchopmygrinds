@@ -1,0 +1,87 @@
+# Contexte de construction Docker.
+#
+# Deux étages font `COPY . .` sur ce dépôt : l'image applicative i386 de
+# railsbox et son étage amd64 de précompilation d'assets. Tout ce qui entre ici
+# voyage donc jusque dans l'image disque publiée — publique et téléchargeable.
+# Deux enjeux : la taille (railsbox annonce 150–350 Mo par sandbox, GitHub Pages
+# refuse un fichier au-delà de 95 Mo) et le secret (voir SECURITY.md).
+#
+# Ce qui doit RESTER : app/ config/ db/ lib/ bin/ public/ (dont public/dist,
+# le bundle React embarqué), frontend/, vendor/assets/, Gemfile*, package*.json,
+# les fichiers de configuration Vite/Tailwind/TS, Rakefile, config.ru,
+# .ruby-version et railsbox.yml.
+
+# --- Secrets : ne doivent JAMAIS entrer dans une image publique --------------
+.env
+.env.*
+config/master.key
+config/credentials/*.key
+config/application.yml
+sendgrid.env
+
+# --- Historique et métadonnées Git (~91 Mo, dont les objets du bundle mort) --
+.git
+.gitignore
+.gitattributes
+.github
+
+# --- Dépendances réinstallées par la construction elle-même -----------------
+# railsbox lance `bundle install` et `npm ci` : les copier reviendrait à
+# transporter des arbres de la machine de développement (Windows/x64) inutiles
+# et incompatibles avec le guest i386.
+vendor/bundle
+node_modules
+frontend/node_modules
+.bundle
+
+# --- Sortie de build régénérée pendant la construction ----------------------
+# public/assets versionné = 161 fichiers Sprockets digestés (64 Mo), dont
+# plusieurs digests du même fichier. L'étage amd64 les reconstruit et les
+# réinjecte JUSTE APRÈS ce `COPY . .` :
+#   COPY --from=railsbox-assets public/assets ./public/assets
+# et la construction s'interrompt explicitement si cet étage n'a produit aucun
+# asset. Les exclure ici ne retire donc rien de l'image — cela évite d'y
+# empiler 64 Mo d'assets périmés, et rend ce garde-fou réellement significatif.
+#
+# public/dist (le bundle React) N'EST PAS concerné : railsbox ne l'exporte pas,
+# c'est la version versionnée qui est embarquée. Il doit rester.
+public/assets
+
+# --- État local, jamais reproductible ni utile en image ---------------------
+log
+tmp
+db/*.sqlite3
+db/*.sqlite3-shm
+db/*.sqlite3-wal
+db/*.sqlite3-journal
+core.*
+*.log
+
+# --- Tests et outillage de développement ------------------------------------
+# Les gems des groupes :development et :test sont exclues du bundle de
+# production (BUNDLE_WITHOUT), ces répertoires ne sont donc pas exécutables
+# dans l'image de toute façon.
+spec
+test
+tests
+coverage
+.rspec
+.baygon
+baygon.yaml
+test_*.js
+test_*.html
+simple_seeds.rb
+backup_database.sh
+
+# --- Documentation et configuration d'outils --------------------------------
+docs
+doc
+.claude
+CLAUDE.md
+CLAUDE-UPDATED.md
+README.md
+README.markdown
+RATING_SYSTEM_SUMMARY.md
+TESTS_E2E_GUIDE.md
+.eslintrc*
+.prettier*

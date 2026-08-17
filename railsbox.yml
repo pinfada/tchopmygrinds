@@ -9,9 +9,15 @@
 # série 3.3 (~> 3.3.10) pour que bundle install ne refuse pas ce patch.
 ruby: 3.3.12
 
-# config/database.yml pointe déjà sur PostgreSQL en production, et la gem
-# sqlite3 est confinée au groupe :development (exclu du bundle de production).
-database: postgresql
+# sqlite3 plutôt que PostgreSQL : l'instantané mémoire publié doit tenir sous
+# la limite de 95 Mo par fichier de GitHub Pages, et railsbox ne le découpe pas
+# (il ne découpe que le disque applicatif et le rootfs). Un cluster PostgreSQL
+# résident dans la VM pèse sur cette image mémoire, et son datadir sur le
+# disque. railsbox pose DATABASE_URL=sqlite3:storage/production.sqlite3, qui
+# prime sur le bloc `production:` de config/database.yml.
+#
+# Render reste sur PostgreSQL : c'est sa propre DATABASE_URL qui décide.
+database: sqlite3
 
 seed:
   # Joué À LA CONSTRUCTION, avant la capture d'instantané : le visiteur trouve
@@ -27,6 +33,9 @@ env:
   # La sandbox sert l'application en HTTP derrière le pont série :
   # config.force_ssl redirigerait en boucle et rendrait les cookies inopérants.
   RAILS_FORCE_SSL: "false"
+  # Aucun réseau sortant : ActionMailer tomberait sur localhost:25 à chaque
+  # inscription et à chaque changement de statut de commande.
+  RAILS_DISABLE_MAILER: "true"
   # Origine de la coquille railsbox. Le SPA et l'API y sont servis sur la même
   # origine, donc CORS ne joue pas ; on évite seulement que le défaut de
   # config/initializers/cors.rb retombe sur l'URL Render.

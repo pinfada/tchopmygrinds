@@ -24,6 +24,11 @@ gem 'turbo-rails'
 gem 'stimulus-rails'
 gem 'jbuilder', '~> 2.7'
 gem 'pg', '~> 1.5'
+# Hors du groupe :development depuis la bascule de la démonstration railsbox
+# sur sqlite3 : le disque applicatif est construit en RAILS_ENV=production avec
+# BUNDLE_WITHOUT="development:test", l'adaptateur doit donc être dans le bundle
+# de production. Render continue d'utiliser PostgreSQL via DATABASE_URL.
+gem 'sqlite3', '~> 1.4'
 group :development, :test do
   gem 'byebug', platform: :mri
 end
@@ -86,7 +91,6 @@ group :development do
   gem 'better_errors'
   gem 'rails_layout'
   gem "letter_opener"
-  gem 'sqlite3', '~> 1.4'
 end
 
 #group :production do

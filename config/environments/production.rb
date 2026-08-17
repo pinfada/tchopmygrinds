@@ -85,6 +85,17 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  # Cibles SANS réseau sortant (démonstration railsbox). Sans cela ActionMailer
+  # retombe sur son SMTP par défaut, localhost:25, qui n'écoute nulle part :
+  # chaque email produit un Errno::ECONNREFUSED et quarante lignes de trace —
+  # sept fois rien qu'au seed — et, chez le visiteur, une inscription qui
+  # attend un timeout réseau. En :test le message est rangé dans
+  # ActionMailer::Base.deliveries sans qu'aucune socket ne soit ouverte.
+  if ENV["RAILS_DISABLE_MAILER"] == "true"
+    config.action_mailer.delivery_method = :test
+    config.action_mailer.perform_deliveries = false
+  end
+
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
