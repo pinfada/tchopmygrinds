@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- CSP de la page hôte. 'wasm-unsafe-eval' : requis par v86
+         wss://disks.webvm.io : image Debian publique du mode démo.
+         blob:/workers : v86 instancie ses workers internes ainsi. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self' 'wasm-unsafe-eval';
+               style-src 'self' 'unsafe-inline';
+               connect-src 'self';
+               worker-src 'self' blob:;
+               img-src 'self' data:;
+               frame-src 'self';
+               object-src 'none';
+               base-uri 'self';
+               form-action 'self'"
+    />
+    <title>railsbox 2.1 — VM x86 + pont Service Worker</title>
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: #11161d;
+        --border: #223041;
+        --text: #d8e1ea;
+        --muted: #8b98a5;
+        --accent: #7ee787;
+        --error: #ff6b6b;
+        --pending: #d4a72c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+        background: var(--bg);
+        color: var(--text);
+        display: grid;
+        grid-template-rows: auto 1fr;
+        height: 100vh;
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        gap: 1.5rem;
+        padding: 0.9rem 1.4rem;
+        border-bottom: 1px solid var(--border);
+        background: var(--panel);
+      }
+      header h1 {
+        font-size: 1rem;
+        margin: 0;
+        letter-spacing: 0.04em;
+      }
+      header h1 span {
+        color: var(--accent);
+      }
+      .badges {
+        display: flex;
+        gap: 0.6rem;
+        margin-left: auto;
+      }
+      .badge {
+        font-size: 0.72rem;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--muted);
+      }
+      .badge.pending::before {
+        content: "◌ ";
+        color: var(--pending);
+      }
+      .badge.ok {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .badge.ok::before {
+        content: "● ";
+      }
+      .badge.error {
+        border-color: var(--error);
+        color: var(--error);
+      }
+      .badge.error::before {
+        content: "✕ ";
+      }
+      main {
+        display: grid;
+        grid-template-columns: minmax(320px, 34%) 1fr;
+        min-height: 0;
+      }
+      #boot-log {
+        margin: 0;
+        padding: 1rem 1.2rem;
+        overflow-y: auto;
+        font-size: 0.78rem;
+        line-height: 1.55;
+        color: var(--muted);
+        border-right: 1px solid var(--border);
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+      #app-frame {
+        border: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--panel);
+      }
+      /* Diagnostic affiché À LA PLACE de l'application : un visiteur dont le
+         navigateur ne convient pas doit le lire sans fouiller le journal. */
+      #diagnostic {
+        padding: 2rem 2.4rem;
+        overflow-y: auto;
+        background: var(--panel);
+      }
+      #diagnostic[hidden] {
+        display: none;
+      }
+      #diagnostic h2 {
+        margin: 0 0 1rem;
+        font-size: 1.05rem;
+        color: var(--error);
+      }
+      #diagnostic p {
+        margin: 0;
+        max-width: 62ch;
+        font-size: 0.85rem;
+        line-height: 1.7;
+        color: var(--text);
+        white-space: pre-wrap;
+      }
+      /* Ton « info » : un onglet secondaire n'a rien cassé, le rouge de panne
+         y serait un mensonge. */
+      #diagnostic.info h2 {
+        color: var(--accent);
+      }
+      #diagnostic button {
+        margin-top: 1.4rem;
+        padding: 0.55rem 1.1rem;
+        font: inherit;
+        font-size: 0.8rem;
+        color: var(--bg);
+        background: var(--accent);
+        border: 1px solid var(--accent);
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      #diagnostic button:hover:not(:disabled) {
+        filter: brightness(1.12);
+      }
+      #diagnostic button:focus-visible {
+        outline: 2px solid var(--text);
+        outline-offset: 2px;
+      }
+      #diagnostic button:disabled {
+        cursor: progress;
+        opacity: 0.6;
+      }
+      /* État du démarrage : quelle étape, depuis combien de temps. Mesuré sous
+         bridage processeur réel (`npm run test:bridage`) — de 25 s sans bridage
+         à 54 s sur un processeur bridé 8×, pendant lesquelles la coquille
+         n'offrait qu'un journal gris qui défile, puis un cadre vide sous une
+         rangée de badges déjà tous verts. Barre FIXE et non élément de grille :
+         elle apparaît et disparaît sans jamais déplacer la mise en page de
+         l'application. */
+      #etat-demarrage {
+        position: fixed;
+        inset: auto 0 0 0;
+        margin: 0;
+        padding: 0.55rem 1.2rem;
+        font-size: 0.75rem;
+        line-height: 1.5;
+        color: var(--text);
+        background: var(--panel);
+        border-top: 2px solid var(--pending);
+        box-shadow: 0 -6px 18px rgb(0 0 0 / 45%);
+      }
+      #etat-demarrage[hidden] {
+        display: none;
+      }
+      #etat-demarrage::before {
+        content: "◌ ";
+        color: var(--pending);
+      }
+      /* Attente au-delà de ce qui a été mesuré : le ton change, la couleur
+         aussi — sans passer au rouge, qui annoncerait un échec qui n'a pas
+         eu lieu. */
+      #etat-demarrage.tres-lente {
+        border-top-color: var(--error);
+      }
+      @media (max-width: 900px) {
+        main {
+          grid-template-columns: 1fr;
+          grid-template-rows: 40% 60%;
+        }
+        #boot-log {
+          border-right: 0;
+          border-bottom: 1px solid var(--border);
+        }
+      }
+      /* Téléphones. Deux défauts mesurés en émulation mobile sur la sandbox
+         publiée : l'en-tête en ligne imposait une largeur minimale de 468 px,
+         si bien que tout écran plus étroit dézoomait la page entière (texte à
+         ~10 px réels) ; et le journal de boot mangeait 40 % d'un écran où le
+         visiteur vient voir l'APPLICATION. `dvh` plutôt que `vh` : la barre
+         d'URL mobile rogne autrement le bas de la page. */
+      @media (max-width: 640px) {
+        body {
+          height: 100dvh;
+        }
+        header {
+          flex-wrap: wrap;
+          gap: 0.5rem 0.9rem;
+          padding: 0.6rem 0.9rem;
+        }
+        header h1 {
+          font-size: 0.95rem;
+        }
+        .badges {
+          gap: 0.4rem;
+          margin-left: 0;
+          width: 100%;
+        }
+        .badge {
+          font-size: 0.66rem;
+          padding: 0.2rem 0.45rem;
+        }
+        main {
+          grid-template-rows: minmax(0, 22%) minmax(0, 78%);
+        }
+        #boot-log {
+          font-size: 0.7rem;
+          padding: 0.6rem 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>railsbox <span>2.1</span> · VM Linux x86 dans le navigateur</h1>
+      <div class="badges">
+        <span id="env-slot"></span>
+        <span class="badge pending" id="badge-sw">Service Worker</span>
+        <span class="badge pending" id="badge-coi">Isolation COI</span>
+        <span class="badge pending" id="badge-vm">VM v86</span>
+        <span class="badge pending" id="badge-http">Serveur HTTP</span>
+      </div>
+    </header>
+    <main>
+      <pre id="boot-log"></pre>
+      <!-- sandbox : l'application émulée ne doit pas pouvoir naviguer la page
+           hôte ni ouvrir de contexte hors contrôle. allow-same-origin est
+           nécessaire (cookies de session + interception Service Worker). -->
+      <iframe
+        id="app-frame"
+        title="Application Rails"
+        src="about:blank"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-downloads"
+      ></iframe>
+      <!-- Rempli par main.js quand la sandbox ne peut pas démarrer ; remplace
+           alors l'iframe, qui resterait vide et muette. -->
+      <section id="diagnostic" role="alert" aria-live="polite" hidden></section>
+    </main>
+    <!-- Étape de démarrage en cours et secondes écoulées. Rempli par main.js
+         via public/shared/progression-demarrage.js, retiré dès que la première
+         page de l'application est RENDUE — pas dès qu'elle est demandée. -->
+    <p id="etat-demarrage" role="status" aria-live="polite" hidden></p>
+    <link rel="stylesheet" href="env-drawer.css" />
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

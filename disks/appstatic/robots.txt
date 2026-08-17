@@ -1,0 +1,26 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Block private / transactional routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /auth
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /orders/
+Disallow: /profile
+Disallow: /dashboard
+Disallow: /messages
+Disallow: /interests
+Disallow: /.well-known/
+
+# Legacy test pages — not part of the React app
+Disallow: /test-angular.html
+Disallow: /test-improvements.html
+Disallow: /test-module.html
+Disallow: /test-searchbox.html
+
+# Sitemap
+Sitemap: https://tchopmygrinds.com/sitemap.xml

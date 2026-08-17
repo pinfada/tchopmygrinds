@@ -1,0 +1,18 @@
+{
+  "name": "tchopmygrinds",
+  "baseName": "base-3.3-r2",
+  "kernel": "https://pinfada.github.io/railsbox-assets/base-3.3-r2/base-3.3-r2-vmlinuz",
+  "initrd": "https://pinfada.github.io/railsbox-assets/base-3.3-r2/base-3.3-r2-initrd",
+  "disk": "https://pinfada.github.io/railsbox-assets/base-3.3-r2/base-3.3-r2.ext2.zst",
+  "diskSize": 1790967808,
+  "appDisk": "disks/tchopmygrinds-app.ext2.zst",
+  "appDiskSize": 536870912,
+  "cmdline": "root=/dev/sda rw console=ttyS0 init=/opt/rib/guest-init.sh net.ifnames=0 quiet loglevel=4",
+  "memoryMb": 1024,
+  "mountPath": "/tchopmygrinds/app",
+  "database": "sqlite3",
+  "builtAt": "2026-08-17T23:28:37Z",
+  "diskChunkSize": 4194304,
+  "appDiskChunkSize": 4194304,
+  "state": "disks/tchopmygrinds-split-state.bin.gz"
+}
