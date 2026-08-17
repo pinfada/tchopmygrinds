@@ -1,0 +1,11 @@
+name: Sandbox railsbox
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  sandbox:
+    uses: pinfada/railsbox/.github/workflows/construire-sandbox.yml@main
+    permissions:
+      contents: write

@@ -56,6 +56,17 @@ class PagesController < ApplicationController
 
   private
 
+  # Préfixe public sous lequel l'application est montée, sans barre finale
+  # (chaîne vide dans le cas normal). Non vide quand un hôte sert Rails sous un
+  # sous-chemin via RAILS_RELATIVE_URL_ROOT — c'est le cas de la démonstration
+  # railsbox, publiée sur « /<depot>/app/ ». Le SPA doit alors préfixer ses
+  # URL d'assets, ses appels d'API et le basename de son routeur, faute de quoi
+  # ils sortent du périmètre servi.
+  def spa_url_root
+    Rails.application.config.relative_url_root.to_s.chomp('/')
+  end
+  helper_method :spa_url_root
+
   def react_vite_assets
     index_path = Rails.root.join('public', 'dist', 'index.html')
     unless File.exist?(index_path)
@@ -63,13 +74,14 @@ class PagesController < ApplicationController
     end
 
     index_html = File.read(index_path, mode: 'r:UTF-8')
+    root = spa_url_root
 
     {
       stylesheets: index_html.scan(%r{<link[^>]+href=["'](?:/dist)?/assets/([^"']+\.css)["'][^>]*>}).flatten.map do |asset_name|
-        "/dist/assets/#{asset_name}"
+        "#{root}/dist/assets/#{asset_name}"
       end,
       scripts: index_html.scan(%r{<script[^>]+src=["'](?:/dist)?/assets/([^"']+\.js)["'][^>]*>}).flatten.map do |asset_name|
-        "/dist/assets/#{asset_name}"
+        "#{root}/dist/assets/#{asset_name}"
       end
     }
   end

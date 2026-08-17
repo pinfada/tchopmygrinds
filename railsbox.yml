@@ -1,0 +1,38 @@
+# Configuration de la démonstration railsbox (https://github.com/pinfada/railsbox).
+# Ne renseigne que ce que l'auto-détection ne peut pas deviner.
+#
+# ATTENTION : tout ce qui entre dans une sandbox est PUBLIC (image disque et
+# instantané mémoire téléchargeables, visiteur root dans sa VM). Aucun secret
+# réel, aucune donnée client ne doit apparaître ici ni dans les seeds.
+
+# La base railsbox 3.3-r2 embarque Ruby 3.3.12 ; le Gemfile accepte toute la
+# série 3.3 (~> 3.3.10) pour que bundle install ne refuse pas ce patch.
+ruby: 3.3.12
+
+# config/database.yml pointe déjà sur PostgreSQL en production, et la gem
+# sqlite3 est confinée au groupe :development (exclu du bundle de production).
+database: postgresql
+
+seed:
+  # Joué À LA CONSTRUCTION, avant la capture d'instantané : le visiteur trouve
+  # une base déjà peuplée. seeds_api.rb fixe les coordonnées en dur, donc aucun
+  # appel de géocodage n'est nécessaire.
+  command: "bin/rails runner db/seeds_api.rb"
+  # Le visiteur arrive connecté en tant qu'acheteur (cf. db/seeds_api.rb).
+  auto_login: "client1@test.com"
+
+env:
+  # La sandbox sert l'application en HTTP derrière le pont série :
+  # config.force_ssl redirigerait en boucle et rendrait les cookies inopérants.
+  RAILS_FORCE_SSL: "false"
+  # Origine de la coquille railsbox. Le SPA et l'API y sont servis sur la même
+  # origine, donc CORS ne joue pas ; on évite seulement que le défaut de
+  # config/initializers/cors.rb retombe sur l'URL Render.
+  FRONTEND_URL: "https://pinfada.github.io"
+
+assets:
+  # Seul Tailwind est rejoué ici : il écrit dans app/assets/builds/, l'un des
+  # deux répertoires que l'étage amd64 exporte vers le disque i386. Le bundle
+  # React (public/dist/) n'est pas exporté par railsbox — il est versionné dans
+  # le dépôt et embarqué tel quel (voir README, section « Démo en ligne »).
+  scripts: ["build:css"]

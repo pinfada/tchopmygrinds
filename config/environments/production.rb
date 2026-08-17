@@ -53,7 +53,11 @@ Rails.application.configure do
   # config.assume_ssl = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  # Désactivable par RAILS_FORCE_SSL=false pour les cibles qui servent l'application
+  # en HTTP sans terminaison TLS devant (démonstration railsbox : le pont série
+  # ne parle que http://localhost, une redirection 301 y boucle et les cookies
+  # « secure » n'y sont jamais renvoyés). Le défaut reste true.
+  config.force_ssl = ENV.fetch("RAILS_FORCE_SSL", "true") == "true"
 
   # Log to STDOUT by default
   config.logger = ActiveSupport::Logger.new(STDOUT)

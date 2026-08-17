@@ -1,10 +1,69 @@
 # TchopMyGrinds
 
+[![Try with railsbox](https://pinfada.github.io/tchopmygrinds/badge.svg)](https://pinfada.github.io/tchopmygrinds/)
+
 Une plateforme e-commerce géolocalisée connectant les marchands locaux avec leurs clients dans un rayon de 50km.
+
+**Essayer sans rien installer → [pinfada.github.io/tchopmygrinds](https://pinfada.github.io/tchopmygrinds/)**
 
 ## 🎯 Vue d'ensemble
 
 TchopMyGrinds est une application web qui permet aux utilisateurs de découvrir et d'acheter des produits auprès de commerçants locaux basés sur leur géolocalisation. La plateforme propose une expérience de commerce de proximité avec cartographie interactive et gestion complète des commandes.
+
+## 🎮 Démo en ligne
+
+La démonstration est une sandbox [railsbox](https://github.com/pinfada/railsbox) : Rails, Puma et
+PostgreSQL tournent dans une VM Linux i386 émulée **dans l'onglet du visiteur**. Aucun serveur,
+aucune inscription, aucun coût — chaque visiteur apporte le sien. Comptez 20 à 30 secondes de
+démarrage, puis `F5` pour repartir d'une copie neuve.
+
+### Comptes de démonstration
+
+La base est pré-peuplée par `db/seeds_api.rb`. Tous les comptes partagent le mot de passe
+`password123` :
+
+| Rôle | Identifiant |
+| --- | --- |
+| Acheteur | `client1@test.com` |
+| Commerçant itinérant | `marie.plantain@test.com` |
+| Commerçant sédentaire | `grace.epicerie@test.com` |
+| Administrateur | `admin@tchopmygrinds.com` |
+
+`railsbox.yml` ouvre une **session Rails** pour `client1@test.com` dès le premier chargement, ce
+qui profite aux surfaces rendues côté serveur (RailsAdmin notamment). L'authentification du SPA
+React repose en revanche sur un **JWT stocké côté navigateur** : l'interface React démarre donc
+déconnectée et attend un passage explicite par l'écran de connexion.
+
+Ces identifiants sont **publics par conception** : tout ce qui entre dans une sandbox est
+téléchargeable (image disque et instantané mémoire). N'y embarquez jamais de secret ni de donnée
+réelle — voir [SECURITY.md](SECURITY.md).
+
+### Ce qui ne fonctionne pas dans la sandbox
+
+La VM n'a **aucun réseau sortant**. Concrètement :
+
+- les **tuiles OpenStreetMap ne se chargent pas** — la carte Leaflet reste vide, seuls les
+  marqueurs et les distances calculées côté serveur sont exploitables ;
+- les emails (SendGrid) et le géocodage d'adresses nouvellement saisies sont inopérants ;
+- ActionCable / WebSockets sont hors périmètre de railsbox.
+
+Le reste du parcours — découverte des commerces, catalogue, panier, commandes, manifestations
+d'intérêt — est servi normalement par la VM.
+
+### Publier ou republier la démo
+
+Le workflow [`.github/workflows/sandbox.yml`](.github/workflows/sandbox.yml) reconstruit la sandbox
+à chaque push sur `master` (~9 min) et republie la branche `gh-pages`, servie par GitHub Pages.
+Sa configuration vit dans [`railsbox.yml`](railsbox.yml).
+
+> **Le bundle React versionné fait foi.** railsbox n'exporte que `public/assets/` et
+> `app/assets/builds/` depuis son étage de compilation : la sortie Vite (`public/dist/`) n'y passe
+> pas et c'est la version **commitée** qui est embarquée dans l'image. Lancez `npm run build:react`
+> et commitez `public/dist/` avant de pousser, sinon la démo affiche une interface périmée.
+
+**Première mise en service** : pousser sur `master` une première fois pour que le workflow crée la
+branche `gh-pages`, puis activer *Settings → Pages → Source : Deploy from a branch → `gh-pages` /
+`(root)`*. La branche `gh-pages` est **entièrement remplacée** à chaque construction.
 
 ## 🏗️ Architecture technique
 

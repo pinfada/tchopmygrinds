@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAppSelector } from '../../hooks/redux'
 import { toast } from 'react-hot-toast'
+import { getMountPrefix } from '../../lib/railsData'
 
 interface Rating {
   id: number
@@ -71,7 +72,7 @@ const RatingModerationPanel = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/v1/admin/ratings/stats', {
+      const response = await fetch(`${getMountPrefix()}/api/v1/admin/ratings/stats`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'

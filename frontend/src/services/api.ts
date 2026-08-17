@@ -1,9 +1,12 @@
 import axios from 'axios'
 import { User, Commerce, Product, Order, ApiResponse, PaginatedResponse, Coordinates } from '../types'
 import { secureStorage } from './secureStorage'
+import { getMountPrefix } from '../lib/railsData'
 
-// Configuration axios
-const API_BASE_URL = import.meta.env.VITE_RAILS_API_URL || ''
+// Configuration axios. À défaut d'URL explicite, on repart du préfixe de
+// montage annoncé par Rails : vide à la racine (comportement inchangé), égal à
+// `/<depot>/app` quand l'application est servie sous un sous-chemin.
+const API_BASE_URL = import.meta.env.VITE_RAILS_API_URL || getMountPrefix()
 
 const api = axios.create({
   baseURL: API_BASE_URL ? `${API_BASE_URL}/api/v1` : '/api/v1',

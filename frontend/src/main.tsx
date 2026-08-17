@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css'
 import './index.css'
 import { currenciesAPI } from './services/api'
 import { setCurrencyRegistry } from './lib/currencyRegistry'
+import { getRouterBasename } from './lib/railsData'
 
 // Refresh the currency registry from the API as soon as the app boots.
 // Fire-and-forget: the registry already has localStorage-cached or baked-in
@@ -26,7 +27,7 @@ currenciesAPI
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter basename={getRouterBasename()}>
         <App />
       </BrowserRouter>
     </Provider>

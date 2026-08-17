@@ -1,6 +1,9 @@
 source 'https://rubygems.org'
 
-ruby "3.3.10"
+# Toute la série 3.3 à partir de 3.3.10 : la version exacte utilisée en local
+# et sur Render reste fixée par .ruby-version, mais l'image de base railsbox
+# fournit un autre patch (3.3.12) et bundler refuserait une égalité stricte.
+ruby "~> 3.3.10"
 gem 'rails', '~> 7.1.0'
 gem 'puma', '~> 6.4'
 

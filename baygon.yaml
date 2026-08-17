@@ -1,0 +1,139 @@
+# baygon.yaml — tchopmygrinds, en lecture seule.
+#
+# Ce fichier suffit à rendre le projet visible par Baygon : la découverte
+# se fait par sa présence, jamais par git ni par GitHub.
+#
+#     baygon --projects ~/Projets projects
+#     baygon -f ~/Projets/tchopmygrinds/baygon.yaml run "montre l'historique"
+#
+# Volontairement limité à ce qui existe et se vérifie depuis cette
+# machine. Aucun fournisseur de déploiement, de base de données ni
+# d'accès distant, et toutes les permissions refusées : Baygon ne peut
+# rien modifier ici. Une capacité absente ne casse rien, elle est
+# simplement indisponible (ENF-006).
+
+version: 1
+
+project:
+  name: tchopmygrinds
+  description: Application Rails — commerce de proximité géolocalisé
+  repository: https://github.com/pinfada/tchopmygrinds
+  language: ruby
+  framework: rails
+
+providers:
+  # Lecture de l'historique depuis la copie locale : aucun jeton, aucun
+  # appel réseau, fonctionne hors ligne. Implémentation par défaut de la
+  # capacité `repository`.
+  git:
+    type: repository
+    plugin: baygon_plugins.local_git:LocalGitRepository
+    default: true
+    options:
+      path: .
+
+  # La même capacité, servie par l'API GitHub : deux implémentations, un
+  # seul contrat, le choix se fait ici et jamais dans le code
+  # (chapitre 8). Le jeton est lu dans l'environnement, jamais dans ce
+  # fichier (EF-011). Sans GITHUB_TOKEN cette implémentation est
+  # indisponible et `git` continue de répondre — la panne est isolée.
+  github:
+    type: repository
+    plugin: baygon_plugins.github_api:GitHubRepository
+    options:
+      repository: pinfada/tchopmygrinds
+      token_env: GITHUB_TOKEN
+
+  # Journaux réellement présents sur cette machine. `staging` et
+  # `production` tournent ailleurs (render.yaml déclare un service web
+  # et une base Postgres) : ils ne sont pas déclarés, donc la capacité
+  # renvoie une liste vide pour ces environnements plutôt que d'inventer
+  # des lignes. Pour les consulter vraiment il faudra brancher un
+  # adaptateur sur l'agrégateur qui les reçoit.
+  logs:
+    type: logs
+    plugin: baygon_plugins.file_logs:FileLogs
+    default: true
+    options:
+      files:
+        development: log/development.log
+      max_lines: 100
+
+  # Le shell local exécute les commandes déclarées plus bas. Rien de
+  # distant : ce que vous lanceriez à la main, lancé par son nom.
+  atelier:
+    type: workspace
+    plugin: baygon_plugins.local_shell:LocalShellWorkspace
+    default: true
+    options:
+      cwd: .
+      timeout_seconds: 900
+
+  # Agent codeur : `claude` et `codex` sont installés sur cette machine.
+  # Baygon ne modifie jamais le code lui-même et ne favorise aucun agent
+  # (ENF-019) — changez la commande pour en utiliser un autre.
+  dev:
+    type: developer
+    plugin: baygon_plugins.coding_agent:CodingAgent
+    options:
+      command: ["claude", "-p", "{prompt}"]
+      cwd: .
+      timeout_seconds: 1800
+
+  # Pas de capacité `service` : ce dépôt n'a pas de docker-compose.
+  # Pas de `metrics` : aucun Prometheus local vérifiable ici.
+
+environments:
+  # Les trois environnements sont exigés par le schéma. Aucune URL n'est
+  # renseignée : render.yaml nomme le service web mais pas son domaine
+  # public, et une valeur inventée serait pire qu'une valeur absente.
+  development: {}
+  staging: {}
+  production: {}
+
+# Commandes réellement déclarées par le projet (package.json). Baygon ne
+# les code pas : il les reconnaît par leur nom dans une intention.
+commands:
+  test: "npm run test:full"
+  test:ci: "npm run test:ci"
+  test:regression: "npm run test:regression"
+  lint: "npm run lint"
+  type-check: "npm run type-check"
+  build: "npm run build"
+
+
+# Modèle servi par l'Ollama de cette machine. Compatible avec la lecture
+# seule : un modèle produit du texte, il ne modifie rien. Tout reste en
+# local — rien n'est envoyé à un service tiers.
+#
+# Il sert à comprendre les formulations qu'aucune règle ne reconnaît et
+# à analyser le contexte d'un diagnostic. Sans lui, Baygon dégrade
+# proprement : l'IA n'est jamais une dépendance (EF-014).
+ai:
+  default: local
+  providers:
+    local:
+      type: ai
+      plugin: baygon_plugins.openai_compat_ai:OpenAICompatibleAI
+      options:
+        base_url: http://127.0.0.1:11434/v1
+        model: deepseek-r1:8b
+        connect_timeout_seconds: 5
+        # Fenêtre de 4096 tokens servie par Ollama : le contexte envoyé
+        # est borné et la réponse plafonnée pour tenir dedans.
+        max_context_chars: 4000
+        max_tokens: 2500
+
+# Rien qui sorte de la machine ni ne touche un environnement distant.
+permissions:
+  deploy: false
+  production: false
+  restart: false
+  publish: false
+  database: false
+  ssh: false
+
+metadata:
+  owner: pinfada
+  mode: lecture-seule
+  tags: [rails, lecture-seule]
